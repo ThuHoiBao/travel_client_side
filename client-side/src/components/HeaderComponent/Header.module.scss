@@ -1,0 +1,242 @@
+/* src/components/HeaderComponent/Header.module.scss */
+
+$primary-color: #007bff; // Màu xanh dương
+$accent-color: #ff5722; // Màu cam Tours
+$dark-blue: #0d3257; // Màu xanh đậm
+$profile-bg: #e0ac65; // Màu nền modal header
+$coin-color: #ffc107; // Màu vàng coin
+
+.header {
+    /* Vị trí cố định (Sticky) */
+    position: fixed; 
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100; /* Đảm bảo Header luôn ở trên cùng */
+    
+    /* Màu nền trong suốt mặc định */
+    background-color: transparent; 
+    
+    /* Hiệu ứng chuyển đổi mượt mà */
+    transition: background-color 0.3s ease-in-out;
+    
+    padding: 10px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    height: 50px; 
+    font-size: 0.9rem;
+}
+
+/* Trạng thái khi cuộn (Scrolled State) */
+.headerScrolled {
+    background-color: $dark-blue; /* Màu xanh đậm khi cuộn */
+}
+
+.headerLeft {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-right: 25px;
+    color: white;
+    cursor: pointer;
+}
+
+.navLink {
+    color: white;
+    text-decoration: none;
+    margin: 0 10px;
+    padding: 5px 0;
+    transition: color 0.3s;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    
+    svg {
+        margin-right: 4px;
+    }
+}
+
+.navLinkActive {
+    composes: navLink;
+    border-bottom: 3px solid $accent-color; 
+    font-weight: bold;
+    color: white;
+}
+
+.headerRight {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+/* Container chung cho Auth và Profile */
+.authContainer, .profileContainer {
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 30; 
+}
+
+/* Phần hiển thị SĐT */
+.phone {
+    font-weight: bold;
+    margin-right: 20px; 
+    display: flex;
+    align-items: center;
+    
+    svg {
+        margin-right: 5px;
+        font-size: 1.1rem;
+    }
+}
+
+/* --- TRẠNG THÁI ĐÃ ĐĂNG NHẬP (PROFILE) --- */
+.user {
+    background-color: rgba(255, 255, 255, 0.1); 
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+}
+.coinIndicator {
+    color: $coin-color;
+    margin-left: 10px;
+    font-size: 1.1rem;
+}
+.userActive {
+    border-color: $coin-color;
+    box-shadow: 0 0 0 2px rgba($coin-color, 0.5);
+}
+
+/* --- TRẠNG THÁI CHƯA ĐĂNG NHẬP (BUTTONS) --- */
+.authButtons {
+    display: flex;
+    gap: 10px;
+}
+
+.loginButton, .registerButton {
+    border: 1px solid white;
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.loginButton {
+    background: transparent;
+    color: white;
+    &:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+}
+
+.registerButton {
+    background: $primary-color;
+    color: white;
+    border-color: $primary-color;
+    &:hover {
+        background: darken($primary-color, 10%);
+    }
+}
+
+/* --- PROFILE MODAL (DROPDOWN) --- */
+.profileModal {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 300px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: #333;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.modalHeader {
+    background-color: $profile-bg; 
+    color: white;
+    padding: 20px 15px;
+    line-height: 1.5;
+}
+
+.modalUsername {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.modalStatus {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+.memberTier {
+    font-size: 0.8rem;
+    font-weight: normal;
+    display: block;
+    margin-top: 5px;
+}
+
+.coinIcon {
+    color: $coin-color; 
+    margin-right: 5px;
+}
+
+.modalMenu {
+    list-style: none;
+    padding: 10px 0;
+
+    li {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: #f5f5f5;
+        }
+
+        svg {
+            margin-right: 10px;
+            color: #777;
+        }
+    }
+}
+
+.highlightNew {
+    font-weight: bold;
+    color: $accent-color;
+
+    svg {
+        color: $accent-color;
+    }
+}
+
+.newBadge {
+    background-color: $accent-color;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 10px;
+}

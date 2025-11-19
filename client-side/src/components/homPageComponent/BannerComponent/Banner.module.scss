@@ -1,0 +1,250 @@
+/* src/components/homPageComponent/BannerComponent/Banner.module.scss */
+
+$primary-color: #007bff; 
+$accent-color: #ff5722; 
+
+.bannerContainer {
+    /* Đảm bảo đường dẫn đúng theo cấu trúc 3 cấp */
+    background-image: url('../../../assets/images/nuidoi.jpg'); 
+    background-size: cover;
+    background-position: center;
+    height: 650px; 
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 0; 
+    position: relative;
+    width: 100%;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1); /* Lớp phủ mờ hơn */
+}
+
+.content {
+    position: relative;
+    z-index: 10;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 90%;
+    display: grid;
+    grid-template-areas: 
+        "title info"
+        "subtitle info"
+        "search info"
+        "count info";
+    grid-template-columns: 2fr 1fr;
+    gap: 15px;
+    padding-top: 100px; /* Đẩy xuống 100px để chừa chỗ cho Header */
+}
+
+.headline {
+    grid-area: title;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.subHeadline {
+    grid-area: subtitle;
+    font-size: 1rem;
+    font-weight: 400;
+    margin-top: 0px;
+    margin-bottom: 30px;
+}
+
+/* Hộp đếm khách đã đặt */
+.bookingCount {
+    position: absolute;
+    /* Căn chỉnh chính xác bên phải headline */
+    top: 110px; 
+    left: 360px; 
+    background-color: #ff5722;
+    width: fit-content;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    z-index: 10;
+}
+
+/* ------------------------------------------- */
+/* SEARCH BOX STYLES */
+/* ------------------------------------------- */
+.searchBox {
+    grid-area: search;
+    display: flex;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    height: 55px; /* Chiều cao lớn hơn */
+    width: 100%;
+    max-width: 700px; 
+}
+
+.inputGroup {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    flex-grow: 1;
+    border-right: 1px solid #eee; 
+    
+    &:nth-child(2) { /* Ngày khởi hành */
+        flex-grow: 1.2; 
+    }
+    &:nth-child(3) { /* Khởi hành từ */
+        flex-grow: 1.2; 
+    }
+}
+
+.icon {
+    color: #777; /* Màu icon xám nhạt */
+    margin-right: 10px;
+    font-size: 1.1rem;
+}
+
+.inputField, .selectField {
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    width: 100%;
+    color: #333;
+    padding: 0;
+    /* Thêm style cho placeholder */
+    &::placeholder {
+        color: #777; 
+    }
+}
+
+.inputField.placeholderFlexibility {
+    color: #777; 
+}
+
+
+.searchButton {
+    background-color: $accent-color; 
+    color: white;
+    border: none;
+    padding: 0 40px;
+    border-radius: 0 4px 4px 0;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0; 
+}
+
+/* ------------------------------------------- */
+/* SIDE INFO BOX (Thông tin Tour bên phải) */
+/* ------------------------------------------- */
+.sideInfoBox {
+    grid-area: info;
+    background: rgba(255, 255, 255, 0.2); /* Nền trắng trong suốt */
+    padding: 15px;
+    border-radius: 4px;
+    position: absolute; 
+    right: 5%;
+    top: 50px; 
+    width: 300px;
+    z-index: 15;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.sideTitle {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.sideDetails {
+    font-size: 0.9rem;
+    margin: 3px 0;
+    font-weight: 300;
+}
+
+.priceLabel {
+    font-size: 0.8rem;
+    margin-top: 15px;
+    margin-bottom: 0px;
+    color: #ccc;
+}
+
+.priceValue {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #ffc107; 
+    margin-top: 5px;
+    small {
+        font-size: 0.8rem;
+        font-weight: normal;
+        color: white;
+    }
+}
+
+.arrowIcon {
+    position: absolute;
+    top: 50%;
+    right: -25px;
+    transform: translateY(-50%);
+    background: $accent-color;
+    padding: 10px 15px;
+    border-radius: 100%;
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* ------------------------------------------- */
+/* BOTTOM INFO STRIP */
+/* ------------------------------------------- */
+.bottomInfoStrip {
+    position: absolute;
+    bottom: -70px; 
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 1000px;
+    background-color: white;
+    border-radius: 4px; /* Giảm bo tròn */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-around;
+    padding: 20px 0;
+    z-index: 10; 
+}
+
+.infoItem {
+    text-align: center;
+    color: #333;
+    flex: 1;
+    padding: 0 10px;
+    border-right: 1px solid #eee;
+    
+    &:last-child {
+        border-right: none;
+    }
+    
+    img {
+        width: 40px;
+        height: 40px;
+        margin-bottom: 10px;
+    }
+    
+    p {
+        margin: 2px 0;
+        font-size: 0.9rem;
+    }
+    strong {
+        color: $primary-color;
+    }
+}
