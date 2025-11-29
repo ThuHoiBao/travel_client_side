@@ -20,7 +20,7 @@
     "@types/react": "^19.1.11",
     "@types/react-dom": "^19.1.7",
     "antd": "^5.27.4",
-    "axios": "^1.11.0",
+    "axios": "^1.13.2",
     "bootstrap": "^5.3.8",
     "classnames": "^2.5.1",
     "cors": "^2.8.5",
@@ -31,8 +31,10 @@
     "rc-tooltip": "^6.4.0",
     "react": "^19.1.1",
     "react-bootstrap": "^2.10.10",
+    "react-datepicker": "^8.10.0",
     "react-dom": "^19.1.1",
     "react-icons": "^5.5.0",
+    "react-imask": "^7.6.1",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.8.2",
     "react-scripts": "5.0.1",
@@ -70,6 +72,6 @@
   },
   "devDependencies": {
     "@types/react-toastify": "^4.0.2",
-    "sass": "^1.94.1"
+    "sass": "^1.94.2"
   }
 }
