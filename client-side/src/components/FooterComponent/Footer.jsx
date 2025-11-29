@@ -7,7 +7,8 @@ import { GiShipBow } from 'react-icons/gi';
 import { IoIosAirplane } from "react-icons/io";
 import { FaTicketAlt } from "react-icons/fa";
 import { FaRegBuilding } from "react-icons/fa";
-
+import chanel from '../../assets/images/chanel.png'
+import nike from '../../assets/images/nike.png'
 // Data cấu hình cho 4 cột menu
 const menuColumns = [
     {
@@ -86,8 +87,8 @@ const Footer = () => {
                         
                         {/* ⚠️ Thay thế bằng ảnh thật của logo/chứng nhận của bạn */}
                         <div className={styles.certs}>
-                            <img src="/path/to/iata-logo.png" alt="IATA" className={styles.certImage} />
-                            <img src="/path/to/licensed-logo.png" alt="Registered" className={styles.certImage} />
+                            <img src={chanel} alt="chanel" className={styles.certImage} />
+                            <img src={nike} alt="nike" className={styles.certImage} />
                         </div>
 
                         <button className={styles.partnerButton}>

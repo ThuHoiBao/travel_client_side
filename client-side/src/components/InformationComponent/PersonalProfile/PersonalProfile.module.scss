@@ -1,0 +1,218 @@
+.personalProfile {
+    width: 100%;
+}
+
+.pageTitle {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.tabs {
+    display: flex;
+    gap: 30px;
+    border-bottom: 2px solid #e0e0e0;
+    margin-bottom: 30px;
+}
+
+.tab {
+    padding: 12px 0;
+    font-size: 16px;
+    color: #666;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.3s;
+    
+    &:hover {
+        color: #1890ff;
+    }
+    
+    &.tabActive {
+        color: #1890ff;
+        border-bottom-color: #1890ff;
+        font-weight: 500;
+    }
+}
+
+.section {
+    margin-bottom: 40px;
+}
+
+.sectionTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.formGroup {
+    margin-bottom: 20px;
+}
+
+.label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.input,
+.select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+    
+    &:focus {
+        outline: none;
+        border-color: #1890ff;
+    }
+    
+    // Style cho input readOnly (email)
+    &.inputReadOnly {
+        background-color: #f5f5f5;
+        color: #999;
+        cursor: not-allowed;
+        opacity: 0.7;
+        
+        &:focus {
+            border-color: #d9d9d9;
+        }
+    }
+    
+    // Style cho input có lỗi
+    &.inputError {
+        border-color: #ff4d4f;
+        
+        &:focus {
+            border-color: #ff4d4f;
+        }
+    }
+}
+
+.helperText {
+    font-size: 12px;
+    color: #999;
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+.errorText {
+    font-size: 12px;
+    color: #ff4d4f;
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+.dateInputs {
+    display: flex;
+    gap: 10px;
+}
+
+.dateSelect {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    font-size: 14px;
+    
+    &:focus {
+        outline: none;
+        border-color: #1890ff;
+    }
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+
+.buttonPrimary {
+    padding: 10px 24px;
+    background-color: #1890ff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    
+    &:hover {
+        background-color: #40a9ff;
+    }
+}
+
+.buttonSecondary {
+    padding: 10px 24px;
+    background-color: white;
+    color: #666;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    
+    &:hover {
+        border-color: #1890ff;
+        color: #1890ff;
+    }
+}
+
+.buttonAdd {
+    padding: 10px 20px;
+    background-color: white;
+    color: #1890ff;
+    border: 1px solid #1890ff;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+    
+    &:hover {
+        background-color: #1890ff;
+        color: white;
+    }
+}
+
+.buttonPrimary {
+    &:disabled {
+        background-color: #d9d9d9;
+        cursor: not-allowed;
+        
+        &:hover {
+            background-color: #d9d9d9;
+        }
+    }
+}
+
+.successMessage {
+    padding: 12px 16px;
+    background-color: #f6ffed;
+    border: 1px solid #b7eb8f;
+    border-radius: 4px;
+    color: #52c41a;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.errorMessage {
+    padding: 12px 16px;
+    background-color: #fff2f0;
+    border: 1px solid #ffccc7;
+    border-radius: 4px;
+    color: #ff4d4f;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+

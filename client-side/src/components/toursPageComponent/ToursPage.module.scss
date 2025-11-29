@@ -1,0 +1,76 @@
+/* src/components/ToursPageComponent/ToursPage.module.scss (CẬP NHẬT) */
+
+.toursPageLayout {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    /* Đã có margin-top để tránh Header cố định */
+    margin-top: 100px;  
+}
+
+.filterColumn {
+    flex: 0 0 300px;
+    
+    /* ✨ ĐIỀU CHỈNH GIÁ TRỊ TOP ✨ */
+    position: sticky;
+    top: 120px; /* Thử nghiệm với 70px (Chiếu cao Header khoảng 60px + 10px đệm) */
+    align-self: flex-start;
+    height: fit-content;
+}
+
+.resultsColumn {
+    flex: 1; /* Cột kết quả chiếm phần còn lại */
+}
+
+/* KIỂU DÁNG CHO KHỐI THÔNG TIN ĐIỂM ĐẾN */
+.destinationHeader {
+/* ... (Giữ nguyên các styles khác) ... */
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #e6f7ff;
+    border-left: 5px solid #1f6aaf;
+    border-radius: 4px;
+    
+    h2 {
+        margin-top: 0;
+        color: #1f6aaf;
+        font-size: 1.5em;
+    }
+    p {
+        margin-bottom: 0;
+        color: #595959;
+        line-height: 1.5;
+    }
+}
+
+.tourCount {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ddd;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.toursList {
+    display: grid;
+    gap: 20px;
+}
+
+.tourItemMock {
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.errorMessage {
+    color: #f5222d;
+    padding: 10px;
+    background-color: #fff1f0;
+    border: 1px solid #ffa39e;
+    border-radius: 4px;
+}
