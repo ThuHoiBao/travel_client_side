@@ -5,7 +5,8 @@ import HomePage from './components/homPageComponent/HomePage';
 import MainLayout from './components/LayoutComponent/MainLayout'; 
 import ToursPage from './components/toursPageComponent/ToursPage';
 import InformationComponent from './components/InformationComponent/InformationComponent';
-
+import TourBooking from './components/TourBookingComponent/TourBooking';
+import TourDetail from './components/TourDetailComponent/TourDetail';
 // Các trang giả định
 const HotelPage = () => <div>Trang Khách sạn</div>; 
 const FlightsPage = () => <div>Trang Vé máy bay</div>; 
@@ -37,6 +38,19 @@ function App() {
             <Route path="/flights" element={<FlightsPage />} />
             <Route path="/entertainment" element={<EntertainmentPage />} />
             <Route path="/trains" element={<TrainsPage />} />
+
+            <Route 
+              path="/tour-detail" 
+              element={<TourDetail />} 
+          />
+
+          <Route 
+              path="/tour/:tourCode" 
+              element={<TourDetail />} 
+          />
+              <Route 
+                 path="/order-booking" 
+                 element={<TourBooking />} />
 
         </Route>
           
