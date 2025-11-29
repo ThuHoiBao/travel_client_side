@@ -1,63 +1,48 @@
-// src/App.js
+// src/App.tsx (Cập nhật cuối cùng)
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/HeaderComponent/Header'; // Header bạn đã tạo
-import HomePage from './components/homPageComponent/HomePage'; // Trang chủ (Tours)
+import HomePage from './components/homPageComponent/HomePage'; 
+import MainLayout from './components/LayoutComponent/MainLayout'; 
+import ToursPage from './components/toursPageComponent/ToursPage';
+import InformationComponent from './components/InformationComponent/InformationComponent';
 
-// Giả định các Component cho các trang khác
+// Các trang giả định
 const HotelPage = () => <div>Trang Khách sạn</div>; 
 const FlightsPage = () => <div>Trang Vé máy bay</div>; 
+const EntertainmentPage = () => <div>Trang Vui chơi giải trí</div>;
+const TrainsPage = () => <div>Trang Vé tàu</div>;
 const LoginPage = () => <div>Trang Đăng nhập</div>; 
 const AdminPage = () => <div>Trang Quản trị</div>; 
-// ...
 
 function App() {
   return (
     <Router>
       <Routes>
+        
+        {/* LAYOUT CHÍNH: Bọc tất cả các trang cần Header và Footer */}
+        <Route element={<MainLayout />}>
+             
+            {/* Trang Chủ (Landing page) */}
+            <Route path="/" element={<HomePage />} /> 
+            
+            {/* Trang Tours (Sẽ nhận params từ Banner) */}
+            <Route path="/tours" element={<ToursPage />} /> 
+            
+            {/* Trang Information */}
+            <Route path="/information" element={<InformationComponent />} />
+            <Route path="/information/:tab" element={<InformationComponent />} />
+            
+            {/* Các trang khác */}
+            <Route path="/hotel" element={<HotelPage />} />
+            <Route path="/flights" element={<FlightsPage />} />
+            <Route path="/entertainment" element={<EntertainmentPage />} />
+            <Route path="/trains" element={<TrainsPage />} />
+
+        </Route>
           
-          {/* -------------------------------------------------- */}
-          {/* 1. CÁC TRANG CÓ SỬ DỤNG HEADER (Phần lớn trang web) */}
-          {/* -------------------------------------------------- */}
-          {/* ⚠️ Đặt Header trực tiếp bên trong element của từng Route */}
-          
-          <Route 
-              path="/" 
-              element={
-                  <>
-                      <Header /> {/* Header hiển thị trên trang chủ */}
-                      <HomePage />
-                  </>
-              } 
-          />
-          
-          <Route 
-              path="/hotel" 
-              element={
-                  <>
-                      <Header /> {/* Header hiển thị trên trang khách sạn */}
-                      <HotelPage />
-                  </>
-              } 
-          />
-          
-          <Route 
-              path="/flights" 
-              element={
-                  <>
-                      <Header /> {/* Header hiển thị trên trang vé máy bay */}
-                      <FlightsPage />
-                  </>
-              } 
-          />
-          
-          {/* -------------------------------------------------- */}
-          {/* 2. CÁC TRANG KHÔNG SỬ DỤNG HEADER (Login, Admin,...) */}
-          {/* -------------------------------------------------- */}
-          {/* ⚠️ Chỉ render Component chính, KHÔNG có Header */}
-          
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/admin" element={<AdminPage />} />
+        {/* CÁC TRANG KHÔNG SỬ DỤNG LAYOUT */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/admin" element={<AdminPage />} />
 
       </Routes>
     </Router>

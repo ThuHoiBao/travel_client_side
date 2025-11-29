@@ -1,150 +1,236 @@
-// src/components/homPageComponent/BannerComponent/Banner.jsx
+// File: src/components/homPageComponent/BannerComponent/Banner.jsx (FULL CODE)
+
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // 👈 Thêm useNavigate
 import styles from './Banner.module.scss';
-import { FaMapMarkerAlt, FaCalendarAlt } from 'react-icons/fa'; 
-import { FaSearch, FaRegThumbsUp, FaRegCreditCard } from 'react-icons/fa'; // Icons cho bottom strip
-import axios from 'axios'; 
-import rightArrowImage from "../../../assets/images/right-arrow.png"
-// ⚠️ THÊM DÒNG IMPORT CÁC FILE ẢNH CỦA BẠN VÀO ĐÂY
-import searchIcon from '../../../assets/images/flight.png'; // Thay bằng đường dẫn ảnh thật của bạn
-import thumbsUpIcon from '../../../assets/images/rating.png'; // Thay bằng đường dẫn ảnh thật của bạn
-import creditCardIcon from '../../../assets/images/endow.png'; // Thay bằng đường dẫn ảnh thật của bạn
+import { FaSearch, FaMoneyBillAlt, FaMapMarkerAlt } from 'react-icons/fa'; 
+import LocationDropdown from './LocationDropdown';
+
+import searchIcon from '../../../assets/images/flight.png';
+import thumbsUpIcon from '../../../assets/images/rating.png';
+import creditCardIcon from '../../../assets/images/endow.png';
+import rightArrowImage from '../../../assets/images/right-arrow.png';
+
+// --- Utils Functions ---
+
+const budgetOptions = [
+    'Dưới 5 triệu',
+    'Từ 5 - 10 triệu',
+    'Từ 10 - 20 triệu',
+    'Trên 20 triệu',
+];
+
+// --- Banner Component ---
+
 const Banner = () => {
-  const [searchData, setSearchData] = useState({
-    destination: '',
-    startDate: '',
-    budget: 'Chọn mức giá', // Đổi từ departure sang budget
-  });
-  
-  const [isDateFocused, setIsDateFocused] = useState(false);
-  const [isBudgetOpen, setIsBudgetOpen] = useState(false); 
+    // Hook để điều hướng
+    const navigate = useNavigate(); // 👈 SỬ DỤNG HOOK NAVIGATE
 
-  const handleChange = (e) => {
-    setSearchData({
-      ...searchData,
-      [e.target.name]: e.target.value,
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [validationError, setValidationError] = useState('');
+
+    const [searchData, setSearchData] = useState({
+        searchNameTour: '',
+        endLocationID: '',
+        budget: 'Chọn mức giá',
     });
-  };
     
-  // Hàm chọn ngân sách
-  const handleBudgetSelect = (value) => {
-      setSearchData(prev => ({ ...prev, budget: value }));
-      setIsBudgetOpen(false);
-  }
+    const [isBudgetMenuOpen, setIsBudgetMenuOpen] = useState(false);
+    const [isDestinationFocused, setIsDestinationFocused] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log('Dữ liệu tìm kiếm:', searchData);
-  };
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setSearchData((prev) => ({
+            ...prev,
+            [name]: value,
+            ...(name === 'searchNameTour' ? { endLocationID: '' } : {}),
+        }));
+        setValidationError('');
+    };
     
-  // Danh sách các lựa chọn ngân sách (dựa trên ảnh F880D4EE-8D02-4F76-9B49-67E5F78CE37A.png)
-  const budgetOptions = [
-      'Dưới 5 triệu',
-      'Từ 5 - 10 triệu',
-      'Từ 10 - 20 triệu',
-      'Trên 20 triệu',
-  ];
+    const handleBudgetSelect = (value) => {
+        setSearchData({
+            ...searchData,
+            budget: value,
+        });
+        setValidationError('');
+        setIsBudgetMenuOpen(false); 
+    }
 
-  return (
-    <div className={styles.bannerContainer}>
-      <div className={styles.overlay}></div>
-      <div className={styles.content}>
-            
-        <h1 className={styles.headline}>Hơn 1000+ Tour, Khám Phá Ngay</h1>
-        <p className={styles.subHeadline}>Giá tốt – hỗ trợ 24/7 – khắp nơi</p>
+    const handleLocationSelect = (location) => {
+        setSearchData((prev) => ({
+            ...prev,
+            searchNameTour: location.name,
+            endLocationID: location.locationID.toString(),
+        }));
+        setValidationError('');
+        setIsDestinationFocused(false);
+    };
+
+    /**
+     * HÀM XỬ LÝ SUBMIT CHÍNH: Tạo query params và CHUYỂN HƯỚNG.
+     */
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // VALIDATION
+        if (searchData.searchNameTour.trim() === '') {
+            setValidationError("Vui lòng nhập nơi bạn muốn đi!");
+            return;
+        }
+        setValidationError('');
+        setLoading(true);
+        setError(null);
+
+        // 1. Tạo payload để truyền qua URL
+        const payload = {
+            searchNameTour: searchData.searchNameTour,
+        };
+
+        if (searchData.endLocationID) {
+            payload.endLocationID = searchData.endLocationID;
+        }
+
+        if (searchData.budget !== 'Chọn mức giá') {
+            payload.budget = searchData.budget;
+        }
+
+        console.log('Chuyển hướng với dữ liệu:', payload);
+
+        // 2. Tạo URLSearchParams từ payload (Tự động mã hóa URL)
+        const queryParams = new URLSearchParams(payload).toString();
+
+        // 3. Chuyển hướng đến trang /tours kèm theo query parameters
+        navigate(`/tours?${queryParams}`); 
+        
+        // Dừng loading ở đây vì việc gọi API thực hiện ở trang /tours
+        setLoading(false);
+    };
 
 
+    return (
+        <div className={styles.bannerContainer}>
+            <div className={styles.overlay}></div>
+            <div className={styles.content}>
 
-        <form className={styles.searchBox} onSubmit={handleSubmit}>
-          {/* Input 1: Nơi muốn đi */}
-          <div className={styles.inputGroup}>
-            <FaSearch className={styles.icon} />
-            <input
-              type="text"
-              name="destination"
-              className={styles.inputField}
-              placeholder="Bạn muốn đi đâu?"
-              value={searchData.destination}
-              onChange={handleChange}
-              required
-            />
-          </div>
+                <h1 className={styles.headline}>Hơn 1000+ Tour, Khám Phá Ngay</h1>
+                <p className={styles.subHeadline}>Giá tốt – hỗ trợ 24/7 – khắp nơi</p>
 
-          {/* Input 2: Ngày khởi hành */}
-          <div className={styles.inputGroup}>
-            <FaCalendarAlt className={styles.icon} />
-            <input
-                type={isDateFocused || searchData.startDate ? 'date' : 'text'}
-                name="startDate"
-                className={`${styles.inputField} ${!isDateFocused && !searchData.startDate ? styles.placeholderFlexibility : ''}`}
-                placeholder="Linh hoạt"
-                value={searchData.startDate}
-                onChange={handleChange}
-                onFocus={() => setIsDateFocused(true)}
-                onBlur={() => setIsDateFocused(false)}
-            />
-          </div>
-          
-          {/* Input 3: Khởi hành từ */}
-          <div className={styles.inputGroup}>
-            <FaMapMarkerAlt className={styles.icon} />
-            <select
-              name="departure"
-              className={styles.selectField}
-              value={searchData.departure}
-              onChange={handleChange}
-            >
-              <option value="Hồ Chí Minh">Hồ Chí Minh</option>
-              <option value="Hà Nội">Hà Nội</option>
-              {/* Thêm các lựa chọn khác */}
-            </select>
-          </div>
+                <form className={styles.searchBox} onSubmit={handleSubmit}>
+                    
+                    {/* Input 1: Nơi muốn đi */}
+                    <div className={`${styles.inputGroup} ${styles.destinationGroup}`}>
+                        <FaMapMarkerAlt className={styles.icon} /> 
+                        <div className={styles.inputLabels}>
+                            <label htmlFor="destination">Bạn muốn đi đâu?</label>
+                            <input
+                                type="text"
+                                id="destination"
+                                name="searchNameTour" 
+                                className={styles.inputField}
+                                placeholder="Ví dụ: Đà Nẵng, Phú Quốc,..."
+                                value={searchData.searchNameTour}
+                                onChange={handleChange}
+                                onFocus={() => setIsDestinationFocused(true)}
+                                // Dùng setTimeout để giữ Autocomplete mở một chút khi click ra ngoài
+                                onBlur={() => setTimeout(() => setIsDestinationFocused(false), 200)} 
+                            />
+                        </div>
+                    </div>
 
-          {/* Button: Tìm */}
-          <button type="submit" className={styles.searchButton}>
-            Tìm
-          </button>
-        </form>
+                    {/* Input 2: Ngân sách */}
+                    <div className={`${styles.inputGroup} ${styles.budgetGroup}`}>
+                        <FaMoneyBillAlt className={styles.icon} />
+                        <div className={styles.inputLabels}>
+                            <label htmlFor="budget">Ngân sách</label>
+                            <div 
+                                className={`${styles.selectDisplay} ${searchData.budget === 'Chọn mức giá' ? styles.placeholder : ''}`}
+                                onClick={(e) => {
+                                    e.preventDefault(); 
+                                    setIsBudgetMenuOpen(!isBudgetMenuOpen);
+                                }} 
+                            >
+                                {searchData.budget}
+                            </div>
+                        </div>
+                          
+                        {isBudgetMenuOpen && (
+                            <div className={styles.customSelectMenu}> 
+                                {budgetOptions.map(option => (
+                                    <div 
+                                        key={option} 
+                                        onClick={(e) => {
+                                            e.preventDefault(); 
+                                            handleBudgetSelect(option);
+                                        }} 
+                                        className={styles.menuItem}
+                                    >
+                                        {option}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
 
-        {/* Khối thông tin tour nổi bật bên phải banner */}
-        <div className={styles.sideInfoBox}>
-            <p className={styles.sideTitle}>Tour Hàn Quốc 5N4Đ</p>
-            <p className={styles.sideDetails}>HCM – Seoul – Đảo Nami</p>
-            <p className={styles.sideDetails}>Công Viên Everland</p>
-            <p className={styles.priceLabel}>Giá chỉ từ</p>
-            <p className={styles.priceValue}>15.990.000 <small>VNĐ/khách</small></p>
-            {/* SỬA LỖI HIỂN THỊ ẢNH: Sử dụng thẻ <img> và gán biến vào src */}
-             <div className={styles.arrowIcon}>
-                <img src={rightArrowImage} alt="Mũi tên" style={{width: '20px', height: '20px'}} /> 
+                    {/* Button: Tìm */}
+                    <button type="submit" className={styles.searchButton}>
+                        <FaSearch className={styles.searchIcon} />
+                    </button>
+                    
+                    {isDestinationFocused && (
+                        <LocationDropdown
+                            query={searchData.searchNameTour}
+                            onSelect={handleLocationSelect}
+                            onClose={() => setIsDestinationFocused(false)}
+                        />
+                    )}
+                </form>
+
+                {/* Validation Error Message */}
+                {validationError && (
+                    <p className={styles.validationMessage}>
+                        {validationError}
+                    </p>
+                )}
+
+                {/* Khối thông tin tour nổi bật bên phải banner (Giữ nguyên) */}
+                <div className={styles.sideInfoBox}>
+                    <p className={styles.sideTitle}>Tour Hàn Quốc 5N4Đ</p>
+                    <p className={styles.sideDetails}>HCM – Seoul – Đảo Nami</p>
+                    <p className={styles.sideDetails}>Công Viên Everland</p>
+                    <p className={styles.priceLabel}>Giá chỉ từ</p>
+                    <p className={styles.priceValue}>15.990.000 <small>VNĐ/khách</small></p>
+                    <div className={styles.arrowIcon}>
+                        <img src={rightArrowImage} alt="Mũi tên" style={{width: '20px', height: '20px'}} />
+                    </div>
+                </div>
             </div>
-            {/* KẾT THÚC SỬA LỖI */}
+
+            {/* Dải thông tin dưới cùng (Giữ nguyên) */}
+            <div className={styles.bottomInfoStrip}>
+                <div className={styles.infoItem}>
+                    <img src={searchIcon} alt="Search Icon" className={styles.infoIconImage} />
+                    <p><strong>1.000+ tours</strong></p>
+                    <p>Chất lượng trong và ngoài nước</p>
+                </div>
+                <div className={styles.infoItem}>
+                    <img src={thumbsUpIcon} alt="Thumbs Up Icon" className={styles.infoIconImage} />
+                    <p><strong>10K+ đánh giá 5 sao</strong></p>
+                    <p>Từ những khách hàng đã đặt tour</p>
+                </div>
+                <div className={styles.infoItem}>
+                    <img src={creditCardIcon} alt="Credit Card Icon" className={styles.infoIconImage} />
+                    <p><strong>100+ ưu đãi mỗi ngày</strong></p>
+                    <p>Cho khách đặt sớm, theo nhóm, phút chót</p>
+                </div>
+            </div>
+
+            {/* Chỉ giữ lại phần loading/error để dễ debug khi cần */}
+            {loading && <p className={styles.statusMessage} style={{color: 'white'}}>Đang chuẩn bị chuyển hướng...</p>}
+            {error && <p className={styles.statusMessage} style={{color: 'red'}}>Lỗi: {error}</p>}
         </div>
-      </div>
-      
-      {/* Dải thông tin dưới cùng */}
-{/* Dải thông tin dưới cùng */}
-      <div className={styles.bottomInfoStrip}>
-          <div className={styles.infoItem}>
-              {/* ⚠️ Thay thế FaSearch bằng thẻ <img> */}
-              <img src={searchIcon} alt="Search Icon" className={styles.infoIconImage} /> 
-              <p><strong>1.000+ tours</strong></p>
-              <p>Chất lượng trong và ngoài nước</p>
-          </div>
-          <div className={styles.infoItem}>
-              {/* ⚠️ Thay thế FaRegThumbsUp bằng thẻ <img> */}
-              <img src={thumbsUpIcon} alt="Thumbs Up Icon" className={styles.infoIconImage} />
-              <p><strong>10K+ đánh giá 5 sao</strong></p>
-              <p>Từ những khách hàng đã đặt tour</p>
-          </div>
-          <div className={styles.infoItem}>
-              {/* ⚠️ Thay thế FaRegCreditCard bằng thẻ <img> */}
-              <img src={creditCardIcon} alt="Credit Card Icon" className={styles.infoIconImage} />
-              <p><strong>100+ ưu đãi mỗi ngày</strong></p>
-              <p>Cho khách đặt sớm, theo nhóm, phút chót</p>
-          </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Banner;
