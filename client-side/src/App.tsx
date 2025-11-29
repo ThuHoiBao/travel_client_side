@@ -3,7 +3,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/HeaderComponent/Header'; // Header bạn đã tạo
 import HomePage from './components/homPageComponent/HomePage'; // Trang chủ (Tours)
+import TourDetail from './components/TourDetailComponent/TourDetail';
+import TourBooking from './components/TourBookingComponent/TourBooking';
 
+// ...
 // Giả định các Component cho các trang khác
 const HotelPage = () => <div>Trang Khách sạn</div>; 
 const FlightsPage = () => <div>Trang Vé máy bay</div>; 
@@ -40,6 +43,16 @@ function App() {
                   </>
               } 
           />
+
+          <Route 
+              path="/tour-detail" 
+              element={<TourDetail />} 
+          />
+
+          <Route 
+              path="/tour/:tourCode" 
+              element={<TourDetail />} 
+          />
           
           <Route 
               path="/flights" 
@@ -50,6 +63,12 @@ function App() {
                   </>
               } 
           />
+
+            <Route 
+                 path="/order-booking" 
+                 element={<TourBooking />} />
+
+
           
           {/* -------------------------------------------------- */}
           {/* 2. CÁC TRANG KHÔNG SỬ DỤNG HEADER (Login, Admin,...) */}

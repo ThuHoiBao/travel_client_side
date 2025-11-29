@@ -15,7 +15,8 @@ $coin-color: #ffc107; // Màu vàng coin
     z-index: 100; /* Đảm bảo Header luôn ở trên cùng */
     
     /* Màu nền trong suốt mặc định */
-    background-color: transparent; 
+    background-color: $dark-blue;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     
     /* Hiệu ứng chuyển đổi mượt mà */
     transition: background-color 0.3s ease-in-out;
