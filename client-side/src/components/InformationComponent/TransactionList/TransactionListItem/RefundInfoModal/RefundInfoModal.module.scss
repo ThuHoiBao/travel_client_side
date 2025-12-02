@@ -1,0 +1,117 @@
+/* src/components/InformationComponent/TransactionList/TransactionListItem/RefundInfoModal/RefundInfoModal.module.scss */
+
+// --- Variables ---
+$primary-color: #1890ff;
+$secondary-color: #6c757d;
+$error-color: #ff4d4f;
+$bg-light: #f7f7f7;
+
+.modalOverlay {
+    // Kế thừa từ CancelOptionModal
+    composes: modalOverlay from "../CancelOptionModal/CancelOptionModal.module.scss";
+    z-index: 2010; /* Cao hơn modal cha */
+}
+
+.modalContent {
+    // Kế thừa từ CancelOptionModal
+    composes: modalContent from "../CancelOptionModal/CancelOptionModal.module.scss";
+    max-width: 500px;
+    text-align: left;
+}
+
+.icon {
+    font-size: 48px;
+    color: $primary-color;
+    margin-bottom: 15px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.description {
+    color: #6c757d;
+    margin-bottom: 25px;
+    font-size: 15px;
+    text-align: center;
+}
+
+.formGroup {
+    margin-bottom: 15px;
+
+    label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #495057;
+        font-size: 14px;
+    }
+
+    input[type="text"] {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+
+        &:focus {
+            border-color: $primary-color;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+        }
+    }
+}
+
+.error {
+    color: $error-color;
+    font-size: 14px;
+    margin-top: -10px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: rgba($error-color, 0.05);
+    border-radius: 4px;
+    border-left: 3px solid $error-color;
+}
+
+.buttonGroup {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 25px;
+
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+    }
+}
+
+.btnPrimary {
+    // Kế thừa style button Primary
+    composes: btnPrimary from "../CancelOptionModal/CancelOptionModal.module.scss";
+}
+
+.btnSecondary {
+    // Kế thừa style button Secondary (dùng làm nút Quay lại)
+    background-color: $secondary-color;
+    color: white;
+    border: 1px solid $secondary-color;
+    &:hover { background-color: darken($secondary-color, 10%); }
+}
+
+.successTitle {
+    // Kế thừa style thông báo thành công
+    composes: successTitle from "../ConfirmCancellationModal/ConfirmCancellationModal.module.scss";
+}
+
+.successMessage {
+    // Kế thừa style thông báo thành công
+    composes: successMessage from "../ConfirmCancellationModal/ConfirmCancellationModal.module.scss";
+}

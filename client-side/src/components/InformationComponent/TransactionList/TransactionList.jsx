@@ -12,8 +12,9 @@ const statusTabs = [
     { key: 'PAID', label: 'Đã thanh toán' },
     { key: 'CANCELLED', label: 'Hủy booking' },
     { key: 'OVERDUE_PAYMENT', label: 'Quá hạn thanh toán' },
-    { key: 'PENDING_REVIEW', label: 'Chờ đánh giá' },
-    { key: 'REVIEWED', label: 'Đã đánh giá' }
+    // { key: 'PENDING_REVIEW', label: 'Chờ đánh giá' },
+    { key: 'REVIEWED', label: 'Đã đánh giá' },
+    { key: 'PENDING_REFUND', label: 'Chờ hoàn tiền' }
 ];
 
 const TransactionList = ({ user }) => {

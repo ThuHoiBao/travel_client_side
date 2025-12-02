@@ -45,3 +45,29 @@ export const getAllBookingsByUserApi = async (
         throw error;
     }
 };
+// Giả định Request DTO:
+interface BookingCancellationRequestDTO {
+    bookingID: number;
+}
+interface RefundInformationRequestDTO {
+    accountName: string;
+    accountNumber: string;
+    bank: string;
+}
+
+/**
+ * Gọi API hủy booking và hoàn tiền bằng Coin (Hoàn tiền tự động)
+ */
+export const cancelBookingApi = async (bookingID: number): Promise<BookingResponseDTO> => {
+    const payload: BookingCancellationRequestDTO = { bookingID };
+    const response = await api.post(`/bookings/cancel`, payload);
+    return BookingResponseDTO.fromApiResponse(response.data);
+};
+
+/**
+ * Gọi API yêu cầu hoàn tiền vào ngân hàng (Gửi yêu cầu admin xử lý)
+ */
+export const requestRefundApi = async (bookingID: number, refundInfo: RefundInformationRequestDTO): Promise<BookingResponseDTO> => {
+    const response = await api.post(`/bookings/refund-request/${bookingID}`, refundInfo);
+    return BookingResponseDTO.fromApiResponse(response.data);
+};
