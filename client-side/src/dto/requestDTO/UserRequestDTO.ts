@@ -5,7 +5,7 @@ export class UserRequestDTO {
     private _dateOfBirth: string = ""; // ISO date string
     private _coinBalance: number = 0; // BigDecimal from Java -> number in TS
     private _email: string = "";
-    private _avatar: string = "https://th.bing.com/th/id/OIP.KMh7jiRqiGInQryreHc-UwHaHa?w=180&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3"; // Avatar URL cứng
+    private _avatar: string = ""; // Avatar URL cứng
 
     // ------------------------------------
     // 📝 Getters and Setters
@@ -45,7 +45,7 @@ export class UserRequestDTO {
         dto.coinBalance = apiResponse.coinBalance || apiResponse.coinbalance || 0;
         dto.email = apiResponse.email || "";
         // Avatar giữ nguyên giá trị cứng, không lấy từ API
-        dto.avatar = "https://th.bing.com/th/id/OIP.KMh7jiRqiGInQryreHc-UwHaHa?w=180&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3";
+        dto.avatar = apiResponse.avatar|| "https://th.bing.com/th/id/OIP.KMh7jiRqiGInQryreHc-UwHaHa?w=180&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3";
 
         return dto;
     }

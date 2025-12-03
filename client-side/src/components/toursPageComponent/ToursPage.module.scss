@@ -24,9 +24,12 @@
     flex: 1; /* Cột kết quả chiếm phần còn lại */
 }
 
-/* KIỂU DÁNG CHO KHỐI THÔNG TIN ĐIỂM ĐẾN */
+.resultsColumn {
+    flex: 1; 
+}
+
+/* KIỂU DÁNG CHO KHỐI THÔNG TIN ĐIỂM ĐẾN (destinationHeader) */
 .destinationHeader {
-/* ... (Giữ nguyên các styles khác) ... */
     margin-bottom: 20px;
     padding: 15px;
     background-color: #e6f7ff;
@@ -45,26 +48,87 @@
     }
 }
 
+/* HEADER KẾT QUẢ VÀ SẮP XẾP MỚI */
+.resultHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 20px;
+}
+
 .tourCount {
     font-size: 1.2em;
     font-weight: bold;
     color: #333;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #ddd;
-    margin-top: 0;
-    margin-bottom: 20px;
+    margin: 0; 
+    
+    strong {
+        color: #1f6aaf;
+    }
 }
 
-.toursList {
-    display: grid;
-    gap: 20px;
+/* STYLES CHO DROP DOWN SẮP XẾP */
+.sortContainer {
+    display: flex;
+    align-items: center;
+    font-size: 0.95em;
+    color: #595959;
 }
 
-.tourItemMock {
-    padding: 15px;
-    border: 1px solid #eee;
-    border-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+.sortLabel {
+    margin-right: 10px;
+    font-weight: normal;
+}
+
+.sortDropdown {
+    position: relative;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    background-color: white;
+    min-width: 200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    i {
+        margin-left: 10px;
+        font-size: 0.8em;
+    }
+}
+
+.sortOptionsList {
+    position: absolute;
+    top: 100%; 
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.sortOption {
+    padding: 10px 12px;
+    cursor: pointer;
+    
+    &:hover {
+        background-color: #f0f0f0;
+        color: #1f6aaf;
+    }
+}
+
+.activeSort {
+    background-color: #e6f7ff;
+    color: #1f6aaf;
+    font-weight: bold;
 }
 
 .errorMessage {
@@ -73,4 +137,12 @@
     background-color: #fff1f0;
     border: 1px solid #ffa39e;
     border-radius: 4px;
+}
+.tourCountValue {
+    color: #1f6aaf; /* Màu xanh nổi bật */
+    font-weight: bold;
+    font-size: 23px;
+    /* Thêm chút khoảng cách xung quanh số */
+    margin-right: -5px;
+    
 }

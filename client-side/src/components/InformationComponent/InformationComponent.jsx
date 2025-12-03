@@ -9,12 +9,13 @@ import Notifications from './Notifications/Notifications';
 import FavoriteTours from './FavoriteTours/FavoriteTours';
 import useUser from '../../hook/useUser.ts';
 import styles from './InformationComponent.module.scss';
-
+import AvatarUploadModal from './AvatarUploadModal/AvatarUploadModal'; // ✨ IMPORT MODAL ✨
+import { UserRequestDTO } from '../../dto/requestDTO/UserRequestDTO.ts';
 const InformationComponent = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { tab } = useParams();
-    const { user } = useUser(4);
+    const { user ,setUser} = useUser(4);
     const sidebarRef = useRef(null);
     const containerRef = useRef(null);
     
@@ -29,7 +30,11 @@ const InformationComponent = () => {
     };
     
     const [activeTab, setActiveTab] = useState(getActiveTab());
-    
+    const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+    // Hàm cập nhật user state sau khi upload thành công
+    const handleAvatarUpdateSuccess = (updatedUserPlainObject) => {
+        setUser(updatedUserPlainObject);
+    };
     // Cập nhật activeTab khi URL thay đổi
     useEffect(() => {
         const newTab = getActiveTab();
@@ -109,6 +114,7 @@ const InformationComponent = () => {
                         user={user}
                         activeTab={activeTab}
                         onMenuClick={handleMenuClick}
+                        onAvatarClick={() => setIsAvatarModalOpen(true)}
                     />
                 </div>
                 
@@ -117,6 +123,14 @@ const InformationComponent = () => {
                     {renderContent()}
                 </div>
             </div>
+            {/* ✨ MODAL AVATAR ✨ */}
+            {isAvatarModalOpen && user && (
+                <AvatarUploadModal
+                    user={user}
+                    onClose={() => setIsAvatarModalOpen(false)}
+                    onUpdateSuccess={handleAvatarUpdateSuccess}
+                />
+            )}
         </div>
     );
 };

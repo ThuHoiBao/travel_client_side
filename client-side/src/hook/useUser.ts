@@ -9,6 +9,7 @@ interface UserHook {
     user: UserRequestDTO | null;
     loading: boolean;
     error: string | null;
+    setUser: React.Dispatch<React.SetStateAction<UserRequestDTO | null>>;
 }
 
 /**
@@ -39,7 +40,7 @@ const useUser = (userID: number): UserHook => {
         fetchUser();
     }, [userID]);
 
-    return { user, loading, error };
+    return { user, loading, error, setUser };
 };
 
 export default useUser;

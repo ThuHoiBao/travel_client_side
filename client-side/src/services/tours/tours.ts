@@ -60,7 +60,7 @@ export const searchToursApi = async (searchData: any): Promise<TourResponseDTO[]
     requestDto.endLocationID = searchData.endLocationID ? parseInt(searchData.endLocationID) : -1;
 
     requestDto.transportation = searchData.transportation || "";
-
+    requestDto.rating = searchData.rating ? parseInt(searchData.rating) : 0; // rating: 1, 2, 3, 4, 5 (0 = All)
     const payload = requestDto.toPlain(); 
     console.log('Dữ liệu tìm kiếm (Payload - dùng cho GET parameters):', payload);
 
