@@ -11,6 +11,7 @@ export class TourResponseDTO {
     private _departureDates: TourDepartureDateResponseDTO[] = [];
     private _money: number = 0; // Thay Long bằng number
     private _image: string = "";
+    private _isFavorite: boolean = false;
 
     // --- Getters and Setters ---
     get tourID(): number { return this._tourID; }
@@ -43,6 +44,8 @@ export class TourResponseDTO {
     get image(): string { return this._image; }
     set image(value: string) { this._image = value; }
 
+    get isFavorite(): boolean { return this._isFavorite; }
+    set isFavorite(value: boolean) { this._isFavorite = value; }
     // Phương thức Ánh xạ từ API Response
     public static fromApiResponse(data: any): TourResponseDTO {
         const dto = new TourResponseDTO();
@@ -55,6 +58,7 @@ export class TourResponseDTO {
         dto.departureDates = data.departureDates || []; // Sẽ kích hoạt setter
         dto.money = data.money;
         dto.image = data.image;
+        dto.isFavorite = data.isFavorite || false;
         return dto;
     }
 
@@ -74,7 +78,8 @@ export class TourResponseDTO {
                 fullDate: d.departureDate // Ngày đầy đủ (ISO string)
             })), 
             money: this.money,
-            image: this.image
+            image: this.image,
+            isFavorite: this.isFavorite
         };
     }
 }

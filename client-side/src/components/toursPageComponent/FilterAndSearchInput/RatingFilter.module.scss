@@ -113,22 +113,22 @@
     
     /* 4 sao vàng */
     &[data-rating="4"]::after {
-        width: 80%;
+        width: 58%;
     }
     
     /* 3 sao vàng */
     &[data-rating="3"]::after {
-        width: 60%;
+        width: 45%;
     }
     
     /* 2 sao vàng */
     &[data-rating="2"]::after {
-        width: 40%;
+        width: 30%;
     }
     
     /* 1 sao vàng */
     &[data-rating="1"]::after {
-        width: 20%;
+        width: 14%;
     }
     
     /* 0 sao (tất cả xám) */
