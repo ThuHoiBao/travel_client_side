@@ -143,8 +143,6 @@ const handleBookNow = () => {
 
   return (
     <div className={styles.pageContainer}>
-      <Header />
-
       <main className={styles.mainContent}>
         <div className={styles.breadcrumb}>
           Du lịch / {tourData.startLocation} / {tourData.endLocation} / <span>{tourData.tourCode}</span>
@@ -348,8 +346,6 @@ const handleBookNow = () => {
             startIndex={startImageIndex}
         />
       </main>
-
-      <Footer />
     </div>
   );
 };
