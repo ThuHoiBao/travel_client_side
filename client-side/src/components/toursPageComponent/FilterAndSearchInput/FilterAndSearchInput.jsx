@@ -134,12 +134,30 @@ const FilterAndSearchInput = () => {
             if (isOpen) setEndLocationSearch('');
         }
     };
-
+    // ✨ HÀM LÀM MỚI BỘ LỌC ✨
+    const handleResetFilters = () => {
+        // 1. Reset các state về giá trị mặc định
+        setSearchNameTour('');
+        setBudget('');
+        setStartLocationId('-1');
+        setEndLocationId('-1');
+        setTransportation('');
+        setSelectedRating(0);
+        setStartLocationSearch(''); // Reset giá trị hiển thị Dropdown
+        setEndLocationSearch(''); // Reset giá trị hiển thị Dropdown
+        
+        // 2. Xóa tất cả query parameters khỏi URL
+        setSearchParams({}, { replace: true });
+    };
     if (locationsLoading) return <div className={styles.filterContainer}>Đang tải bộ lọc...</div>;
 
     return (
         <div className={styles.filterContainer}>
             {/* Thanh Tìm kiếm */}
+            <div className={styles.headerWithReset}>
+                <h3 className={styles.filterTitle}>Bạn muốn đi đâu ?</h3>
+                <p onClick={handleResetFilters} className={styles.resetText}>Làm mới</p>
+            </div>
             <form onSubmit={handleApplyFilter} className={styles.searchBar}>
                 <input
                     type="text"
@@ -273,7 +291,19 @@ const FilterAndSearchInput = () => {
                                 <div className={ratingStyles.starsContainer} data-rating={ratingValue}></div>
                                 
                                 {ratingValue === 0 && (
-                                    <span className={ratingStyles.allLabel}>Tất cả</span>
+                                    <span className={ratingStyles.allLabel}>Trở lên</span>
+                                )}
+                                {ratingValue === 1 && (
+                                    <span className={ratingStyles.allLabel}>Trở lên</span>
+                                )}
+                                {ratingValue === 2 && (
+                                    <span className={ratingStyles.allLabel}>Trở lên</span>
+                                )}
+                                {ratingValue === 3 && (
+                                    <span className={ratingStyles.allLabel}>Trở lên</span>
+                                )}
+                                {ratingValue === 4 && (
+                                    <span className={ratingStyles.allLabel}>Trở lên</span>
                                 )}
                             </label>
                         ))}
