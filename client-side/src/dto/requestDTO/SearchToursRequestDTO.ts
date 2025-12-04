@@ -7,7 +7,7 @@ export class SearchToursRequestDTO {
     private _startLocationID: number = -1; // -1: Tất cả
     private _endLocationID: number = -1; // -1: Tất cả
     private _transportation: string = ""; // "" hoặc null: Tất cả
-
+    private _rating: number = 0;
     // --- Getters và Setters ---
     get searchNameTour(): string { return this._searchNameTour; }
     set searchNameTour(value: string) { this._searchNameTour = value; }
@@ -27,6 +27,8 @@ export class SearchToursRequestDTO {
     get transportation(): string { return this._transportation; }
     set transportation(value: string) { this._transportation = value; }
 
+    get rating(): number { return this._rating; }
+    set rating(value: number) { this._rating = value; }
     // Phương thức toPlain cho payload API
     toPlain() {
         // Chỉ gửi các trường có giá trị hợp lệ (-1 cho ID sẽ được backend xử lý)
@@ -36,7 +38,8 @@ export class SearchToursRequestDTO {
             endPrice: this.endPrice,
             startLocationID: this.startLocationID === -1 ? null : this.startLocationID,
             endLocationID: this.endLocationID === -1 ? null : this.endLocationID,
-            transportation: this.transportation || null, // Gửi null nếu rỗng
+            transportation: this.transportation || null,
+            rating: this.rating === 0 ? null : this.rating, // Gửi null nếu rỗng
         };
     }
 }

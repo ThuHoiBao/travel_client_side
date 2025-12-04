@@ -1,19 +1,111 @@
+/* src/components/InformationComponent/TransactionList/TransactionList.module.scss */
+
+// --- Variables ---
+$primary-color: #1890ff;
+$text-default: #495057;
+$text-active: $primary-color;
+$bg-hover: #f0f0f0;
+$border-color: #e9ecef;
+
+
 .transactionList {
     width: 100%;
 }
 
 .pageTitle {
-    font-size: 24px;
-    font-weight: 600;
+    font-size: 26px; /* Hơi lớn hơn */
+    font-weight: 700;
     color: #333;
     margin-bottom: 30px;
 }
 
-.emptyState {
-    text-align: center;
-    padding: 60px 20px;
-    color: #999;
-    font-size: 16px;
+.statusTabs {
+    display: flex;
+    flex-wrap: nowrap; 
+    overflow-x: auto; 
+    
+    // Custom scrollbar styling (cho trải nghiệm desktop tốt hơn)
+    &::-webkit-scrollbar {
+        height: 8px; /* Chiều cao thanh cuộn */
+    }
+    &::-webkit-scrollbar-thumb {
+        background: $border-color;
+        border-radius: 4px;
+        &:hover {
+            background: #ccc;
+        }
+    }
+    
+    // Loại bỏ border-bottom cũ để chuyển sang hiệu ứng underline trên tab active
+    border-bottom: 2px solid $border-color; 
+    padding-bottom: 0; /* Đẩy padding vào button */
+    margin-bottom: 20px;
 }
 
+.tab {
+    flex-shrink: 0; 
+    background: transparent;
+    border: none;
+    padding: 12px 18px; /* Tăng padding */
+    font-size: 15px;
+    cursor: pointer;
+    color: $text-default;
+    position: relative;
+    font-weight: 500;
+    transition: all 0.3s ease; /* Transition cho hiệu ứng mượt mà */
 
+    &:hover {
+        color: $text-active;
+        background-color: $bg-hover; /* Hiệu ứng nền nhẹ khi hover */
+    }
+    
+    &:focus {
+        outline: none;
+    }
+
+    &.active {
+        color: $text-active;
+        font-weight: 600;
+        background-color: white; /* Đảm bảo nền trắng khi active */
+        
+        // Hiệu ứng underline hiện đại
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; /* Dưới cùng của statusTabs border-bottom */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%; /* Độ rộng đường gạch nhỏ hơn */
+            height: 3px; /* Độ dày đường gạch */
+            background-color: $primary-color;
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba($primary-color, 0.5); /* Bóng đổ nhẹ cho đường gạch */
+        }
+    }
+}
+
+.bookingList {
+    margin-top: 20px;
+}
+
+.loading, .error, .emptyState {
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 18px;
+}
+
+.loading {
+    color: $primary-color;
+    font-weight: 600;
+}
+
+.error {
+    color: #f5222d;
+    border: 1px solid #f5222d;
+    background-color: #fff1f0;
+    border-radius: 4px;
+}
+
+.emptyState {
+    color: #999;
+}

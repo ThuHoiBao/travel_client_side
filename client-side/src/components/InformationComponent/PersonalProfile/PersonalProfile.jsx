@@ -113,15 +113,23 @@ const PersonalProfile = ({ user }) => {
                 const day = formData.day.padStart(2, '0'); // Đảm bảo 2 chữ số
                 dateOfBirth = `${year}-${month}-${day}`;
             }
-            
+            const formDataPayload = new FormData();
             // Tạo DTO
-            const updateDto = new UserUpdateRequestDTO();
-            updateDto.fullName = formData.fullName;
-            updateDto.phone = formData.phone;
-            updateDto.dateOfBirth = dateOfBirth;
+
+            // Backend (@ModelAttribute) sẽ tìm các field này
+            formDataPayload.append('fullName', formData.fullName);
+            formDataPayload.append('phone', formData.phone);
+            
+            // Gửi ngày sinh nếu có giá trị (hoặc chuỗi rỗng)
+            if (dateOfBirth) {
+                formDataPayload.append('dateOfBirth', dateOfBirth);
+            } else {
+                // Nếu muốn xóa ngày sinh (nếu backend cho phép null) hoặc gửi rỗng
+                formDataPayload.append('dateOfBirth', ''); 
+            }
             
             // Gọi API update
-            await updateUserApi(userID, updateDto);
+            await updateUserApi(userID, formDataPayload);
             
             setMessage({ type: 'success', text: 'Cập nhật thông tin thành công!' });
             

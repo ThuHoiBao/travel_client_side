@@ -47,11 +47,32 @@
 }
 
 .filterTitle {
-    font-size: 1.1em;
+    font-size: 1em;
     margin-bottom: 8px;
     color: #333;
 }
+.headerWithReset {
+    display: flex;
+    justify-content: space-between; /* Đẩy tiêu đề và nút về hai phía */
+    align-items: center;
+    margin-bottom: 5px; 
+}
+.resetText {
+    // Đây là thẻ <p>, ta làm nó trông giống button/link
+    color: #1f6aaf; /* Màu xanh nổi bật */
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    padding-top: 8px;
+    transition: color 0.2s;
+    text-decoration: none; /* Xóa gạch chân nếu bạn muốn trông giống button/label */
 
+    &:hover {
+        color: #0f80eb;
+        text-decoration: underline; /* Thêm gạch chân khi hover để nhấn mạnh hành động */
+    }
+}
 /* Tùy chọn Ngân sách và Phương tiện (dạng button) */
 .budgetOptions, .transportationOptions {
     display: flex;

@@ -1,0 +1,202 @@
+/* src/components/InformationComponent/TransactionList/ViewReviewModal/ViewReviewModal.module.scss */
+
+$primary-color: #1890ff; 
+$secondary-color: #f56206; 
+$text-default: #333;
+$text-light: #6c757d;
+$border-color: #e0eeef;
+
+// --- Base Modal Styles ---
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.65);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2500; 
+}
+
+.modalContent {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.closeButton {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: $text-light;
+    cursor: pointer;
+    transition: color 0.2s;
+    &:hover { color: $primary-color; }
+}
+
+.modalTitle {
+    font-size: 24px;
+    font-weight: 700;
+    color: $text-default;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+// --- Tour Summary ---
+.tourSummary {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid $border-color;
+    margin-bottom: 20px;
+    
+    .tourImage {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+    .tourDetails {
+        h4 {
+            font-size: 18px;
+            margin: 0 0 5px 0;
+            color: $primary-color;
+        }
+        p {
+            font-size: 14px;
+            color: $text-light;
+            margin: 3px 0;
+        }
+    }
+}
+
+// --- Review Section ---
+.reviewSection {
+    margin-bottom: 30px;
+}
+
+.ratingDisplay {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    
+    .stars {
+        font-size: 24px;
+        color: #ffc107;
+        svg { margin-right: 2px; }
+    }
+    .ratingValue {
+        font-size: 18px;
+        font-weight: 700;
+        color: $text-default;
+    }
+}
+
+.comment {
+    background-color: $border-color;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: $text-default;
+    white-space: pre-wrap; /* Giữ định dạng xuống dòng */
+}
+
+// --- Gallery Section ---
+.gallerySection {
+    h3 {
+        font-size: 16px;
+        color: $text-default;
+        margin-bottom: 10px;
+    }
+}
+
+.imageGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    
+    img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: transform 0.2s, opacity 0.2s;
+        border: 1px solid $border-color;
+        
+        &:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+    }
+}
+
+
+// --- Lightbox (Image Zoom) ---
+.lightboxOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000; 
+}
+
+.lightboxContent {
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    img {
+        max-width: 100%;
+        max-height: 80vh;
+        object-fit: contain;
+        border-radius: 8px;
+    }
+}
+
+.closeLightbox {
+    background: $secondary-color;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 15px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &:hover {
+        background-color: darken($secondary-color, 10%);
+    }
+}
+
+// Keyframes
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

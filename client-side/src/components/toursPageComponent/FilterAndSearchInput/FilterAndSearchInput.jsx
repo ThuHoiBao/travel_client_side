@@ -4,14 +4,44 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useLocations } from '../../../hook/useLocations.ts';
 import styles from './FilterAndSearchInput.module.scss';
+import ratingStyles from './RatingFilter.module.scss';
 
 // Cấu hình các tùy chọn cứng
 const BUDGET_OPTIONS = [
     'Dưới 5 triệu', 'Từ 5 - 10 triệu', 
     'Từ 10 - 20 triệu', 'Trên 20 triệu'
 ];
-
+const RATING_OPTIONS = [5, 4, 3, 2, 1, 0]; // Thêm 0 vào cuối
 const TRANSPORTATION_OPTIONS = ['Xe', 'Máy bay'];
+
+// ✨ Hàm render sao (vàng + xám)
+const renderStars = (rating) => {
+    const stars = [];
+    
+    // Số sao vàng (solid)
+    for (let i = 0; i < rating; i++) {
+        stars.push(
+            <i 
+                key={`filled-${i}`} 
+                className="fas fa-star" 
+                style={{color: '#ffc107', fontSize: '18px'}}
+            ></i>
+        );
+    }
+    
+    // Số sao xám (regular/outline)
+    for (let i = rating; i < 5; i++) {
+        stars.push(
+            <i 
+                key={`empty-${i}`} 
+                className="far fa-star" 
+                style={{color: '#d0d0d0', fontSize: '18px'}}
+            ></i>
+        );
+    }
+    
+    return stars;
+};
 
 // Hàm Fuzzy Search đơn giản
 const fuzzySearch = (list, query) => {
@@ -32,6 +62,7 @@ const FilterAndSearchInput = () => {
     const [startLocationId, setStartLocationId] = useState(searchParams.get('startLocationID') || '-1');
     const [endLocationId, setEndLocationId] = useState(searchParams.get('endLocationID') || '-1');
     const [transportation, setTransportation] = useState(searchParams.get('transportation') || '');
+    const [selectedRating, setSelectedRating] = useState(parseInt(searchParams.get('rating')) || 0);
 
     // 2. Trạng thái cho Dropdown Search và Query
     const [startLocationSearch, setStartLocationSearch] = useState('');
@@ -39,7 +70,7 @@ const FilterAndSearchInput = () => {
     const [isStartDropdownOpen, setIsStartDropdownOpen] = useState(false);
     const [isEndDropdownOpen, setIsEndDropdownOpen] = useState(false);
 
-    // 3. Logic Fuzzy Search (Sử dụng useMemo để tối ưu)
+    // 3. Logic Fuzzy Search
     const filteredStartLocations = useMemo(() => {
         return fuzzySearch(startLocations, startLocationSearch);
     }, [startLocations, startLocationSearch]);
@@ -48,16 +79,14 @@ const FilterAndSearchInput = () => {
         return fuzzySearch(endLocations, endLocationSearch);
     }, [endLocations, endLocationSearch]);
     
-    // Thiết lập tên hiển thị ban đầu dựa trên ID trong URL
+    // Thiết lập tên hiển thị ban đầu
     useEffect(() => {
         const currentStartLoc = startLocations.find(loc => loc.locationID.toString() === startLocationId);
-        // Không setStartLocationSearch nếu đang gõ
         if (!isStartDropdownOpen) {
             setStartLocationSearch(currentStartLoc ? currentStartLoc.name : '');
         }
         
         const currentEndLoc = endLocations.find(loc => loc.locationID.toString() === endLocationId);
-        // Không setEndLocationSearch nếu đang gõ
         if (!isEndDropdownOpen) {
             setEndLocationSearch(currentEndLoc ? currentEndLoc.name : '');
         }
@@ -82,40 +111,53 @@ const FilterAndSearchInput = () => {
         
         const newParams = {};
         
-        // Chỉ thêm vào params nếu có giá trị
         if (searchNameTour) newParams.searchNameTour = searchNameTour;
         if (budget) newParams.budget = budget;
         if (startLocationId && startLocationId !== '-1') newParams.startLocationID = startLocationId;
         if (endLocationId && endLocationId !== '-1') newParams.endLocationID = endLocationId;
         if (transportation) newParams.transportation = transportation;
-
-        // Cập nhật URL params
+        if (selectedRating > 0) newParams.rating = selectedRating.toString();
+        
         setSearchParams(newParams, { replace: true });
         
-        // Đóng dropdown sau khi áp dụng
         setIsStartDropdownOpen(false);
         setIsEndDropdownOpen(false);
     };
 
-    // Hàm reset dropdown search khi mở/đóng
+    // Hàm toggle dropdown
     const handleDropdownToggle = (type, isOpen) => {
         if (type === 'start') {
             setIsStartDropdownOpen(isOpen);
-            if (isOpen) setStartLocationSearch(''); // Clear search on open
+            if (isOpen) setStartLocationSearch('');
         } else {
             setIsEndDropdownOpen(isOpen);
-            if (isOpen) setEndLocationSearch(''); // Clear search on open
+            if (isOpen) setEndLocationSearch('');
         }
     };
-
-
+    // ✨ HÀM LÀM MỚI BỘ LỌC ✨
+    const handleResetFilters = () => {
+        // 1. Reset các state về giá trị mặc định
+        setSearchNameTour('');
+        setBudget('');
+        setStartLocationId('-1');
+        setEndLocationId('-1');
+        setTransportation('');
+        setSelectedRating(0);
+        setStartLocationSearch(''); // Reset giá trị hiển thị Dropdown
+        setEndLocationSearch(''); // Reset giá trị hiển thị Dropdown
+        
+        // 2. Xóa tất cả query parameters khỏi URL
+        setSearchParams({}, { replace: true });
+    };
     if (locationsLoading) return <div className={styles.filterContainer}>Đang tải bộ lọc...</div>;
-
-    // ✨ KHÔNG CÒN KHỐI destinationHeader Ở ĐÂY
 
     return (
         <div className={styles.filterContainer}>
-            {/* Thanh Tìm kiếm Tên Tour */}
+            {/* Thanh Tìm kiếm */}
+            <div className={styles.headerWithReset}>
+                <h3 className={styles.filterTitle}>Bạn muốn đi đâu ?</h3>
+                <p onClick={handleResetFilters} className={styles.resetText}>Làm mới</p>
+            </div>
             <form onSubmit={handleApplyFilter} className={styles.searchBar}>
                 <input
                     type="text"
@@ -123,7 +165,6 @@ const FilterAndSearchInput = () => {
                     value={searchNameTour}
                     onChange={(e) => setSearchNameTour(e.target.value)}
                 />
-                {/* <button type="submit">Tìm kiếm</button> */}
             </form>
             
             <div className={styles.filterBlock}>
@@ -150,12 +191,10 @@ const FilterAndSearchInput = () => {
                     <div className={styles.dropdown}>
                         <input
                             type="text"
-                            // Hiển thị tên nếu dropdown đóng, hiển thị query nếu dropdown mở
                             value={isStartDropdownOpen ? startLocationSearch : (startLocations.find(loc => loc.locationID.toString() === startLocationId)?.name || 'Tất cả')}
                             onChange={(e) => setStartLocationSearch(e.target.value)}
                             onFocus={() => handleDropdownToggle('start', true)}
                             placeholder="Chọn hoặc tìm kiếm"
-                            // Cho phép gõ khi dropdown mở, không cho gõ khi đóng để tránh lỗi hiển thị
                             readOnly={!isStartDropdownOpen}
                         />
                         {isStartDropdownOpen && (
@@ -226,7 +265,51 @@ const FilterAndSearchInput = () => {
                         ))}
                     </div>
                 </div>
-                
+
+                {/* ⭐ Đánh giá - Hiển thị sao bằng CSS thuần */}
+                <div className={styles.filterSection}>
+                    <h3 className={styles.filterTitle}>Đánh giá</h3>
+                    <div className={ratingStyles.ratingOptions}>
+                        {RATING_OPTIONS.map(ratingValue => (
+                            <label 
+                                key={ratingValue}
+                                htmlFor={`rating-${ratingValue}`}
+                                className={`${ratingStyles.ratingLabel} ${selectedRating === ratingValue ? ratingStyles.selected : ''}`}
+                            >
+                                <input
+                                    type="radio"
+                                    id={`rating-${ratingValue}`}
+                                    name="rating"
+                                    value={ratingValue}
+                                    checked={selectedRating === ratingValue}
+                                    onChange={() => setSelectedRating(ratingValue)}
+                                    className={ratingStyles.ratingRadio}
+                                />
+                                <div className={ratingStyles.customRadio}></div>
+                                
+                                {/* Sao được tạo bằng CSS - thêm data-rating để CSS xử lý */}
+                                <div className={ratingStyles.starsContainer} data-rating={ratingValue}></div>
+                                
+                                {ratingValue === 0 && (
+                                    <span className={ratingStyles.allLabel}>Trở lên</span>
+                                )}
+                                {ratingValue === 1 && (
+                                    <span className={ratingStyles.allLabel}>Trở lên</span>
+                                )}
+                                {ratingValue === 2 && (
+                                    <span className={ratingStyles.allLabel}>Trở lên</span>
+                                )}
+                                {ratingValue === 3 && (
+                                    <span className={ratingStyles.allLabel}>Trở lên</span>
+                                )}
+                                {ratingValue === 4 && (
+                                    <span className={ratingStyles.allLabel}>Trở lên</span>
+                                )}
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
                 {/* Nút Áp dụng */}
                 <button 
                     className={styles.applyButton} 
