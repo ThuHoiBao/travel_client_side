@@ -7,6 +7,13 @@ import ToursPage from './components/toursPageComponent/ToursPage';
 import InformationComponent from './components/InformationComponent/InformationComponent';
 import TourBooking from './components/TourBookingComponent/TourBooking';
 import TourDetail from './components/TourDetailComponent/TourDetail';
+import BookingPayment from './components/BookingPaymentComponent/BookingPayment';
+import PaymentFailed from './components/BookingPaymentComponent/PaymentFailed';
+import PaymentSuccess from './components/BookingPaymentComponent/PaymentSuccess';
+import PaymentError from './components/BookingPaymentComponent/PaymentError';
+import Register from './components/RegisterComponent/Register';
+import VerifyEmail from './components/VerifyEmail/VerifyEmail';
+import Login from './components/Login/Login';
 // Các trang giả định
 const HotelPage = () => <div>Trang Khách sạn</div>; 
 const FlightsPage = () => <div>Trang Vé máy bay</div>; 
@@ -48,10 +55,24 @@ function App() {
               path="/tour/:tourCode" 
               element={<TourDetail />} 
           />
-              <Route 
-                 path="/order-booking" 
-                 element={<TourBooking />} />
+          <Route 
+              path="/order-booking" 
+              element={<TourBooking />} 
+          />
+          <Route 
+              path="/payment-booking" 
+              element={<BookingPayment />}
+          />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-failed" element={<PaymentFailed />} />
+          <Route path="/payment-error" element={<PaymentError />} />
 
+          <Route path="/register" element={<Register />} />
+           <Route 
+              path="/login" 
+              element={<Login />} 
+          />
         </Route>
           
         {/* CÁC TRANG KHÔNG SỬ DỤNG LAYOUT */}

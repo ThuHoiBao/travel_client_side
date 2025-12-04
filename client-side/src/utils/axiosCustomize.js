@@ -1,42 +1,72 @@
 import axios from 'axios';
-
-// Tạo một instance của axios với cấu hình mặc định
+const BASE_URL = 'http://localhost:8080/api';
 const instance = axios.create({
-    // Lấy URL từ file .env
-    baseURL: process.env.REACT_APP_BACKEND_URL || 'http://localhost:8080/api', 
-    
-    // (Tùy chọn) Thời gian chờ tối đa (10 giây)
+    baseURL: BASE_URL,
     timeout: 10000, 
-    
-    // (Tùy chọn) Headers mặc định
     headers: {
         'Content-Type': 'application/json',
     }
 });
 
-// --- (Nâng cao) Cấu hình Interceptors (Bộ đón chặn) ---
-// Giúp tự động đính kèm Token vào mọi request hoặc xử lý lỗi chung
-
 // 1. Trước khi gửi request đi
-instance.interceptors.request.use(function (config) {
-    // Ví dụ: Lấy token từ localStorage và gắn vào header
-    // const token = localStorage.getItem('access_token');
-    // if (token) {
-    //     config.headers.Authorization = `Bearer ${token}`;
-    // }
+instance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
-}, function (error) {
+  },
+  (error) => {
     return Promise.reject(error);
-});
+  }
+);
 
-// 2. Sau khi nhận response về
-instance.interceptors.response.use(function (response) {
-    // Trả về data luôn cho gọn (bỏ qua lớp .data của axios)
-    // Ví dụ: thay vì response.data.data thì giờ chỉ cần response.data
-    return response.data ? response.data : response; 
-}, function (error) {
-    // Xử lý lỗi chung (VD: Token hết hạn thì logout)
+instance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Nếu lỗi 401 và chưa retry
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const refreshToken = localStorage.getItem('refreshToken');
+        
+        if (!refreshToken) {
+          // Không có refresh token -> redirect login
+          localStorage.clear();
+          window.location.href = '/login';
+          return Promise.reject(error);
+        }
+
+        // Gọi API refresh token
+        const response = await axios.post(
+          'http://localhost:8080/api/auth/refresh-token',
+          { refreshToken }
+        );
+
+        const { accessToken, refreshToken: newRefreshToken } = response.data;
+
+        // Lưu token mới
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', newRefreshToken);
+
+        // Retry request với token mới
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        return instance(originalRequest);
+
+      } catch (refreshError) {
+        // Refresh token thất bại -> logout
+        localStorage.clear();
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      }
+    }
+
     return Promise.reject(error);
-});
+  }
+);
 
 export default instance;
