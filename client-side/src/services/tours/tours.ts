@@ -45,7 +45,7 @@ const parseBudgetRange = (budgetString: string): { startPrice: number, endPrice:
  * @param searchData - Dữ liệu tìm kiếm từ URL params.
  * @returns Promise<TourResponseDTO[]> - Danh sách các TourResponseDTO.
  */
-export const searchToursApi = async (searchData: any): Promise<TourResponseDTO[]> => {
+export const searchToursApi = async (searchData: any, userId?: number): Promise<any[]> => {
     // 1. Chuẩn hóa dữ liệu form thành SearchToursRequestDTO
     // ... (Giữ nguyên logic tạo requestDto và payload) ...
     const { startPrice, endPrice } = parseBudgetRange(searchData.budget || ''); 
@@ -62,6 +62,9 @@ export const searchToursApi = async (searchData: any): Promise<TourResponseDTO[]
     requestDto.transportation = searchData.transportation || "";
     requestDto.rating = searchData.rating ? parseInt(searchData.rating) : 0; // rating: 1, 2, 3, 4, 5 (0 = All)
     const payload = requestDto.toPlain(); 
+    if (userId) {
+        payload.userId = userId;
+    }
     console.log('Dữ liệu tìm kiếm (Payload - dùng cho GET parameters):', payload);
 
     try {

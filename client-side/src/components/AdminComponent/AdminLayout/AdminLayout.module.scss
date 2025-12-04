@@ -1,0 +1,16 @@
+/* src/components/AdminComponent/AdminLayout/AdminLayout.module.scss */
+
+.adminLayout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f7fafc; /* Nền chung màu trắng ngà */
+}
+
+/* Khu vực nội dung chính */
+.mainContent {
+    flex-grow: 1; /* Cho phép nội dung lấp đầy không gian */
+    margin-left: 250px; /* Offset Sidebar */
+    padding: 80px 20px 20px 20px; /* Padding cho nội dung (Offset Header 60px + 20px đệm) */
+    min-height: calc(100vh - 60px - 55px); /* Tính toán chiều cao tối thiểu */
+}

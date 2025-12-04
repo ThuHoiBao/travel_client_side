@@ -5,9 +5,9 @@ import { useSearchParams } from 'react-router-dom';
 import { searchToursApi } from '../../services/tours/tours.ts';
 import { useLocations } from '../../hook/useLocations.ts';
 import FilterAndSearchInput from './FilterAndSearchInput/FilterAndSearchInput.jsx'; 
-// ✨ IMPORT COMPONENT TOUR MỚI ✨
 import TourComponent from './TourComponent/TourComponent.jsx'; 
 import styles from './ToursPage.module.scss'; 
+import useUser from '../../hook/useUser.ts';
 // Định nghĩa các Tùy chọn Sắp xếp
 const SORT_OPTIONS = [
     { value: 'ALL', label: 'Tất cả' },
@@ -24,7 +24,9 @@ const ToursPage = () => {
     const [currentSort, setCurrentSort] = useState(SORT_OPTIONS[0]); // Mặc định: 'Tất cả'
     const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
     const currentSearchParams = Object.fromEntries(searchParams.entries());
-
+    const mockUserId = 4; // Thay thế bằng logic thực tế! 
+    const { user: currentUser } = useUser(mockUserId); // Hook của bạn đã có, ta dùng nó
+    const currentUserId = currentUser?.userID;
     const currentEndPointInfo = useMemo(() => {
         const endLocationId = currentSearchParams.endLocationID || '-1';
         return endLocations.find(loc => loc.locationID.toString() === endLocationId);
@@ -39,7 +41,7 @@ const ToursPage = () => {
 
             try {
                 // data đã là mảng plain object từ searchToursApi
-                const data = await searchToursApi(requestData); 
+                const data = await searchToursApi(requestData,currentUserId); 
                 setTours(data);
                 setCurrentSort(SORT_OPTIONS[0]); // Reset sắp xếp về 'Tất cả' sau mỗi lần tìm kiếm
             } catch (err) {
@@ -53,7 +55,7 @@ const ToursPage = () => {
 
         fetchTours();
         
-    }, [searchParams]); 
+    }, [searchParams, currentUserId]); 
 
     // ✨ LOGIC SẮP XẾP SỬ DỤNG useMemo ✨
     const sortedTours = useMemo(() => {
@@ -125,7 +127,7 @@ const isSpecificDestinationSelected = currentEndPointInfo && currentEndPointInfo
                 
                 {/* ✨ HEADER KẾT QUẢ VÀ SẮP XẾP MỚI ✨ */}
                 <div className={styles.resultHeader}> 
-<h3 className={styles.tourCount}>Tìm thấy <span className={styles.tourCountValue}>{tours.length}</span>chương trình tour cho bạn.</h3>                    
+                <h3 className={styles.tourCount}>Tìm thấy <span className={styles.tourCountValue}>{tours.length}</span>chương trình tour cho bạn.</h3>                    
                     {/* DROP DOWN SẮP XẾP */}
                     <div className={styles.sortContainer}>
                         <span className={styles.sortLabel}>Sắp xếp theo:</span>
@@ -157,9 +159,12 @@ const isSpecificDestinationSelected = currentEndPointInfo && currentEndPointInfo
                 {error && <p className={styles.errorMessage}>Lỗi: {error}</p>}
                 
                 {/* SỬ DỤNG DANH SÁCH TOUR ĐÃ SẮP XẾP */}
-                {!loading && !error && (
-                    <TourComponent tours={sortedTours} />
-                )}
+               {!loading && !error && (
+                <TourComponent 
+                    tours={sortedTours} 
+                    currentUserId={currentUserId} // TRUYỀN ID XUỐNG
+                />
+            )}
                 {/* Xóa logic hiển thị 'Không tìm thấy' cũ vì đã được xử lý trong TourComponent */}
                 
             </div>

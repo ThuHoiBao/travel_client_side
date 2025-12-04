@@ -1,0 +1,142 @@
+.adminHeader {
+    height: 60px;
+    background-color: white; /* Nền trắng */
+    color: #4a5568; 
+    display: flex;
+    justify-content: flex-end; /* Căn phải */
+    align-items: center;
+    padding: 0 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); /* Shadow nhẹ */
+    position: fixed;
+    top: 0;
+    left: 250px; /* Offset Sidebar */
+    right: 0;
+    z-index: 100;
+}
+
+.leftSection {
+    /* Trong mẫu DashStack, logo nằm trong Sidebar */
+}
+
+.centerSection {
+    flex-grow: 1;
+    max-width: 400px;
+    margin-right: 50px; 
+}
+
+.searchBar {
+    display: flex;
+    align-items: center;
+    background-color: #f7fafc; /* Nền rất nhạt */
+    border-radius: 8px; /* Bo tròn */
+    padding: 8px 15px;
+    border: 1px solid #edf2f7;
+    
+    input {
+        background: none;
+        border: none;
+        color: #1a202c;
+        padding: 0 10px;
+        width: 100%;
+        &:focus {
+            outline: none;
+        }
+        &::placeholder {
+            color: #a0aec0;
+        }
+    }
+}
+
+.searchIcon {
+    color: #a0aec0;
+}
+
+.rightSection {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.iconButton {
+    position: relative;
+    cursor: pointer;
+    font-size: 1.2em; /* To hơn một chút */
+    color: #718096;
+    transition: color 0.2s;
+
+    &:hover {
+        color: #4299e1;
+    }
+}
+
+.badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #f56565;
+    color: white;
+    font-size: 0.7em;
+    border-radius: 50%;
+    padding: 2px 5px;
+    height: 18px;
+    width: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.languageSelect {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.95em;
+    cursor: pointer;
+    color: #4a5568;
+    
+    .languageIcon {
+        color: #718096; /* Giữ màu icon riêng biệt */
+    }
+
+    /* Giả định style cho cờ */
+    .flag-icon {
+        font-size: 1.2em;
+    }
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #edf2f7;
+}
+
+.userText {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Thay đổi thành căn trái */
+
+    .userName {
+        font-weight: 600;
+        font-size: 0.9em;
+        color: #1a202c;
+        line-height: 1.2;
+    }
+    .userRole {
+        font-size: 0.7em;
+        color: #718096;
+    }
+}
+
+.dropdownIcon {
+    color: #a0aec0;
+    margin-left: 5px;
+    font-size: 0.8em;
+}
