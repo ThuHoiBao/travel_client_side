@@ -1,10 +1,10 @@
 // src/components/InformationComponent/TransactionList/TransactionList.jsx
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import useBookings from '../../../hook/useBookings.ts';
+import useWebSocket from '../../../hook/useWebSocket.ts';
 import TransactionListItem from './TransactionListItem/TransactionListItem';
 import styles from './TransactionList.module.scss';
 
-// Định nghĩa trạng thái và label hiển thị (Phải khớp với enum BookingStatus bên BE)
 const statusTabs = [
     { key: null, label: 'Tất cả' },
     { key: 'PENDING_PAYMENT', label: 'Chờ thanh toán' },
@@ -12,19 +12,29 @@ const statusTabs = [
     { key: 'PAID', label: 'Đã thanh toán' },
     { key: 'CANCELLED', label: 'Hủy booking' },
     { key: 'OVERDUE_PAYMENT', label: 'Quá hạn thanh toán' },
-    // { key: 'PENDING_REVIEW', label: 'Chờ đánh giá' },
     { key: 'REVIEWED', label: 'Đã đánh giá' },
     { key: 'PENDING_REFUND', label: 'Chờ hoàn tiền' }
 ];
 
 const TransactionList = ({ user }) => {
-    // Ban đầu, activeStatus là null để lấy 'Tất cả'
-    const [activeStatus, setActiveStatus] = useState(null); 
+    const [activeStatus, setActiveStatus] = useState(null);
     
-    // Giả định user có thuộc tính userID
     const { bookings, loading, error, refetch } = useBookings(user?.id || user?.userID || -1, activeStatus);
+    console.log('📄 Fetched bookings:', user?.userID );
+    // ✨ WEBSOCKET: Lắng nghe cập nhật từ backend cho user cụ thể
+    const handleWebSocketMessage = useCallback((updatedBooking) => {
+        console.log('🔔 User received booking update:', updatedBooking);
+        // Refetch để cập nhật danh sách
+        refetch();
+    }, [refetch]);
 
-    // Lấy label từ key
+    // Subscribe to user-specific topic
+    useWebSocket({
+        topic: `/topic/user/${user?.id || user?.userID}/bookings`,
+        onMessage: handleWebSocketMessage,
+        enabled: !!(user?.id || user?.userID)
+    });
+
     const getLabelFromKey = (key) => {
         return statusTabs.find(tab => tab.key === key)?.label || 'Tất cả';
     };
@@ -37,7 +47,6 @@ const TransactionList = ({ user }) => {
                 {statusTabs.map(tab => (
                     <button
                         key={tab.key || 'all'}
-                        // Kiểm tra nếu null thì tab 'Tất cả' được active
                         className={`${styles.tab} ${activeStatus === tab.key ? styles.active : ''}`}
                         onClick={() => setActiveStatus(tab.key)}
                     >
@@ -52,7 +61,7 @@ const TransactionList = ({ user }) => {
             
             {!loading && !error && bookings.length === 0 && (
                 <div className={styles.emptyState}>
-                    <p>Không có giao dịch nào ở trạng thái **{getLabelFromKey(activeStatus)}**.</p>
+                    <p>Không có giao dịch nào ở trạng thái <strong>{getLabelFromKey(activeStatus)}</strong>.</p>
                 </div>
             )}
 

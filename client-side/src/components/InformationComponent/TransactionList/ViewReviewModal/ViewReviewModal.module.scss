@@ -1,19 +1,28 @@
 /* src/components/InformationComponent/TransactionList/ViewReviewModal/ViewReviewModal.module.scss */
 
-$primary-color: #1890ff; 
-$secondary-color: #f56206; 
-$text-default: #333;
-$text-light: #6c757d;
-$border-color: #e0eeef;
+$primary-color: #2c70f8; // Blue hiện đại
+$secondary-color: #f56206; // Màu cam/đỏ cho nút
+$star-color: #ffc107; // Màu vàng ngôi sao
+$text-default: #1a202c; // Text đậm, dễ đọc
+$text-light: #6c757d; // Text phụ
+$border-color: #edf2f7; // Border nhẹ nhàng
+$bg-light: #f7fafc; // Nền rất nhẹ
+$white: #ffffff; 
 
-// --- Base Modal Styles ---
+// Keyframes (Giữ nguyên)
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+// --- Base Modal Styles (Giữ nguyên) ---
 .modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.65);
+    background-color: rgba(0, 0, 0, 0.7); 
     display: flex;
     justify-content: center;
     align-items: center;
@@ -21,12 +30,12 @@ $border-color: #e0eeef;
 }
 
 .modalContent {
-    background-color: white;
-    padding: 30px;
-    border-radius: 12px;
+    background-color: $white;
+    padding: 25px; 
+    border-radius: 5px; 
     width: 90%;
-    max-width: 600px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    max-width: 600px; 
+    box-shadow: 0 10px 30px rgba(218, 214, 214, 0.4);
     position: relative;
     max-height: 90vh;
     overflow-y: auto;
@@ -35,11 +44,11 @@ $border-color: #e0eeef;
 
 .closeButton {
     position: absolute;
-    top: 15px;
-    right: 15px;
+    top: 20px;
+    right: 20px;
     background: none;
     border: none;
-    font-size: 24px;
+    font-size: 20px;
     color: $text-light;
     cursor: pointer;
     transition: color 0.2s;
@@ -47,156 +56,294 @@ $border-color: #e0eeef;
 }
 
 .modalTitle {
-    font-size: 24px;
-    font-weight: 700;
+    font-size: 23px; 
+    font-weight: 650; 
     color: $text-default;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
     text-align: center;
 }
 
-// --- Tour Summary ---
+// --- 1. Tour Summary (Giữ nguyên) ---
 .tourSummary {
     display: flex;
-    gap: 15px;
+    gap: 20px;
     align-items: center;
     padding-bottom: 20px;
     border-bottom: 1px solid $border-color;
-    margin-bottom: 20px;
+    margin-bottom: 20px; 
     
     .tourImage {
-        width: 100px;
-        height: 100px;
+        width: 250px; 
+        height: 180px; 
         object-fit: cover;
         border-radius: 8px;
+        flex-shrink: 0;
     }
     .tourDetails {
         h4 {
             font-size: 18px;
+            font-weight: 620;
             margin: 0 0 5px 0;
-            color: $primary-color;
+            color:  #171717;
         }
         p {
-            font-size: 14px;
+            font-size: 13px;
             color: $text-light;
             margin: 3px 0;
         }
     }
 }
 
-// --- Review Section ---
+// --- 2. Review Section (ĐÃ TÁI THIẾT KẾ CHO ICON CẢM XÚC VÀ CẤU TRÚC) ---
 .reviewSection {
-    margin-bottom: 30px;
+    margin-bottom: 0px;
+    border: 1px solid $border-color;
+    border-radius: 5px;
+    padding: 25px; 
+    background-color: $bg-light;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    
+    display: flex; 
+    flex-direction: column;
 }
 
-.ratingDisplay {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.reviewHeader {
+    font-size: 18px;
+    font-weight: 500;
+    color: #171717;; 
     margin-bottom: 15px;
-    
-    .stars {
-        font-size: 24px;
-        color: #ffc107;
-        svg { margin-right: 2px; }
-    }
-    .ratingValue {
-        font-size: 18px;
-        font-weight: 700;
-        color: $text-default;
-    }
+    border-bottom: 2px solid rgba( #7a7777, 0.1);
+    padding-bottom: 10px;
+    flex-shrink: 0;
 }
 
 .comment {
-    background-color: $border-color;
-    padding: 15px;
-    border-radius: 8px;
-    font-size: 16px;
+    background-color: #f3f4f5; 
+    border: 1px solid #e4e6e9;
+    padding: 18px;
+    border-radius: 4px;
+    font-size: 16px; 
     line-height: 1.6;
     color: $text-default;
-    white-space: pre-wrap; /* Giữ định dạng xuống dòng */
+    white-space: pre-wrap; 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); 
+    margin-bottom: 0px;
+    flex-grow: 1; 
 }
 
-// --- Gallery Section ---
+// --- 3. Image Gallery (ĐÃ TÍCH HỢP) ---
 .gallerySection {
+    padding-top: 15px;
+    border-top: 1px dashed $border-color; 
+    margin-bottom: 20px; 
+    flex-shrink: 0;
+    
     h3 {
-        font-size: 16px;
+        font-size: 14px;
+        font-weight: 500;
         color: $text-default;
         margin-bottom: 10px;
+        padding-left: 0; 
     }
 }
 
 .imageGrid {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 12px;
     
     img {
         width: 80px;
         height: 80px;
         object-fit: cover;
-        border-radius: 6px;
+        border-radius: 5px;
         cursor: pointer;
-        transition: transform 0.2s, opacity 0.2s;
-        border: 1px solid $border-color;
+        transition: transform 0.2s, opacity 0.2s, box-shadow 0.2s;
+        border: 2px solid $border-color;
         
         &:hover {
-            opacity: 0.8;
+            opacity: 0.9;
             transform: scale(1.05);
+            box-shadow: 0 0 10px rgba($primary-color, 0.3);
+        }
+    }
+}
+// --- END Image Gallery ---
+
+
+// --- RATING FOOTER ---
+.ratingFooter {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid $border-color; 
+    flex-shrink: 0;
+}
+
+// 💡 CẢM XÚC (Bên phải)
+.emotionContainer {
+    display: flex;
+    align-items: center; 
+    gap: 10px;
+    flex-shrink: 0;
+
+    .emotionIcon {
+        font-size: 30px; 
+        filter: drop-shadow(0 2px 2px rgba(158, 155, 155, 0.1));
+    }
+
+    .emotionLabel {
+        font-size: 14px;
+        font-weight: 500;
+        color: $text-default;
+    }
+}
+
+// 💡 SAO VÀ ĐIỂM SỐ GỐC (Bên trái)
+.smallRating {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    
+    .stars {
+        font-size: 20px; 
+        color: $star-color;
+        svg { 
+            margin-right: 2px; 
+        }
+    }
+    .ratingValue {
+        font-size: 14px; 
+        font-weight: 500; 
+        color: $text-default;
+        
+        span {
+            font-size: 14px;
+            color: $text-light;
+            font-weight: 500;
         }
     }
 }
 
 
-// --- Lightbox (Image Zoom) ---
 .lightboxOverlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(0, 0, 0, 0.95); 
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 3000; 
+    transition: background-color 0.3s;
 }
 
 .lightboxContent {
-    max-width: 90vw;
+    /* 💡 Kích thước cố định cho khung chứa ảnh */
+    width: 800px;
+    height: 600px; 
+    max-width: 95vw; /* Đảm bảo đáp ứng trên màn hình nhỏ */
     max-height: 90vh;
+    
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative; 
+    padding: 0; /* Loại bỏ padding để ảnh chiếm tối đa */
+    background-color: #000; /* Nền đen cho khu vực ảnh */
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    overflow: hidden; /* Quan trọng để ảnh không tràn */
+}
+
+.lightboxContent img {
+    /* 💡 Ảnh chiếm tối đa khung 800x600 và được CROP */
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    transition: opacity 0.3s ease-in-out; /* Hiệu ứng mờ khi chuyển ảnh */
+}
+
+
+.lightboxControls {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
     
-    img {
-        max-width: 100%;
-        max-height: 80vh;
-        object-fit: contain;
-        border-radius: 8px;
+    /* Đảm bảo nút điều hướng nằm sát cạnh ảnh */
+    padding: 0 20px; 
+    
+    max-width: 100%; /* Đã sửa lỗi max-width */
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none; /* Cho phép click xuyên qua nếu không chạm vào nút */
+}
+
+.navButton {
+    /* 💡 Nút điều hướng (Nav Button) */
+    background: rgba($white, 0.15); /* Nền trong suốt mờ */
+    color: $white;
+    border: none;
+    font-size: 30px; /* Kích thước lớn hơn */
+    padding: 15px; /* Padding lớn hơn */
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    z-index: 3001;
+    pointer-events: all; /* Cho phép click */
+    backdrop-filter: blur(2px); /* Hiệu ứng làm mờ nền nút */
+
+    &:hover {
+        background: rgba($primary-color, 0.8);
+        transform: scale(1.1);
     }
 }
 
-.closeLightbox {
-    background: $secondary-color;
-    color: white;
+/* 💡 Nút đóng TOP */
+.closeLightboxTop {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba($white, 0.2);
+    color: $white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
+    font-size: 24px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 3010; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(2px); /* Hiệu ứng làm mờ nền nút */
+
+    &:hover {
+        background: $primary-color;
+    }
+}
+
+/* 💡 Nút đóng BOTTOM (Đóng modal) - Đặt ở đây để sử dụng trong Lightbox JSX */
+.closeLightboxBottom {
+    position: absolute;
+    bottom: 20px; /* Đặt ở dưới ảnh */
+    background: $secondary-color;
+    color: $white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    margin-top: 15px;
     font-size: 16px;
     display: flex;
     align-items: center;
     gap: 8px;
+    box-shadow: 0 4px 10px rgba($secondary-color, 0.4);
+    z-index: 3010; 
 
     &:hover {
         background-color: darken($secondary-color, 10%);
     }
-}
-
-// Keyframes
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
 }

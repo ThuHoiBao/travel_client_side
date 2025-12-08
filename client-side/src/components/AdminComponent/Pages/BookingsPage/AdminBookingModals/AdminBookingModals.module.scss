@@ -1,0 +1,340 @@
+// src/components/AdminComponent/Pages/BookingsPage/AdminBookingModals/AdminBookingModals.module.scss
+
+$primary-blue: #2c70f8;
+$success-color: #52c41a;
+$warning-color: #faad14;
+$danger-color: #ff4d4f;
+$text-dark: #333;
+$border-color: #e0e0e0;
+$bg-light: #f7fafc;
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modalContent {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modalHeader {
+    padding: 24px;
+    border-bottom: 1px solid $border-color;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 16px 16px 0 0;
+
+    h2 {
+        margin: 0;
+        font-size: 1.5em;
+        font-weight: 600;
+    }
+
+    .iconSuccess, .iconWarning {
+        font-size: 2em;
+    }
+
+    .iconSuccess {
+        color: #d4f4dd;
+    }
+
+    .iconWarning {
+        color: #ffe58f;
+    }
+}
+
+.modalBody {
+    padding: 24px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.bookingInfo {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    background: $bg-light;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid $border-color;
+
+    img {
+        width: 100px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        flex-shrink: 0;
+    }
+
+    div {
+        flex: 1;
+
+        p {
+            margin: 4px 0;
+            font-size: 14px;
+            color: $text-dark;
+
+            strong {
+                color: $primary-blue;
+                font-weight: 600;
+            }
+        }
+    }
+}
+
+.confirmText {
+    font-size: 16px;
+    line-height: 1.6;
+    color: $text-dark;
+    margin-bottom: 20px;
+    text-align: center;
+
+    strong {
+        color: $primary-blue;
+    }
+}
+
+.refundInfo {
+    padding: 16px;
+    background: #e6f7ff;
+    border-left: 4px solid $primary-blue;
+    border-radius: 8px;
+    margin-bottom: 20px;
+
+    h4 {
+        margin: 0 0 12px 0;
+        color: $primary-blue;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    p {
+        margin: 8px 0;
+        font-size: 14px;
+        color: $text-dark;
+
+        strong {
+            font-weight: 600;
+        }
+    }
+
+    .refundAmount {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid rgba($primary-blue, 0.3);
+        font-size: 16px;
+        color: $success-color;
+        font-weight: 700;
+    }
+}
+
+.infoBox {
+    padding: 16px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    margin-bottom: 20px;
+
+    p {
+        margin: 0;
+        font-size: 14px;
+        color: $text-dark;
+        line-height: 1.6;
+
+        strong {
+            font-weight: 600;
+        }
+    }
+}
+
+.reasonSection {
+    margin-bottom: 20px;
+
+    h4 {
+        margin: 0 0 16px 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: $text-dark;
+
+        .required {
+            color: $danger-color;
+            margin-left: 4px;
+        }
+    }
+}
+
+.radioLabel {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
+    border: 2px solid $border-color;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    line-height: 1.5;
+
+    &:hover {
+        border-color: $primary-blue;
+        background: rgba($primary-blue, 0.05);
+    }
+
+    input[type="radio"] {
+        margin-top: 2px;
+        cursor: pointer;
+        flex-shrink: 0;
+
+        &:checked + span {
+            color: $primary-blue;
+            font-weight: 600;
+        }
+    }
+
+    input[type="radio"]:checked ~ & {
+        border-color: $primary-blue;
+        background: rgba($primary-blue, 0.1);
+    }
+}
+
+.customReasonInput {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid $border-color;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    margin-top: 12px;
+    transition: border-color 0.2s;
+
+    &:focus {
+        outline: none;
+        border-color: $primary-blue;
+        box-shadow: 0 0 0 3px rgba($primary-blue, 0.1);
+    }
+}
+
+.warningBox {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: #fff7e6;
+    border-left: 4px solid $warning-color;
+    border-radius: 8px;
+    margin-top: 20px;
+
+    svg {
+        color: $warning-color;
+        font-size: 1.5em;
+        flex-shrink: 0;
+    }
+
+    p {
+        margin: 0;
+        font-size: 14px;
+        color: #ad6800;
+        font-weight: 500;
+        line-height: 1.5;
+    }
+}
+
+.modalFooter {
+    padding: 20px 24px;
+    border-top: 1px solid $border-color;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: $bg-light;
+    border-radius: 0 0 16px 16px;
+}
+
+.btnCancel,
+.btnConfirm,
+.btnDanger {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.btnCancel {
+    background: white;
+    color: $text-dark;
+    border: 2px solid $border-color;
+
+    &:hover:not(:disabled) {
+        background: $bg-light;
+        border-color: darken($border-color, 10%);
+    }
+}
+
+.btnConfirm {
+    background: linear-gradient(135deg, $success-color 0%, #389e0d 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba($success-color, 0.3);
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba($success-color, 0.4);
+    }
+}
+
+.btnDanger {
+    background: linear-gradient(135deg, $danger-color 0%, #cf1322 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba($danger-color, 0.3);
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba($danger-color, 0.4);
+    }
+}

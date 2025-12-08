@@ -2,17 +2,56 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './ViewReviewModal.module.scss';
-import { FaTimes, FaStar, FaMapMarkerAlt, FaCalendarAlt } from 'react-icons/fa';
-import { getReviewByBookingIdApi } from '../../../../services/review/review.ts'; // Sửa đường dẫn nếu cần
+import { 
+    FaTimes, FaStar, FaChevronLeft, FaChevronRight,
+    FaGrinStars, FaSmile, FaMeh, FaFrown, FaGrimace 
+} from 'react-icons/fa';
+import { getReviewByBookingIdApi } from '../../../../services/review/review.ts';
+
+// --- HÀM CHUYỂN ĐỔI RATING SANG ICON CẢM XÚC (Giữ nguyên) ---
+const getEmotionIcon = (rating, styles) => {
+    switch (rating) {
+        case 5:
+            return {
+                icon: <FaGrinStars className={styles.emotionIcon} style={{ color: '#52c41a' }} />,
+                label: "Tuyệt vời"
+            };
+        case 4:
+            return {
+                icon: <FaSmile className={styles.emotionIcon} style={{ color: '#87d068' }} />,
+                label: "Hài lòng"
+            };
+        case 3:
+            return {
+                icon: <FaMeh className={styles.emotionIcon} style={{ color: '#ffc107' }} />,
+                label: "Bình thường"
+            };
+        case 2:
+            return {
+                icon: <FaFrown className={styles.emotionIcon} style={{ color: '#ff4d4f' }} />,
+                label: "Không hài lòng"
+            };
+        case 1:
+            return {
+                icon: <FaGrimace className={styles.emotionIcon} style={{ color: '#f00' }} />,
+                label: "Tệ"
+            };
+        default:
+            return { icon: null, label: "N/A" };
+    }
+};
+// --- END HÀM CHUYỂN ĐỔI ---
 
 const ViewReviewModal = ({ booking, onClose, formatPrice, formatDate }) => {
     const [reviewData, setReviewData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [lightboxImage, setLightboxImage] = useState(null); // URL của ảnh đang xem
+    const [lightboxImage, setLightboxImage] = useState(null); 
+    const [currentImageIndex, setCurrentImageIndex] = useState(0); 
 
     useEffect(() => {
         const fetchReview = async () => {
+            document.body.style.overflow = 'hidden';
             try {
                 const data = await getReviewByBookingIdApi(booking.bookingID);
                 setReviewData(data);
@@ -24,6 +63,9 @@ const ViewReviewModal = ({ booking, onClose, formatPrice, formatDate }) => {
             }
         };
         fetchReview();
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
     }, [booking.bookingID]);
 
     const renderStars = (rating) => {
@@ -31,6 +73,27 @@ const ViewReviewModal = ({ booking, onClose, formatPrice, formatDate }) => {
             <FaStar key={index} color={index < rating ? "#ffc107" : "#e4e5e9"} />
         ));
     };
+    
+    const openLightbox = (url, index) => {
+        setLightboxImage(url);
+        setCurrentImageIndex(index);
+    };
+
+    const navigateLightbox = (direction) => {
+        if (!reviewData || !reviewData.imageUrls) return;
+        const total = reviewData.imageUrls.length;
+        let newIndex = currentImageIndex + direction;
+        
+        if (newIndex < 0) {
+            newIndex = total - 1;
+        } else if (newIndex >= total) {
+            newIndex = 0;
+        }
+
+        setCurrentImageIndex(newIndex);
+        setLightboxImage(reviewData.imageUrls[newIndex]);
+    };
+
 
     if (loading) {
         return createPortal(<div className={styles.modalOverlay}><div className={styles.loading}>Đang tải...</div></div>, document.body);
@@ -40,26 +103,46 @@ const ViewReviewModal = ({ booking, onClose, formatPrice, formatDate }) => {
         return createPortal(<div className={styles.modalOverlay}><div className={styles.error}>{error}</div></div>, document.body);
     }
     
-    // --- JSX cho Lightbox (Xem ảnh lớn) ---
-    const lightboxJSX = lightboxImage && (
-        <div className={styles.lightboxOverlay} onClick={() => setLightboxImage(null)}>
+    const emotion = reviewData ? getEmotionIcon(reviewData.rating, styles) : { icon: null, label: "N/A" };
+
+    const lightboxJSX = lightboxImage && reviewData.imageUrls.length > 0 && (
+        <div className={styles.lightboxOverlay} onClick={onClose}>
             <div className={styles.lightboxContent} onClick={e => e.stopPropagation()}>
+                
+                {/* 💡 Nút Đóng TOP (X) */}
+                <button className={styles.closeLightboxTop} onClick={onClose}>
+                     <FaTimes />
+                </button> 
+                
                 <img src={lightboxImage} alt="Ảnh đánh giá lớn" />
-                <button className={styles.closeLightbox} onClick={() => setLightboxImage(null)}>
+                
+                {/* Controls (Nút chuyển ảnh) */}
+                {reviewData.imageUrls.length > 1 && (
+                    <div className={styles.lightboxControls}>
+                        <button className={styles.navButton} onClick={(e) => { e.stopPropagation(); navigateLightbox(-1); }}>
+                            <FaChevronLeft />
+                        </button>
+                        <button className={styles.navButton} onClick={(e) => { e.stopPropagation(); navigateLightbox(1); }}>
+                            <FaChevronRight />
+                        </button>
+                    </div>
+                )}
+                
+                {/* 💡 Nút Đóng BOTTOM (Đóng modal) */}
+                <button className={styles.closeLightboxBottom} onClick={onClose}>
                     <FaTimes /> Đóng
                 </button>
+                
             </div>
         </div>
     );
-    
 
-    // --- JSX cho Modal Chính ---
     const modalJSX = (
         <div className={styles.modalOverlay} onClick={onClose}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <button className={styles.closeButton} onClick={onClose}><FaTimes /></button>
 
-                <h2 className={styles.modalTitle}>Chi tiết đánh giá của bạn</h2>
+                <h2 className={styles.modalTitle}>Cảm nhận về chuyến đi</h2>
                 
                 {/* 1. Tour Info */}
                 <div className={styles.tourSummary}>
@@ -71,33 +154,55 @@ const ViewReviewModal = ({ booking, onClose, formatPrice, formatDate }) => {
                     </div>
                 </div>
                 
-                {/* 2. Rating & Comment */}
-                <div className={styles.reviewSection}>
-                    <div className={styles.ratingDisplay}>
-                        <div className={styles.stars}>{renderStars(reviewData.rating)}</div>
-                        <span className={styles.ratingValue}>{reviewData.rating}/5</span>
-                    </div>
-                    
-                    <p className={styles.comment}>{reviewData.comment}</p>
-                </div>
+                {/* 2. Review Section (Tích hợp Gallery) */}
+                {reviewData && (
+                    <div className={styles.reviewSection}>
+                        
+                        {/* 💡 TIÊU ĐỀ PHẦN ĐÁNH GIÁ */}
+                        <h3 className={styles.reviewHeader}>
+                            Cảm nhận về chuyến đi
+                        </h3>
+                        
+                        {/* 💡 COMMENT (Nằm trên) */}
+                        <p className={styles.comment}>{reviewData.comment || 'Không có bình luận.'}</p>
+                        
+                        {/* 💡 IMAGE GALLERY (Tích hợp vào đây) */}
+                        {reviewData.imageUrls && reviewData.imageUrls.length > 0 && (
+                            <div className={styles.gallerySection}>
+                                <h3>Ảnh đã đính kèm ({reviewData.imageUrls.length})</h3>
+                                <div className={styles.imageGrid}>
+                                    {reviewData.imageUrls.map((url, index) => (
+                                        <img
+                                            key={index}
+                                            src={url}
+                                            alt={`Ảnh ${index + 1}`}
+                                            onClick={() => openLightbox(url, index)} 
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        
+                        {/* 💡 RATING & EMOTION (Nằm dưới) */}
+                        <div className={styles.ratingFooter}>
+                            
+                            {/* SAO VÀ ĐIỂM SỐ GỐC */}
+                            <div className={styles.smallRating}>
+                                <div className={styles.stars}>{renderStars(reviewData.rating)}</div>
+                                <span className={styles.ratingValue}>
+                                    {reviewData.rating}<span>/5</span>
+                                </span>
+                            </div>
 
-                {/* 3. Image Gallery */}
-                {reviewData.imageUrls && reviewData.imageUrls.length > 0 && (
-                    <div className={styles.gallerySection}>
-                        <h3>Ảnh đánh giá ({reviewData.imageUrls.length})</h3>
-                        <div className={styles.imageGrid}>
-                            {reviewData.imageUrls.map((url, index) => (
-                                <img
-                                    key={index}
-                                    src={url}
-                                    alt={`Ảnh ${index + 1}`}
-                                    onClick={() => setLightboxImage(url)} // Mở lightbox
-                                />
-                            ))}
+                            {/* ICON CẢM XÚC LỚN + LABEL */}
+                            <div className={styles.emotionContainer}>
+                                {emotion.icon}
+                                <span className={styles.emotionLabel}>{emotion.label}</span>
+                            </div>
                         </div>
                     </div>
                 )}
-                
+
                 {lightboxJSX}
             </div>
         </div>
