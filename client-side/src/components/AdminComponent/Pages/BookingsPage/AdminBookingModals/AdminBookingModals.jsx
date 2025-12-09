@@ -1,7 +1,7 @@
 // src/components/AdminComponent/Pages/BookingsPage/AdminBookingModals/AdminBookingModals.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './AdminBookingModals.module.scss';
-import { FaCheckCircle, FaTimesCircle, FaExclamationTriangle } from 'react-icons/fa';
+import { FaCheckCircle, FaTimesCircle, FaExclamationTriangle, FaQrcode } from 'react-icons/fa';
 import { updateBookingStatusApi } from '../../../../../services/booking/booking.ts';
 
 // CANCEL REASONS
@@ -11,7 +11,30 @@ const CANCEL_REASONS = [
     "Có sự cố về phương tiện vận chuyển",
     "Khác (Nhập lý do)"
 ];
-
+// 🔥 VietQR Component
+const VietQRCode = ({ bank, accountNumber, accountName, amount, bookingCode }) => {
+    const transferContent = `HOANTIEN ${bookingCode}`;
+    
+    // Format theo chuẩn VietQR
+    const vietQRUrl = `https://img.vietqr.io/image/${bank}-${accountNumber}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(accountName)}`;
+    
+    return (
+        <div className={styles.qrCodeSection}>
+            <div className={styles.qrCodeHeader}>
+                <FaQrcode className={styles.qrIcon} />
+                <h4>Quét mã để chuyển khoản</h4>
+            </div>
+            <img src={vietQRUrl} alt="VietQR Code" className={styles.qrImage} />
+            <div className={styles.qrInfo}>
+                <p><strong>Ngân hàng:</strong> {bank}</p>
+                <p><strong>Số TK:</strong> {accountNumber}</p>
+                <p><strong>Chủ TK:</strong> {accountName}</p>
+                <p><strong>Số tiền:</strong> {new Intl.NumberFormat('vi-VN').format(amount)} VND</p>
+                <p><strong>Nội dung:</strong> {transferContent}</p>
+            </div>
+        </div>
+    );
+};
 // 1. MODAL XÁC NHẬN ĐƠN HÀNG (PENDING_CONFIRMATION -> PAID)
 export const ConfirmBookingModal = ({ booking, onClose, onSuccess }) => {
     const [loading, setLoading] = useState(false);
@@ -76,12 +99,13 @@ export const ConfirmBookingModal = ({ booking, onClose, onSuccess }) => {
         </div>
     );
 };
-
 // 2. MODAL HỦY ĐƠN VÀ HOÀN TIỀN (CHO PENDING_CONFIRMATION, PAID)
 export const CancelWithRefundModal = ({ booking, onClose, onSuccess }) => {
     const [selectedReason, setSelectedReason] = useState('');
     const [customReason, setCustomReason] = useState('');
     const [loading, setLoading] = useState(false);
+    const [checking, setChecking] = useState(false);
+    const [checkAttempts, setCheckAttempts] = useState(0);
 
     const formatPrice = (price) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
@@ -89,13 +113,65 @@ export const CancelWithRefundModal = ({ booking, onClose, onSuccess }) => {
 
     const totalRefund = booking.totalPrice + (booking.paidByCoin || 0);
 
-    const handleCancel = async () => {
+    // Auto-check giao dịch mỗi 5 giây (tối đa 12 lần = 1 phút)
+    useEffect(() => {
+        if (!checking || checkAttempts >= 12) return;
+
+        const timer = setTimeout(async () => {
+            try {
+                console.log(`🔍 Checking transaction... Attempt ${checkAttempts + 1}/12`);
+                
+                const finalReason = selectedReason === CANCEL_REASONS[3] ? customReason : selectedReason;
+                
+                // Gọi API update status
+                await updateBookingStatusApi({
+                    bookingID: booking.bookingID,
+                    bookingStatus: 'CANCELLED',
+                    cancelReason: finalReason || 'Admin hủy và hoàn tiền'
+                });
+                
+                // Nếu thành công -> dừng check
+                alert('✅ Đã xác nhận giao dịch chuyển khoản thành công!');
+                setChecking(false);
+                onSuccess();
+                onClose();
+                
+            } catch (error) {
+                console.log('Transaction not found yet, retrying...');
+                setCheckAttempts(prev => prev + 1);
+            }
+        }, 5000);
+
+        return () => clearTimeout(timer);
+    }, [checking, checkAttempts]);
+
+    const handleStartAutoCheck = () => {
         const finalReason = selectedReason === CANCEL_REASONS[3] ? customReason : selectedReason;
         
         if (!finalReason || finalReason.trim() === '') {
             alert('Vui lòng chọn hoặc nhập lý do hủy!');
             return;
         }
+
+        setChecking(true);
+        setCheckAttempts(0);
+        alert('🔍 Bắt đầu kiểm tra giao dịch tự động. Vui lòng quét mã QR để chuyển khoản...');
+    };
+
+    const handleManualConfirm = async () => {
+        const finalReason = selectedReason === CANCEL_REASONS[3] ? customReason : selectedReason;
+        
+        if (!finalReason || finalReason.trim() === '') {
+            alert('Vui lòng chọn hoặc nhập lý do hủy!');
+            return;
+        }
+
+        const confirmManual = window.confirm(
+            '⚠️ Bạn chắc chắn đã chuyển khoản thành công? ' +
+            'Hệ thống sẽ cập nhật trạng thái ngay lập tức.'
+        );
+
+        if (!confirmManual) return;
 
         try {
             setLoading(true);
@@ -116,7 +192,7 @@ export const CancelWithRefundModal = ({ booking, onClose, onSuccess }) => {
 
     return (
         <div className={styles.modalOverlay} onClick={onClose}>
-            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={`${styles.modalContent} ${styles.wideModal}`} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
                     <FaExclamationTriangle className={styles.iconWarning} />
                     <h2>Xác nhận hủy tour và hoàn tiền</h2>
@@ -132,11 +208,17 @@ export const CancelWithRefundModal = ({ booking, onClose, onSuccess }) => {
                         </div>
                     </div>
 
+                    {/* 🔥 VIETQR CODE */}
+                    <VietQRCode
+                        bank={booking.refundBank || booking.bank || 'MB'}
+                        accountNumber={booking.refundAccountNumber || booking.accountNumber || ''}
+                        accountName={booking.refundAccountName || booking.accountName || ''}
+                        amount={totalRefund}
+                        bookingCode={booking.bookingCode}
+                    />
+
                     <div className={styles.refundInfo}>
                         <h4>Thông tin hoàn tiền</h4>
-                        <p><strong>Ngân hàng:</strong> {booking.bank || booking.refundBank || 'N/A'}</p>
-                        <p><strong>Số TK:</strong> {booking.accountNumber || booking.refundAccountNumber || 'N/A'}</p>
-                        <p><strong>Chủ TK:</strong> {booking.accountName || booking.refundAccountName || 'N/A'}</p>
                         <p className={styles.refundAmount}>
                             <strong>Số tiền hoàn:</strong> {formatPrice(totalRefund)}
                         </p>
@@ -168,26 +250,148 @@ export const CancelWithRefundModal = ({ booking, onClose, onSuccess }) => {
                         )}
                     </div>
 
-                    <div className={styles.warningBox}>
-                        <FaExclamationTriangle />
-                        <p>Lưu ý: Bạn phải chắc chắn hoàn tiền cho khách hàng trước khi bấm xác nhận!</p>
-                    </div>
+                    {checking && (
+                        <div className={styles.checkingStatus}>
+                            <div className={styles.spinner}></div>
+                            <p>Đang kiểm tra giao dịch... ({checkAttempts}/12)</p>
+                        </div>
+                    )}
                 </div>
 
                 <div className={styles.modalFooter}>
                     <button 
                         className={styles.btnCancel} 
                         onClick={onClose}
-                        disabled={loading}
+                        disabled={loading || checking}
                     >
-                        Hủy
+                        Đóng
                     </button>
+                    {/* <button 
+                        className={styles.btnAutoCheck} 
+                        onClick={handleStartAutoCheck}
+                        disabled={loading || checking}
+                    >
+                        {checking ? 'Đang kiểm tra...' : '🔍 Tự động kiểm tra'}
+                    </button> */}
                     <button 
                         className={styles.btnDanger} 
-                        onClick={handleCancel}
-                        disabled={loading}
+                        onClick={handleManualConfirm}
+                        disabled={loading || checking}
                     >
-                        {loading ? 'Đang xử lý...' : 'Xác nhận hủy'}
+                        {loading ? 'Đang xử lý...' : 'Xác nhận'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// 4. MODAL HOÀN TIỀN (CHO PENDING_REFUND) - Cũng có QR
+export const ProcessRefundModal = ({ booking, onClose, onSuccess }) => {
+    const [loading, setLoading] = useState(false);
+    const [checking, setChecking] = useState(false);
+    const [checkAttempts, setCheckAttempts] = useState(0);
+
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+    };
+
+    const totalRefund = booking.totalPrice + (booking.paidByCoin || 0);
+
+    // Auto-check
+    useEffect(() => {
+        if (!checking || checkAttempts >= 12) return;
+
+        const timer = setTimeout(async () => {
+            try {
+                await updateBookingStatusApi({
+                    bookingID: booking.bookingID,
+                    bookingStatus: 'CANCELLED',
+                    cancelReason: 'Khách hàng yêu cầu hủy đơn và hoàn tiền tài khoản.'
+                });
+                
+                alert('✅ Đã xác nhận giao dịch chuyển khoản thành công!');
+                setChecking(false);
+                onSuccess();
+                onClose();
+                
+            } catch (error) {
+                setCheckAttempts(prev => prev + 1);
+            }
+        }, 5000);
+
+        return () => clearTimeout(timer);
+    }, [checking, checkAttempts]);
+
+    const handleStartAutoCheck = () => {
+        setChecking(true);
+        setCheckAttempts(0);
+        alert('🔍 Bắt đầu kiểm tra giao dịch tự động...');
+    };
+
+    const handleManualConfirm = async () => {
+        const confirm = window.confirm('⚠️ Bạn chắc chắn đã chuyển khoản?');
+        if (!confirm) return;
+
+        try {
+            setLoading(true);
+            await updateBookingStatusApi({
+                bookingID: booking.bookingID,
+                bookingStatus: 'CANCELLED',
+                cancelReason: 'Khách hàng yêu cầu hủy đơn và hoàn tiền tài khoản.'
+            });
+            alert('✅ Xác nhận hoàn tiền thành công!');
+            onSuccess();
+            onClose();
+        } catch (error) {
+            alert('❌ Lỗi: ' + (error.response?.data?.message || error.message));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className={styles.modalOverlay} onClick={onClose}>
+            <div className={`${styles.modalContent} ${styles.wideModal}`} onClick={(e) => e.stopPropagation()}>
+                <div className={styles.modalHeader}>
+                    <FaCheckCircle className={styles.iconSuccess} />
+                    <h2>Xác nhận hoàn tiền và hủy tour</h2>
+                </div>
+                
+                <div className={styles.modalBody}>
+                    <div className={styles.bookingInfo}>
+                        <img src={booking.image || '/placeholder.png'} alt={booking.tourName} />
+                        <div>
+                            <p><strong>Booking:</strong> {booking.bookingCode}</p>
+                            <p><strong>Tour:</strong> {booking.tourName}</p>
+                        </div>
+                    </div>
+
+                    <VietQRCode
+                        bank={booking.refundBank || 'MB'}
+                        accountNumber={booking.refundAccountNumber || ''}
+                        accountName={booking.refundAccountName || ''}
+                        amount={totalRefund}
+                        bookingCode={booking.bookingCode}
+                    />
+
+                    {checking && (
+                        <div className={styles.checkingStatus}>
+                            <div className={styles.spinner}></div>
+                            <p>Đang kiểm tra giao dịch... ({checkAttempts}/12)</p>
+                        </div>
+                    )}
+                </div>
+
+                <div className={styles.modalFooter}>
+                    <button className={styles.btnCancel} onClick={onClose} disabled={loading || checking}>
+                        Đóng
+                    </button>
+                    <button className={styles.btnAutoCheck} onClick={handleStartAutoCheck} disabled={loading || checking}>
+                        {checking ? 'Đang kiểm tra...' : '🔍 Tự động kiểm tra'}
+                    </button>
+                    <button className={styles.btnConfirm} onClick={handleManualConfirm} disabled={loading || checking}>
+                        {loading ? 'Đang xử lý...' : 'Xác nhận thủ công'}
                     </button>
                 </div>
             </div>
@@ -285,93 +489,6 @@ export const CancelWithoutRefundModal = ({ booking, onClose, onSuccess }) => {
                         disabled={loading}
                     >
                         {loading ? 'Đang xử lý...' : 'Xác nhận hủy'}
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// 4. MODAL HOÀN TIỀN (CHO PENDING_REFUND)
-export const ProcessRefundModal = ({ booking, onClose, onSuccess }) => {
-    const [loading, setLoading] = useState(false);
-
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
-    };
-
-    const totalRefund = booking.totalPrice + (booking.paidByCoin || 0);
-
-    const handleConfirmRefund = async () => {
-        try {
-            setLoading(true);
-            await updateBookingStatusApi({
-                bookingID: booking.bookingID,
-                bookingStatus: 'CANCELLED',
-                cancelReason: 'Khách hàng yêu cầu hủy đơn và hoàn tiền tài khoản.'
-            });
-            alert('✅ Xác nhận hoàn tiền thành công!');
-            onSuccess();
-            onClose();
-        } catch (error) {
-            alert('❌ Lỗi: ' + (error.response?.data?.message || error.message));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return (
-        <div className={styles.modalOverlay} onClick={onClose}>
-            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                <div className={styles.modalHeader}>
-                    <FaCheckCircle className={styles.iconSuccess} />
-                    <h2>Xác nhận hoàn tiền và hủy tour</h2>
-                </div>
-                
-                <div className={styles.modalBody}>
-                    <div className={styles.bookingInfo}>
-                        <img src={booking.image || '/placeholder.png'} alt={booking.tourName} />
-                        <div>
-                            <p><strong>Booking:</strong> {booking.bookingCode}</p>
-                            <p><strong>Tour:</strong> {booking.tourName}</p>
-                            <p><strong>Mã Tour:</strong> {booking.tourCode}</p>
-                        </div>
-                    </div>
-
-                    <div className={styles.refundInfo}>
-                        <h4>Thông tin tài khoản hoàn tiền</h4>
-                        <p><strong>Ngân hàng:</strong> {booking.refundBank || 'N/A'}</p>
-                        <p><strong>Số TK:</strong> {booking.refundAccountNumber || 'N/A'}</p>
-                        <p><strong>Chủ TK:</strong> {booking.refundAccountName || 'N/A'}</p>
-                        <p className={styles.refundAmount}>
-                            <strong>Số tiền cần hoàn:</strong> {formatPrice(totalRefund)}
-                        </p>
-                    </div>
-
-                    <div className={styles.infoBox}>
-                        <p><strong>Lý do hoàn tiền:</strong> Khách hàng yêu cầu hủy đơn và hoàn tiền tài khoản.</p>
-                    </div>
-
-                    <div className={styles.warningBox}>
-                        <FaExclamationTriangle />
-                        <p>Lưu ý: Bạn phải chắc chắn hoàn tiền cho khách hàng trước khi bấm xác nhận!</p>
-                    </div>
-                </div>
-
-                <div className={styles.modalFooter}>
-                    <button 
-                        className={styles.btnCancel} 
-                        onClick={onClose}
-                        disabled={loading}
-                    >
-                        Hủy
-                    </button>
-                    <button 
-                        className={styles.btnConfirm} 
-                        onClick={handleConfirmRefund}
-                        disabled={loading}
-                    >
-                        {loading ? 'Đang xử lý...' : 'Xác nhận'}
                     </button>
                 </div>
             </div>
