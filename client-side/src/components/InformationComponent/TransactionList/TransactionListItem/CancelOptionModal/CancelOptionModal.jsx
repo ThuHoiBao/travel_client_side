@@ -11,7 +11,7 @@ import ConfirmCancellationModal from '../ConfirmCancellationModal/ConfirmCancell
 import RefundInfoModal from '../RefundInfoModal/RefundInfoModal';
 
 
-const CancelOptionModal = ({ bookingID, onClose, onRefetch }) => {
+const CancelOptionModal = ({ booking,bookingID, onClose, onRefetch }) => {
     // State quản lý các modal con
     const [activeSubModal, setActiveSubModal] = useState(null); // 'confirm_coin', 'refund_bank'
 
@@ -31,6 +31,7 @@ const CancelOptionModal = ({ bookingID, onClose, onRefetch }) => {
         return (
             <RefundInfoModal
                 bookingID={bookingID}
+                booking={booking}
                 onClose={onClose} // Đóng hết modal gốc
                 onBack={() => setActiveSubModal(null)}
                 onRefetch={onRefetch}

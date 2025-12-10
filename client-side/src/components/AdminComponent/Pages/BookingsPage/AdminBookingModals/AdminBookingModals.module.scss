@@ -454,3 +454,161 @@ $bg-light: #f7fafc;
         cursor: not-allowed;
     }
 }
+.notificationOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4); /* Ít mờ hơn overlay chính */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000; /* Cao hơn modal chính */
+    animation: fadeIn 0.2s ease-in;
+}
+
+.notificationContent {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Hiệu ứng nảy */
+}
+
+@keyframes zoomIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.notificationIcon {
+    font-size: 4em;
+    margin-bottom: 15px;
+}
+
+.iconSuccess {
+    color: $success-color;
+}
+
+.iconDanger {
+    color: $danger-color;
+}
+
+.notificationTitle {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: $text-dark;
+    margin-bottom: 10px;
+}
+
+.notificationMessage {
+    font-size: 1em;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.btnOk {
+    background: $primary-blue;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+        background: darken($primary-blue, 10%);
+    }
+}
+
+.confirmationOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001; /* Cao hơn cả notification */
+    animation: fadeIn 0.2s ease-in;
+}
+
+.confirmationContent {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+    animation: slideUp 0.3s ease-out;
+
+    .iconWarningLg {
+        color: $warning-color;
+        font-size: 3.5em;
+        margin-bottom: 15px;
+    }
+
+    h3 {
+        font-size: 1.4em;
+        font-weight: 700;
+        color: $text-dark;
+        margin-bottom: 10px;
+    }
+
+    p {
+        font-size: 1em;
+        color: #555;
+        line-height: 1.5;
+        margin-bottom: 25px;
+        font-weight: 500;
+    }
+
+    .confirmationActions {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+}
+
+.btnConfirmAction {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btnConfirmYes {
+    background: $danger-color;
+    color: white;
+    border: 1px solid $danger-color;
+
+    &:hover {
+        background: darken($danger-color, 10%);
+    }
+}
+
+.btnConfirmNo {
+    background: white;
+    color: $text-dark;
+    border: 1px solid $border-color;
+
+    &:hover {
+        background: $bg-light;
+    }
+}

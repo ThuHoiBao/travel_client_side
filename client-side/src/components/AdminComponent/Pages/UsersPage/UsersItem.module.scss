@@ -1,0 +1,45 @@
+// src/components/AdminComponent/Pages/UsersPage/UsersItem.module.scss
+$success-color: #52c41a;
+$danger-color: #ff4d4f;
+$primary-color: #2c70f8;
+
+.userRow {
+    &:hover { background-color: #f9f9f9; }
+    td { vertical-align: middle; font-size: 14px; color: #333; }
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    .avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd; }
+    .fullName { font-weight: 600; }
+}
+
+.statusBadge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    &.active { background-color: #f6ffed; color: $success-color; border: 1px solid $success-color; }
+    &.locked { background-color: #fff1f0; color: $danger-color; border: 1px solid $danger-color; }
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.actionBtn {
+    border: 1px solid #ccc;
+    background: white;
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+
+    &.btnLock { color: $danger-color; border-color: $danger-color; &:hover { background: #fff1f0; } }
+    &.btnUnlock { color: $success-color; border-color: $success-color; &:hover { background: #f6ffed; } }
+    &.btnOrders { color: $primary-color; border-color: $primary-color; &:hover { background: #e6f7ff; } }
+}

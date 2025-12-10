@@ -115,3 +115,111 @@ $bg-light: #f7f7f7;
     // Kế thừa style thông báo thành công
     composes: successMessage from "../ConfirmCancellationModal/ConfirmCancellationModal.module.scss";
 }
+
+// ✅ Style cho Bank Select Trigger
+.bankSelectTrigger {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 16px;
+    background-color: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    
+    &:hover {
+        border-color: $primary-color;
+    }
+    
+    &:active {
+        border-color: $primary-color;
+        box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+    }
+
+    .placeholder {
+        color: #adb5bd;
+    }
+}
+
+// --- Bank Selection Modal Styles ---
+.bankSelectOverlay {
+    composes: modalOverlay; // Kế thừa overlay chung
+    z-index: 3000; /* Cao hơn modal cha */
+}
+
+.bankSelectContent {
+    background-color: white;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 550px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.bankSelectHeader {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    h4 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .closeIcon {
+        cursor: pointer;
+        font-size: 20px;
+        color: #666;
+        &:hover { color: $error-color; }
+    }
+}
+
+.bankList {
+    padding: 10px 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bankItem {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    background-color: $bg-light;
+    transition: background-color 0.2s;
+    
+    &:hover {
+        background-color: lighten($primary-color, 45%);
+    }
+    
+    .bankIconPlaceholder {
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+        background-color: $primary-color;
+        color: white;
+        font-weight: 700;
+        border-radius: 4px;
+        margin-right: 15px;
+        flex-shrink: 0;
+    }
+    
+    .bankName {
+        font-size: 15px;
+        font-weight: 500;
+        color: #333;
+    }
+}
