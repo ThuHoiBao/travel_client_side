@@ -46,6 +46,7 @@ $coin-color: #ffc107; // Màu vàng coin
     margin-right: 25px;
     color: white;
     cursor: pointer;
+    text-decoration: none;
 }
 
 .navLink {
@@ -64,7 +65,6 @@ $coin-color: #ffc107; // Màu vàng coin
 }
 
 .navLinkActive {
-    composes: navLink;
     border-bottom: 3px solid $accent-color; 
     font-weight: bold;
     color: white;

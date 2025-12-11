@@ -25,6 +25,7 @@ const BookingPayment = () => {
   const [showPassengers, setShowPassengers] = useState(false);
   const [error, setError] = useState(null);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('PAYOS');
 
   useEffect(() => {
     const fetchBookingData = async () => {
@@ -41,10 +42,10 @@ const BookingPayment = () => {
         
         const data = response.data || response;
         setBookingData(data);
-        console.log('✅ Booking data loaded:', data);
+        console.log('Booking data loaded:', data);
         setError(null);
       } catch (err) {
-        console.error('❌ Error fetching booking:', err);
+        console.error('Error fetching booking:', err);
         const errorMsg = err.response?.data?.message || 
                         err.response?.data?.error || 
                         'Không thể tải thông tin booking. Vui lòng thử lại.';
@@ -163,59 +164,80 @@ const BookingPayment = () => {
       return;
     }
 
-    try {
+   try {
       setPaymentProcessing(true);
-      
-      const paymentRequest = {
-        bookingCode: bookingData.bookingCode,
-        amount: bookingData.remainingAmount,
-        orderInfo: `Booking ${bookingData.bookingCode}`, // Simplified format for easier extraction
-        locale: 'vn'
-      };
+      let apiEndpoint = '';
+      let paymentRequest = {};
 
-      console.log('📤 Creating payment request:', paymentRequest);
-
-      const response = await axios.post('/payment/vnpay/create', paymentRequest);
-
-      console.log('📥 Payment response:', response);
-      
-      // Handle different response structures
-      let paymentData;
-      if (response.data?.data) {
-        paymentData = response.data.data;
-      } else if (response.data) {
-        paymentData = response.data;
-      } else {
-        paymentData = response;
+      if (paymentMethod === 'VNPAY') {
+        apiEndpoint = '/payment/vnpay/create';
+        paymentRequest = {
+            bookingCode: bookingData.bookingCode,
+            amount: bookingData.remainingAmount,
+            orderInfo: `Thanh toan booking ${bookingData.bookingCode}`,
+            locale: 'vn'
+        };
+      } else if (paymentMethod === 'PAYOS') {
+        apiEndpoint = '/payment/payos/create'; 
+        paymentRequest = {
+            bookingCode: bookingData.bookingCode,
+            amount: bookingData.remainingAmount,
+            description: `Thanh toan ${bookingData.bookingCode}`,
+            returnUrl: window.location.origin + "/payment-waiting",
+            cancelUrl: window.location.origin + "/payment-cancel"
+        };
       }
-      
-      console.log('💳 Payment data:', paymentData);
 
-      // Check for payment URL
-      if (paymentData.paymentUrl) {
-        console.log('✅ Redirecting to VNPay:', paymentData.paymentUrl);
-        // Store booking code in sessionStorage for return handling
-        sessionStorage.setItem('pendingPaymentBookingCode', bookingData.bookingCode);
-        window.location.href = paymentData.paymentUrl;
-      } else if (paymentData.code === '00' && paymentData.url) {
-        // Alternative response structure
-        console.log('✅ Redirecting to VNPay (alternative):', paymentData.url);
-        sessionStorage.setItem('pendingPaymentBookingCode', bookingData.bookingCode);
-        window.location.href = paymentData.url;
-      } else {
-        // Payment creation failed
-        const errorMessage = paymentData.message || 'Không thể tạo thanh toán';
-        throw new Error(errorMessage);
+      console.log(`Creating ${paymentMethod} payment request:`, paymentRequest);
+
+      const response = await axios.post(apiEndpoint, paymentRequest);
+
+      console.log('Payment response:', response);
+      
+      let paymentUrl = null;
+      let orderCode = null;
+
+      if (response.data?.checkoutUrl) {
+          paymentUrl = response.data.checkoutUrl; 
+          orderCode = response.data.transactionId; 
+      } else if (response.data?.paymentUrl) {
+          paymentUrl = response.data.paymentUrl; 
+          orderCode = response.data.transactionId;
+      } else if (response.paymentUrl) {
+          paymentUrl = response.paymentUrl;
+          orderCode = response.data.transactionId; 
+      } else if (response.data?.data?.checkoutUrl) {
+          paymentUrl = response.data.data.checkoutUrl;
+          orderCode = response.data.transactionId; 
+      } else if (response.data?.url) {
+          paymentUrl = response.data.url;
+          orderCode = response.data.transactionId; 
       }
-    } catch (error) {
-      console.error('❌ Payment error:', {
+
+      if (paymentUrl && orderCode) {
+        console.log('Redirecting to PayOS:', paymentUrl);
+        
+        sessionStorage.setItem('pendingPaymentOrderCode', orderCode);
+        sessionStorage.setItem('pendingPaymentBookingCode', bookingData.bookingCode);
+        
+        const paymentWindow = window.open(paymentUrl, '_blank');
+        
+        setTimeout(() => {
+          window.location.href = `/payment-waiting?orderCode=${orderCode}&bookingCode=${bookingData.bookingCode}`;
+        }, 1000);
+        
+      } else {
+        throw new Error('Không tìm thấy đường dẫn thanh toán từ phản hồi server');
+      }
+
+    }catch (error) {
+      console.error('Payment error:', {
         message: error.message,
         response: error.response?.data,
         status: error.response?.status,
         fullError: error
       });
       
-      // Extract user-friendly error message
       let errorMessage = 'Không thể tạo thanh toán. Vui lòng thử lại sau.';
       
       if (error.response?.data?.message) {
@@ -547,6 +569,42 @@ const BookingPayment = () => {
                   </span>
                 </div>
               </div>
+              {bookingData.status === 'PENDING_PAYMENT' && !isPaymentExpired && (
+                <div className={styles.paymentMethodSelection}>
+                  <h4>Chọn phương thức thanh toán:</h4>
+                  
+                  <div 
+                    className={`${styles.methodOption} ${paymentMethod === 'VNPAY' ? styles.selected : ''}`}
+                    onClick={() => setPaymentMethod('VNPAY')}
+                  >
+                    <div className={styles.radioCircle}>
+                      {paymentMethod === 'VNPAY' && <div className={styles.innerCircle} />}
+                    </div>
+                    <img 
+                      src="https://vnpay.vn/s1/statics.vnpay.vn/2023/9/06ncktiwd6dc1694418196384.png" 
+                      alt="VNPAY" 
+                      className={styles.methodLogo} 
+                    />
+                    <span>Ví VNPAY / Ngân hàng</span>
+                  </div>
+
+                  <div 
+                    className={`${styles.methodOption} ${paymentMethod === 'PAYOS' ? styles.selected : ''}`}
+                    onClick={() => setPaymentMethod('PAYOS')}
+                  >
+                    <div className={styles.radioCircle}>
+                      {paymentMethod === 'PAYOS' && <div className={styles.innerCircle} />}
+                    </div>
+                    <img 
+                      src="https://sorts.pro/S1zrq0" 
+                      alt="PayOS" 
+                      className={styles.methodLogo} 
+                      style={{height: '25px'}} 
+                    />
+                    <span>Quét mã VietQR (PayOS)</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Payment Button */}

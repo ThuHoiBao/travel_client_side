@@ -1,5 +1,3 @@
-// src/components/InformationComponent/FavoriteTours/FavoriteTours.jsx
-
 import React from 'react';
 import styles from './FavoriteTours.module.scss';
 

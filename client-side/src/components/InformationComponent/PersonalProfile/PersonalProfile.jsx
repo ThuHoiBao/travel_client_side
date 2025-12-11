@@ -1,14 +1,17 @@
-// src/components/InformationComponent/PersonalProfile/PersonalProfile.jsx
-
 import React, { useState, useMemo, useEffect } from 'react';
 import styles from './PersonalProfile.module.scss';
 import { UserUpdateRequestDTO } from '../../../dto/requestDTO/UserUpdateRequestDTO.ts';
 import { updateUserApi } from '../../../services/user/user.ts';
+import { useAuth } from '../../../context/AuthContext.jsx';
 
-const PersonalProfile = ({ user }) => {
+const PersonalProfile = () => {
+    const { user, updateUser } = useAuth();
+    
+    const userData = user?.data || user;
+    
     const [formData, setFormData] = useState({
-        fullName: user?.fullName || '',
-        phone: user?.phone || '',
+        fullName: '',
+        phoneNumber: '',
         day: '',
         month: '',
         year: ''
@@ -17,12 +20,11 @@ const PersonalProfile = ({ user }) => {
     const [message, setMessage] = useState({ type: '', text: '' });
     const [phoneError, setPhoneError] = useState('');
     
-    const email = user?.email || '';
-    const userID = user?.userID || 4;
+    const email = userData?.email || '';
+    const userID = userData?.userId || userData?.id;
     
-    // Parse ngày sinh từ string (ISO format) thành ngày, tháng, năm
     const parsedDate = useMemo(() => {
-        const dateOfBirth = user?.dateOfBirth || '';
+        const dateOfBirth = userData?.dateOfBirth || '';
         if (!dateOfBirth) {
             return { day: '', month: '', year: '' };
         }
@@ -35,47 +37,42 @@ const PersonalProfile = ({ user }) => {
             
             return {
                 day: date.getDate().toString(),
-                month: (date.getMonth() + 1).toString(), // getMonth() trả về 0-11
+                month: (date.getMonth() + 1).toString(), 
                 year: date.getFullYear().toString()
             };
         } catch (error) {
             console.error('Error parsing date:', error);
             return { day: '', month: '', year: '' };
         }
-    }, [user?.dateOfBirth]);
+    }, [userData?.dateOfBirth]); 
     
-    // Cập nhật formData khi user data thay đổi
     useEffect(() => {
-        if (user) {
+        if (userData) {
             setFormData({
-                fullName: user.fullName || '',
-                phone: user.phone || '',
+                fullName: userData.fullName || '',
+                phoneNumber: userData.phoneNumber || '',
                 day: parsedDate.day,
                 month: parsedDate.month,
                 year: parsedDate.year
             });
         }
-    }, [user, parsedDate]);
+    }, [userData, parsedDate]); 
     
     const handleInputChange = (field, value) => {
-        // Validation cho số điện thoại
-        if (field === 'phone') {
-            // Chỉ cho phép nhập số
+        if (field === 'phoneNumber') {
             const numericValue = value.replace(/\D/g, '');
             
-            // Kiểm tra độ dài tối đa 10 chữ số
             if (numericValue.length > 10) {
                 setPhoneError('Số điện thoại chỉ được nhập tối đa 10 chữ số');
                 return;
             }
             
-            // Kiểm tra độ dài tối thiểu khi đã nhập đủ
             if (numericValue.length > 0 && numericValue.length < 10) {
                 setPhoneError('Số điện thoại phải có đúng 10 chữ số');
             } else if (numericValue.length === 10) {
-                setPhoneError(''); // Xóa lỗi khi đủ 10 chữ số
+                setPhoneError(''); 
             } else {
-                setPhoneError(''); // Xóa lỗi khi chưa nhập gì
+                setPhoneError(''); 
             }
             
             setFormData(prev => ({
@@ -95,69 +92,87 @@ const PersonalProfile = ({ user }) => {
         try {
             setLoading(true);
             setMessage({ type: '', text: '' });
-            
-            // Validation số điện thoại trước khi lưu
-            if (formData.phone && formData.phone.length !== 10) {
+
+            if (formData.phoneNumber && formData.phoneNumber.length !== 10) {
                 setPhoneError('Số điện thoại phải có đúng 10 chữ số');
                 setLoading(false);
                 return;
             }
-            
-            // Tạo dateOfBirth từ day, month, year
-            // Sử dụng format trực tiếp để tránh lỗi timezone
-            let dateOfBirth = '';
-            if (formData.day && formData.month && formData.year) {
-                // Format trực tiếp YYYY-MM-DD để tránh lỗi timezone
-                const year = formData.year;
-                const month = formData.month.padStart(2, '0'); // Đảm bảo 2 chữ số
-                const day = formData.day.padStart(2, '0'); // Đảm bảo 2 chữ số
-                dateOfBirth = `${year}-${month}-${day}`;
-            }
-            const formDataPayload = new FormData();
-            // Tạo DTO
 
-            // Backend (@ModelAttribute) sẽ tìm các field này
-            formDataPayload.append('fullName', formData.fullName);
-            formDataPayload.append('phone', formData.phone);
+            const formDataPayload = new FormData();
             
-            // Gửi ngày sinh nếu có giá trị (hoặc chuỗi rỗng)
-            if (dateOfBirth) {
-                formDataPayload.append('dateOfBirth', dateOfBirth);
-            } else {
-                // Nếu muốn xóa ngày sinh (nếu backend cho phép null) hoặc gửi rỗng
-                formDataPayload.append('dateOfBirth', ''); 
+            if (formData.fullName) {
+                formDataPayload.append('fullName', formData.fullName);
             }
             
-            // Gọi API update
-            await updateUserApi(userID, formDataPayload);
-            
-            setMessage({ type: 'success', text: 'Cập nhật thông tin thành công!' });
-            
-            // Reload page sau 1.5 giây để cập nhật dữ liệu
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500);
-            
+            if (formData.phoneNumber) {
+                formDataPayload.append('phoneNumber', formData.phoneNumber);
+            }
+
+            if (formData.day && formData.month && formData.year) {
+                const year = formData.year;
+                const month = formData.month.padStart(2, '0');
+                const day = formData.day.padStart(2, '0');
+                const dateOfBirth = `${year}-${month}-${day}`;
+                formDataPayload.append('dateOfBirth', dateOfBirth);
+            }
+
+            console.log('Sending FormData:');
+            for (let [key, value] of formDataPayload.entries()) {
+                console.log(`  ${key}: ${value}`);
+            }
+
+            const response = await updateUserApi(userID, formDataPayload);
+
+            updateUser({
+                fullName: formData.fullName,
+                phoneNumber: formData.phoneNumber,
+                dateOfBirth: formData.day && formData.month && formData.year 
+                    ? `${formData.year}-${formData.month.padStart(2, '0')}-${formData.day.padStart(2, '0')}`
+                    : userData?.dateOfBirth
+            });
+
+            setMessage({
+                type: 'success',
+                text: 'Cập nhật thông tin thành công!'
+            });
+
+
         } catch (error) {
             console.error('Error updating user:', error);
-            setMessage({ type: 'error', text: 'Có lỗi xảy ra khi cập nhật thông tin.' });
+            console.error('Error response:', error.response?.data);
+            
+            const errorMessage = error.response?.data?.message 
+                || error.response?.data?.error
+                || 'Có lỗi xảy ra khi cập nhật thông tin.';
+            
+            setMessage({
+                type: 'error',
+                text: errorMessage
+            });
         } finally {
             setLoading(false);
         }
     };
     
+    if (!userData) {
+        return (
+            <div className={styles.personalProfile}>
+                <div className={styles.loading}>Đang tải thông tin ...</div>
+            </div>
+        );
+    }
+
     return (
         <div className={styles.personalProfile}>
             <h1 className={styles.pageTitle}>Hồ Sơ Cá Nhân</h1>
             
-            {/* Tabs */}
             <div className={styles.tabs}>
                 <div className={`${styles.tab} ${styles.tabActive}`}>
                     Thông tin tài khoản
                 </div>
             </div>
             
-            {/* Personal Data Section */}
             <div className={styles.section}>
                 <div className={styles.formGroup}>
                     <label className={styles.label}>Tên đầy đủ</label>
@@ -177,8 +192,8 @@ const PersonalProfile = ({ user }) => {
                     <input
                         type="text"
                         className={`${styles.input} ${phoneError ? styles.inputError : ''}`}
-                        value={formData.phone}
-                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                        value={formData.phoneNumber}
+                        onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
                         placeholder="Nhập 10 chữ số"
                         maxLength={10}
                     />
@@ -222,23 +237,21 @@ const PersonalProfile = ({ user }) => {
                         </select>
                     </div>
                 </div>
-                            {/* Email Section */}
-            <div className={styles.section}>
-                <h2 className={styles.label}>Email</h2>
-                {email && (
-                    <div className={styles.formGroup}>
-                        <input
-                            type="email"
-                            className={`${styles.input} ${styles.inputReadOnly}`}
-                            value={email}
-                            readOnly
-                        />
-                    </div>
-                )}
-                {/* <button className={styles.buttonAdd}>
-                    + Thêm email
-                </button> */}
-            </div>
+        
+                <div className={styles.section}>
+                    <h2 className={styles.label}>Email</h2>
+                    {email && (
+                        <div className={styles.formGroup}>
+                            <input
+                                type="email"
+                                className={`${styles.input} ${styles.inputReadOnly}`}
+                                value={email}
+                                readOnly
+                            />
+                        </div>
+                    )}
+                </div>
+                
                 {message.text && (
                     <div className={message.type === 'success' ? styles.successMessage : styles.errorMessage}>
                         {message.text}
@@ -246,7 +259,6 @@ const PersonalProfile = ({ user }) => {
                 )}
                 
                 <div className={styles.buttonGroup}>
-                    {/* <button className={styles.buttonSecondary}>Có lẽ để sau</button> */}
                     <button 
                         className={styles.buttonPrimary}
                         onClick={handleSave}
@@ -255,13 +267,9 @@ const PersonalProfile = ({ user }) => {
                         {loading ? 'Đang lưu...' : 'Cập nhật'}
                     </button>
                 </div>
-
-                
             </div>
-            
         </div>
     );
 };
 
 export default PersonalProfile;
-

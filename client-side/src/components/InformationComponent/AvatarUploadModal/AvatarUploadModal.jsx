@@ -1,79 +1,137 @@
-// src/components/InformationComponent/AvatarUploadModal/AvatarUploadModal.jsx
-
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FaTimes, FaCamera } from 'react-icons/fa';
 import styles from './AvatarUploadModal.module.scss'; 
 import { updateUserApi } from '../../../services/user/user.ts'; 
-// Lưu ý: Dữ liệu user từ hook đã là plain object, nhưng ta vẫn dùng UserRequestDTO để đảm bảo kiểu
+
 const DEFAULT_AVATAR = "https://th.bing.com/th/id/OIP.KMh7jiRqiGInQryreHc-UwHaHa?w=180&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3";
 
 const AvatarUploadModal = ({ user, onClose, onUpdateSuccess }) => {
+    const userData = user?.data || user;
+    const userID = userData?.id || userData?.userID || userData?.userId;
+    
     const [selectedFile, setSelectedFile] = useState(null);
-    // Sử dụng avatar hiện tại của user cho preview ban đầu
-    const [previewUrl, setPreviewUrl] = useState(user?.avatar || DEFAULT_AVATAR); 
+    const [previewUrl, setPreviewUrl] = useState(userData?.avatar || DEFAULT_AVATAR); 
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
     const fileInputRef = useRef(null);
 
-    if (!user) return null;
+    useEffect(() => {
+        console.log('=== AVATAR MODAL DEBUG ===');
+        console.log('Raw user prop:', user);
+        console.log('userData:', userData);
+        console.log('userID:', userID);
+        console.log('==========================');
+    }, [user, userData, userID]);
+
+    if (!userData) {
+        return null;
+    }
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (file) {
+            if (!file.type.startsWith('image/')) {
+                setError('Vui lòng chọn file ảnh (jpg, png, gif, ...)');
+                return;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) {
+                setError('Kích thước ảnh không được vượt quá 5MB');
+                return;
+            }
+            
             setSelectedFile(file);
             setPreviewUrl(URL.createObjectURL(file));
+            setError('');
         }
     };
 
     const handleUploadClick = () => {
-        fileInputRef.current.click();
+        fileInputRef.current?.click();
     };
 
     const handleUpdate = async () => {
         if (!selectedFile) {
-            alert("Vui lòng chọn ảnh đại diện mới.");
+            setError("Vui lòng chọn ảnh đại diện mới.");
+            return;
+        }
+
+        if (!userID) {
+            console.error('❌ UserID is undefined!');
+            console.error('user prop:', user);
+            console.error('userData:', userData);
+            setError('Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
             return;
         }
 
         setLoading(true);
+        setError('');
+        
         try {
-            // 1. Tạo FormData cho API Multipart/form-data
             const formData = new FormData();
             formData.append('avatar', selectedFile);
             
-            // 2. Gọi API PUT /users/{userID} với FormData
-            // API chỉ cần nhận file avatar, các trường khác là null/empty
-            const response = await updateUserApi(user.userID, formData);
+            console.log('📤 Uploading avatar for userID:', userID);
+            console.log('📁 File:', selectedFile.name, selectedFile.type, selectedFile.size);
+            
+            const response = await updateUserApi(userID, formData);
 
-            // 3. Xử lý thành công
-            // alert("Cập nhật Avatar thành công!");
-            // Gọi hàm success để component cha (InformationComponent) cập nhật lại user data
-            onUpdateSuccess(response); 
+            console.log('✅ Avatar uploaded successfully:', response);
+
+            if (onUpdateSuccess) {
+                onUpdateSuccess({
+                    avatar: response.avatar || response.data?.avatar
+                });
+            }
+            
             onClose();
+            
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
 
         } catch (error) {
-            console.error("Lỗi cập nhật avatar:", error);
-            alert("Lỗi khi cập nhật Avatar. Vui lòng thử lại.");
+            console.error("❌ Lỗi cập nhật avatar:", error);
+            console.error("Error response:", error.response?.data);
+            
+            const errorMessage = error.response?.data?.message 
+                || error.response?.data?.error
+                || "Lỗi khi cập nhật Avatar. Vui lòng thử lại.";
+            
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className={styles.modalOverlay}>
-            <div className={styles.modalContent}>
+        <div className={styles.modalOverlay} onClick={onClose}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 
-                {/* Close Icon (Góc phải) */}
                 <FaTimes className={styles.closeIcon} onClick={onClose} />
 
                 <h3 className={styles.modalTitle}>Cập nhật Ảnh đại diện</h3>
 
-                {/* Avatar Preview */}
+                {error && (
+                    <div className={styles.errorMessage}>
+                        {error}
+                    </div>
+                )}
+
                 <div className={styles.avatarPreviewContainer}>
                     <img src={previewUrl} alt="Avatar Preview" className={styles.avatarPreview} />
                     {loading && <div className={styles.loader}>Đang tải...</div>}
                 </div>
 
-                {/* Hidden File Input */}
+                {selectedFile && (
+                    <div className={styles.fileInfo}>
+                        <span className={styles.fileName}>📁 {selectedFile.name}</span>
+                        <span className={styles.fileSize}>
+                            ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+                        </span>
+                    </div>
+                )}
+
                 <input
                     type="file"
                     ref={fileInputRef}
@@ -83,7 +141,6 @@ const AvatarUploadModal = ({ user, onClose, onUpdateSuccess }) => {
                 />
 
                 <div className={styles.buttonGroup}>
-                    {/* Button Chọn ảnh */}
                     <button 
                         className={styles.selectButton} 
                         onClick={handleUploadClick}
@@ -92,12 +149,10 @@ const AvatarUploadModal = ({ user, onClose, onUpdateSuccess }) => {
                         <FaCamera className={styles.buttonIcon} /> Chọn ảnh đại diện
                     </button>
                     
-                    {/* Button Cập nhật */}
                     <button 
                         className={styles.updateButton} 
                         onClick={handleUpdate}
-                        // Chỉ cho phép cập nhật khi có file mới được chọn
-                        disabled={loading || !selectedFile} 
+                        disabled={loading || !selectedFile}
                     >
                         {loading ? 'Đang cập nhật...' : 'Cập nhật'}
                     </button>

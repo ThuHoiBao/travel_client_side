@@ -10,7 +10,7 @@ import TourPolicy from './TourPolicy/TourPolicy';
 import TourItinerary from './TourItinerary/TourItinerary';
 import RelatedTours from './RelatedTours/RelatedTours';
 import axios from '../../utils/axiosCustomize'; 
-import { FaMapMarkerAlt, FaCalendarAlt, FaClock, FaBarcode, FaPhoneAlt } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaCalendarAlt, FaClock, FaBarcode, FaPhoneAlt, FaPlay } from 'react-icons/fa';
 import { BsPeopleFill } from "react-icons/bs";
 
 const TourDetail = () => {
@@ -18,11 +18,14 @@ const TourDetail = () => {
   const navigate = useNavigate(); 
   const [tourData, setTourData] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const [selectedDeparture, setSelectedDeparture] = useState(null);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [startImageIndex, setStartImageIndex] = useState(0);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  
+  // State mới để quản lý main display
+  const [mainMediaType, setMainMediaType] = useState('video'); // 'video' hoặc 'image'
+  const [mainImageIndex, setMainImageIndex] = useState(0);
 
   const calendarRef = useRef(null);
   const scrollToCalendar = () => {
@@ -38,6 +41,15 @@ const TourDetail = () => {
       const response = await axios.get(`/tours/${tourCode}`);
       const data = response.data || response;
       setTourData(data); 
+      
+      // Set main display: nếu có video thì hiện video, không thì hiện ảnh đầu tiên
+      if (data?.videoUrl) {
+        setMainMediaType('video');
+      } else {
+        setMainMediaType('image');
+        setMainImageIndex(0);
+      }
+      
       if (data?.departures && data.departures.length > 0) {
         setSelectedDeparture(data.departures[0]);
       } else {
@@ -96,28 +108,46 @@ const TourDetail = () => {
     };
   };
 
-const handleBookNow = () => {
-  const currentDeparture = selectedDeparture || tourData?.departures?.[0];
-  
-  if (!currentDeparture) {
-    alert('Vui lòng chọn ngày khởi hành!');
-    scrollToCalendar();
-    return;
-  }
+  const handleBookNow = () => {
+    const currentDeparture = selectedDeparture || tourData?.departures?.[0];
+    
+    if (!currentDeparture) {
+      alert('Vui lòng chọn ngày khởi hành!');
+      scrollToCalendar();
+      return;
+    }
 
-  console.log('Booking with:', {
-    tourCode: tourData.tourCode,
-    departureId: currentDeparture.departureId
-  });
+    console.log('Booking with:', {
+      tourCode: tourData.tourCode,
+      departureId: currentDeparture.departureId
+    });
 
-  navigate(`/order-booking?tourCode=${tourData.tourCode}&departureId=${currentDeparture.departureId}`);
-};
-
+    navigate(`/order-booking?tourCode=${tourData.tourCode}&departureId=${currentDeparture.departureId}`);
+  };
 
   const openGallery = (index) => {
     setStartImageIndex(index);
     setIsModalOpen(true);
   };  
+
+  // Xử lý khi click vào thumbnail image
+  const handleThumbnailClick = (index) => {
+    setMainMediaType('image');
+    setMainImageIndex(index);
+  };
+
+  // Xử lý khi click vào thumbnail video
+  const handleVideoThumbnailClick = () => {
+    setMainMediaType('video');
+  };
+
+  // Xử lý khi click vào main display
+  const handleMainClick = () => {
+    if (mainMediaType === 'image') {
+      openGallery(mainImageIndex);
+    }
+    // Nếu là video thì không làm gì (để người dùng play/pause)
+  };
 
   const formatCurrency = (amount) => {
     if (!amount) return '0 ₫';
@@ -155,29 +185,68 @@ const handleBookNow = () => {
           {/* ================= CỘT TRÁI (Ảnh + Lịch + Chi tiết) ================= */}
           <div className={styles.leftColumn}>
             
-            {/* 1. Gallery Ảnh */}
+            {/* 1. Gallery Ảnh + Video */}
             <div className={styles.gallerySection}>
               {/* Thumbnails */}
               <div className={styles.thumbnails}>
-                {tourData.images && tourData.images.slice(1, 4).map((img, index) => (
+                {/* Thumbnail video - hiển thị đầu tiên nếu có */}
+                {tourData.videoUrl && (
+                  <div 
+                    className={`${styles.thumbItem} ${styles.videoThumb} ${mainMediaType === 'video' ? styles.active : ''}`}
+                    onClick={handleVideoThumbnailClick}
+                  >
+                    <video 
+                      src={tourData.videoUrl}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                    <div className={styles.playOverlay}>
+                      <FaPlay />
+                    </div>
+                  </div>
+                )}
+                
+                {/* Thumbnails ảnh - hiển thị 3 ảnh đầu (hoặc 2 nếu có video) */}
+                {tourData.images && tourData.images.slice(0, tourData.videoUrl ? 2 : 3).map((img, index) => (
                   <div 
                     key={index} 
-                    className={styles.thumbItem} 
-                    onClick={() => openGallery(index + 1)} 
+                    className={`${styles.thumbItem} ${mainMediaType === 'image' && mainImageIndex === index ? styles.active : ''}`}
+                    onClick={() => handleThumbnailClick(index)}
                   >
                     <img src={img} alt={`thumb-${index}`} />
                   </div>
                 ))}
                 
-                {tourData.images && tourData.images.length > 4 && (
-                  <div className={styles.thumbMore} onClick={() => openGallery(4)}>
-                    <span>+{tourData.images.length - 4}</span>
+                {/* Nút xem thêm */}
+                {tourData.images && tourData.images.length > (tourData.videoUrl ? 2 : 3) && (
+                  <div className={styles.thumbMore} onClick={() => openGallery(tourData.videoUrl ? 2 : 3)}>
+                    <span>+{tourData.images.length - (tourData.videoUrl ? 2 : 3)}</span>
                   </div>
                 )}
               </div>
 
-              <div className={styles.mainImage} onClick={() => openGallery(0)}>
-                <img src={tourData.images?.[0]} alt="Main Tour" />
+              {/* Main Display */}
+              <div className={styles.mainImage} onClick={handleMainClick}>
+                {mainMediaType === 'video' && tourData.videoUrl ? (
+                  <video 
+                    src={tourData.videoUrl}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: 'cover',
+                      cursor: 'default'
+                    }}
+                  />
+                ) : (
+                  <img 
+                    src={tourData.images?.[mainImageIndex]} 
+                    alt="Main Tour"
+                    style={{ cursor: 'pointer' }}
+                  />
+                )}
               </div>
             </div>
 
@@ -296,8 +365,7 @@ const handleBookNow = () => {
                   <span className={styles.infoLabel}>Khởi hành:</span>
                   <span className={styles.infoValue}>{tourData.startLocation}</span>
                 </div>
-                {/* Logic hiển thị ngày khởi hành gần nhất */}
-               <div className={styles.infoRow}>
+                <div className={styles.infoRow}>
                   <FaCalendarAlt className={styles.icon} />
                   <span className={styles.infoLabel}>Ngày đi:</span>
                   <span className={styles.infoValue}>

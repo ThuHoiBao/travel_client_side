@@ -78,7 +78,7 @@ const PaymentFailed = () => {
 
         {retryCount >= 3 && (
           <p style={{ marginTop: '15px', fontSize: '13px', color: '#ff4d4f' }}>
-            ⚠️ Nếu vẫn gặp lỗi, vui lòng liên hệ: <strong>1900 1808</strong>
+            Nếu vẫn gặp lỗi, vui lòng liên hệ: <strong>1900 1808</strong>
           </p>
         )}
       </div>
