@@ -1,5 +1,5 @@
-// src/components/InformationComponent/FavoriteTours/FavoriteTours.jsx
 
+// src/components/InformationComponent/FavoriteTours/FavoriteTours.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { getUserFavoriteToursApi, removeFavoriteTourApi } from '../../../services/favoriteTour/favoriteTour.ts';
 import FavoriteTourItem from './FavoriteTourItem/FavoriteTourItem.jsx';

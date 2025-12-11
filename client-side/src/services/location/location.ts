@@ -1,7 +1,7 @@
 //services/loction/location.ts
 import  {api}  from '../api.ts'; // Import instance Axios đã cấu hình (từ src/services/tours/api.ts)
 import { SearchToursRequestDTO } from '../../dto/responseDTO/searchToursRequestDTO.ts' // DTO GỬI ĐI
-import { ToursResponseDTO } from '../../dto/responseDTO/toursResponseDTO.ts'; 
+// import { ToursResponseDTO } from '../../dto/responseDTO/toursResponseDTO.ts'; 
 import { TourRequestDTO } from '../../dto/requestDTO/TourRequestDTO.ts';
 import { LocationDataDTO } from '../../dto/responseDTO/LocationDataDTO.ts';
 export enum Region {

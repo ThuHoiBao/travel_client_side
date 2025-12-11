@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import styles from './Login.module.scss';
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
-import axios from '../../utils/axiosCustomize';
+import { useAuth } from '../../context/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login, loginWithGoogle } = useAuth();
+  
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -15,7 +18,8 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // Validation
+  const from = location.state?.from?.pathname || '/';
+
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) return 'Email không được để trống';
@@ -35,9 +39,6 @@ const Login = () => {
     
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-    if (errors.general) {
-      setErrors(prev => ({ ...prev, general: '' }));
     }
   };
 
@@ -73,27 +74,30 @@ const Login = () => {
 
     try {
       setLoading(true);
-      setErrors({});
+      setErrors({}); 
       
-      const response = await axios.post('/auth/login', formData);
+      console.log('🔐 Attempting login with:', formData.email);
       
-      // Lưu tokens
-      localStorage.setItem('accessToken', response.data.accessToken);
-      localStorage.setItem('refreshToken', response.data.refreshToken);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      const result = await login(formData.email, formData.password);
       
-      console.log('Login successful:', response.data);
+      console.log('✅ Login result:', result);
+      console.log('📦 Tokens saved:', {
+        accessToken: localStorage.getItem('accessToken') ? 'Có' : 'Không',
+        refreshToken: localStorage.getItem('refreshToken') ? 'Có' : 'Không',
+        user: localStorage.getItem('user') ? 'Có' : 'Không'
+      });
       
-      // Redirect theo role
-      const userRole = response.data.user.role;
+      const userRole = result.user.role;
+      console.log('👤 User role:', userRole);
+      
       if (userRole === 'ADMIN') {
-        navigate('/admin/dashboard');
+        navigate('/admin/dashboard', { replace: true });
       } else {
-        navigate('/');
+        navigate(from, { replace: true });
       }
       
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('❌ Login error:', error);
       
       let errorMessage = 'Đã xảy ra lỗi. Vui lòng thử lại!';
       
@@ -101,13 +105,15 @@ const Login = () => {
         const status = error.response.status;
         const data = error.response.data;
         
+        console.error('Response error:', { status, data });
+        
         if (status === 401) {
           errorMessage = 'Email hoặc mật khẩu không đúng';
         } else if (status === 400) {
-          if (data.message.includes('email')) {
+          if (data.message?.includes('email')) {
             errorMessage = 'Vui lòng xác thực email trước khi đăng nhập';
-          } else if (data.message.includes('khóa')) {
-            errorMessage = 'Tài khoản đã bị khóa. Vui lòng liên hệ admin';
+          } else if (data.message?.includes('khóa')) {
+            errorMessage = 'Tài khoản đã bị khóa';
           } else {
             errorMessage = data.message || errorMessage;
           }
@@ -115,7 +121,11 @@ const Login = () => {
           errorMessage = data.message || errorMessage;
         }
       } else if (error.request) {
+        console.error('Request error:', error.request);
         errorMessage = 'Không thể kết nối đến server';
+      } else {
+        console.error('Error:', error.message);
+        errorMessage = error.message;
       }
       
       setErrors({ general: errorMessage });
@@ -124,45 +134,42 @@ const Login = () => {
     }
   };
 
-  // Handle Google Login Success
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       setLoading(true);
-      setErrors({});
+      setErrors({}); 
       
-      console.log('Google credential:', credentialResponse);
+      console.log('🔐 Google credential received');
       
-      const response = await axios.post('/auth/google/login', {
-        idToken: credentialResponse.credential
+      const result = await loginWithGoogle(credentialResponse.credential);
+      
+      console.log('✅ Google login result:', result);
+      console.log('📦 Tokens saved:', {
+        accessToken: localStorage.getItem('accessToken') ? 'Có' : 'Không',
+        refreshToken: localStorage.getItem('refreshToken') ? 'Có' : 'Không',
+        user: localStorage.getItem('user') ? 'Có' : 'Không'
       });
       
-      // Lưu tokens
-      localStorage.setItem('accessToken', response.data.accessToken);
-      localStorage.setItem('refreshToken', response.data.refreshToken);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      const userRole = result.user.role;
+      console.log('👤 User role:', userRole);
       
-      console.log('Google login successful:', response.data);
-      
-      // Redirect
-      const userRole = response.data.user.role;
       if (userRole === 'ADMIN') {
-        navigate('/admin/dashboard');
+        navigate('/admin/dashboard', { replace: true });
       } else {
-        navigate('/');
+        navigate(from, { replace: true });
       }
       
     } catch (error) {
-      console.error('Google login error:', error);
-      const errorMessage = error.response?.data?.message || 'Đăng nhập Google thất bại';
+      console.error('❌ Google login error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Đăng nhập Google thất bại';
       setErrors({ general: errorMessage });
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle Google Login Error
   const handleGoogleError = () => {
-    console.error('Google login failed');
+    console.error('❌ Google login failed');
     setErrors({ general: 'Đăng nhập Google thất bại. Vui lòng thử lại!' });
   };
 
@@ -172,12 +179,18 @@ const Login = () => {
     }
   };
 
+  const handleFocus = () => {
+    if (errors.general) {
+      setErrors(prev => ({ ...prev, general: '' }));
+    }
+  };
+
   return (
     <div className={styles.pageContainer}>
       <div className={styles.formCard}>
         <div className={styles.brandLogo}>
           <h2 style={{ textAlign: 'center', color: '#d97706', marginBottom: '0.5rem' }}>
-            🌴 VietravelPlus
+            🌴 Future Travel
           </h2>
         </div>
 
@@ -193,12 +206,11 @@ const Login = () => {
           </div>
         )}
 
-        {/* Google Login Button */}
         <div className={styles.googleLoginWrapper}>
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={handleGoogleError}
-            useOneTap
+            useOneTap={false}
             theme="outline"
             size="large"
             text="continue_with"
@@ -207,13 +219,11 @@ const Login = () => {
           />
         </div>
 
-        {/* Divider */}
         <div className={styles.divider}>
           <span>hoặc</span>
         </div>
 
         <form onSubmit={handleSubmit} className={styles.formWrapper} onKeyPress={handleKeyPress}>
-          {/* Email Field */}
           <div className={styles.formGroup}>
             <label htmlFor="email" className={styles.label}>
               Email
@@ -227,7 +237,8 @@ const Login = () => {
                 value={formData.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="example@email.com"
+                onFocus={handleFocus} 
+                placeholder="nguyenvana@email.com"
                 className={`${styles.input} ${errors.email ? styles.error : ''}`}
                 autoComplete="email"
                 disabled={loading}
@@ -236,7 +247,6 @@ const Login = () => {
             {errors.email && <p className={styles.errorText}>{errors.email}</p>}
           </div>
 
-          {/* Password Field */}
           <div className={styles.formGroup}>
             <label htmlFor="password" className={styles.label}>
               Mật khẩu
@@ -250,6 +260,7 @@ const Login = () => {
                 value={formData.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                onFocus={handleFocus} 
                 placeholder="••••••••"
                 className={`${styles.input} ${styles.withToggle} ${errors.password ? styles.error : ''}`}
                 autoComplete="current-password"
@@ -268,26 +279,23 @@ const Login = () => {
             {errors.password && <p className={styles.errorText}>{errors.password}</p>}
           </div>
 
-          {/* Forgot Password */}
           <div className={styles.forgotPassword}>
             <Link to="/forgot-password">Quên mật khẩu?</Link>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
             className={styles.submitBtn}
           >
             {loading ? (
-              <span className={styles.loading}>Đang đăng nhập</span>
+              <span className={styles.loading}>Đang đăng nhập...</span>
             ) : (
               'Đăng nhập'
             )}
           </button>
         </form>
 
-        {/* Register Link */}
         <p className={styles.footer}>
           Chưa có tài khoản?{' '}
           <Link to="/register" className={styles.linkBold}>

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import styles from './TourBooking.module.scss';
-import Header from '../HeaderComponent/Header';
-import Footer from '../FooterComponent/Footer';
 import axios from '../../utils/axiosCustomize';
 import {
     FaUser, FaBarcode, FaPlane, FaTag, FaTimes, FaCheckCircle, FaSpinner, FaCoins
@@ -213,7 +211,6 @@ const TourBooking = () => {
     }
   };
 
-  // --- LOGIC TÍNH TIỀN ---
   const calculateSubTotal = () => {
     if (!bookingData) return 0;
    
@@ -263,7 +260,6 @@ const TourBooking = () => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   };
 
-  // --- LOGIC COUPON ---
   const handleApplyGlobalCoupon = (coupon) => {
     if (coupon.minOrderValue && subTotal < coupon.minOrderValue) {
       alert(`Đơn hàng cần tối thiểu ${formatCurrency(coupon.minOrderValue)} để áp dụng mã này!`);
@@ -295,9 +291,7 @@ const TourBooking = () => {
     }
   };
 
-  // ---  SUBMIT BOOKING ---
   const handleSubmitBooking = async () => {
-    // 1. KIỂM TRA SỐ CHỖ TRỐNG
     const totalSeatsNeeded = passengerData.adult.length + 
                              passengerData.child.length + 
                              passengerData.toddler.length;
@@ -314,7 +308,6 @@ const TourBooking = () => {
       return;
     }
 
-    // 2. VALIDATE THÔNG TIN LIÊN LẠC
     if (!contactInfo.fullName.trim()) {
       alert('Vui lòng nhập họ tên liên lạc!');
       return;
@@ -431,52 +424,58 @@ const TourBooking = () => {
 
     console.log('Sending booking request:', requestData);
 
-    try {
-      setSubmitting(true);
-      
-      const response = await axios.post('/bookings/create', requestData);
-      
-      console.log('Booking created successfully:', response.data);
-      
-      alert('Đặt tour thành công!\n\nMã đặt tour: ' + response.bookingCode + '\n\nVui lòng thanh toán trong vòng 24 giờ.');
-      
-      navigate(`/payment-booking?bookingCode=${response.bookingCode}`, {
-        state: { bookingData: response.data }
-      });
-      
-    } catch (err) {
-      console.error(' Error creating booking:', err);
-      
-      let errorMessage = 'Đặt tour thất bại. Vui lòng thử lại!';
-      
-      if (err.response?.data) {
-        const errorData = err.response.data;
-        
-        if (errorData.message && errorData.message.includes('not enough seats')) {
-          errorMessage = ` Rất tiếc, không còn đủ chỗ trống!\n\nChuyến đi này đã được người khác đặt trước.\nVui lòng chọn ngày khởi hành khác hoặc giảm số lượng hành khách.`;
-        } else if (errorData.message && errorData.message.includes('Coupon')) {
-          errorMessage = ` Mã giảm giá không hợp lệ!\n\n${errorData.message}`;
-        } else if (errorData.message && errorData.message.includes('points')) {
-          errorMessage = ` Lỗi điểm thưởng!\n\n${errorData.message}`;
-        } else if (errorData.message) {
-          errorMessage = errorData.message;
-        } else if (errorData.error) {
-          errorMessage = errorData.error;
-        }
-      }
-      
-      alert(errorMessage);
-      
-      if (errorMessage.includes('not enough seats') || errorMessage.includes('không còn đủ chỗ')) {
-        window.location.reload();
-      }
-      
-    } finally {
-      setSubmitting(false);
+  try {
+  setSubmitting(true);
+  
+  const response = await axios.post('/bookings/create', requestData);
+  const bookingCode = response.data?.bookingCode || response.data?.code || response.data?.id;
+  
+  console.log(' Booking created:', { bookingCode, data: response.data });
+  
+  if (!bookingCode) {
+    console.error(' No booking code in response:', response.data);
+    alert('Đặt tour thành công nhưng không nhận được mã booking.\nVui lòng kiểm tra email hoặc liên hệ CSKH: 1900-xxxx');
+    return;
+  }
+
+  alert(` Đặt tour thành công!\n\nMã đặt tour: ${bookingCode}\n\nVui lòng thanh toán trong vòng 24 giờ.`);
+
+  navigate(`/payment-booking?bookingCode=${bookingCode}`, {
+    state: { bookingData: response.data }
+  });
+  
+} catch (err) {
+  console.error(' Error creating booking:', err);
+  
+  let errorMessage = 'Đặt tour thất bại. Vui lòng thử lại!';
+  
+  if (err.response?.data) {
+    const errorData = err.response.data;
+    
+    if (errorData.message && errorData.message.includes('not enough seats')) {
+      errorMessage = ` Rất tiếc, không còn đủ chỗ trống!\n\nChuyến đi này đã được người khác đặt trước.\nVui lòng chọn ngày khởi hành khác hoặc giảm số lượng hành khách.`;
+    } else if (errorData.message && errorData.message.includes('Coupon')) {
+      errorMessage = ` Mã giảm giá không hợp lệ!\n\n${errorData.message}`;
+    } else if (errorData.message && errorData.message.includes('points')) {
+      errorMessage = ` Lỗi điểm thưởng!\n\n${errorData.message}`;
+    } else if (errorData.message) {
+      errorMessage = errorData.message;
+    } else if (errorData.error) {
+      errorMessage = errorData.error;
     }
+  }
+  
+  alert(errorMessage);
+  
+  if (errorMessage.includes('not enough seats') || errorMessage.includes('không còn đủ chỗ')) {
+    window.location.reload();
+  }
+  
+} finally {
+  setSubmitting(false);
+}
   };
 
-  // --- RENDER HELPERS ---
   const renderPassengerInputs = (type, label, priceLabel, price) => {
     const list = passengerData[type];
     if (list.length === 0) return null;
@@ -547,7 +546,6 @@ const TourBooking = () => {
   if (loading) {
     return (
       <div className={styles.pageContainer}>
-        <Header />
         <div style={{
           height: '60vh',
           display: 'flex',
@@ -559,7 +557,6 @@ const TourBooking = () => {
           <FaSpinner style={{ fontSize: '48px', animation: 'spin 1s linear infinite' }} />
           <h3>Đang tải thông tin đặt tour...</h3>
         </div>
-        <Footer />
       </div>
     );
   }
@@ -567,7 +564,6 @@ const TourBooking = () => {
   if (error || !bookingData) {
     return (
       <div className={styles.pageContainer}>
-        <Header />
         <div style={{
           height: '60vh',
           display: 'flex',
@@ -591,7 +587,6 @@ const TourBooking = () => {
             Quay lại
           </button>
         </div>
-        <Footer />
       </div>
     );
   }
@@ -601,7 +596,6 @@ const TourBooking = () => {
 
   return (
     <div className={styles.pageContainer}>
-      <Header />
       <main className={styles.mainContent}>
        
         {/* Stepper */}
@@ -1052,7 +1046,6 @@ const TourBooking = () => {
       </div>
     </div>
   </main>
-  <Footer />
 
   {/* MODAL CHỌN MÃ GIẢM GIÁ */}
   {showCouponModal && (
