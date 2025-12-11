@@ -6,7 +6,7 @@ export class UserRequestDTO {
     private _coinBalance: number = 0; // BigDecimal from Java -> number in TS
     private _email: string = "";
     private _avatar: string = ""; // Avatar URL cứng
-
+    private _status: boolean = true;
     // ------------------------------------
     // 📝 Getters and Setters
     // ------------------------------------
@@ -32,6 +32,8 @@ export class UserRequestDTO {
     get avatar(): string { return this._avatar; }
     set avatar(value: string) { this._avatar = value; }
 
+    get status(): boolean { return this._status; }
+    set status(value: boolean) { this._status = value; }
     // ------------------------------------
     // 📦 Static method to create from API response
     // ------------------------------------
@@ -46,7 +48,7 @@ export class UserRequestDTO {
         dto.email = apiResponse.email || "";
         // Avatar giữ nguyên giá trị cứng, không lấy từ API
         dto.avatar = apiResponse.avatar|| "https://th.bing.com/th/id/OIP.KMh7jiRqiGInQryreHc-UwHaHa?w=180&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3";
-
+        dto.status = apiResponse.status !== undefined ? apiResponse.status : true; 
         return dto;
     }
 
@@ -62,6 +64,7 @@ export class UserRequestDTO {
             coinBalance: this._coinBalance,
             email: this._email,
             avatar: this._avatar,
+            status: this._status
         };
     }
 }

@@ -11,6 +11,6 @@
 .mainContent {
     flex-grow: 1; /* Cho phép nội dung lấp đầy không gian */
     margin-left: 250px; /* Offset Sidebar */
-    padding: 80px 20px 20px 20px; /* Padding cho nội dung (Offset Header 60px + 20px đệm) */
+    padding: 70px 10px 10px 10px; /* Padding cho nội dung (Offset Header 60px + 20px đệm) */
     min-height: calc(100vh - 60px - 55px); /* Tính toán chiều cao tối thiểu */
 }

@@ -1,13 +1,8 @@
 // src/services/booking/booking.ts
 import { api } from '../api.ts'; // Giả định api.ts đã được import đúng
 import { BookingResponseDTO } from '../../dto/responseDTO/BookingResponseDTO.ts';
+import { BookingSearchRequestDTO, PageableRequest } from '../../dto/requestDTO/BookingSearchRequestDTO.ts';
 
-/**
- * Gọi API để lấy tất cả các booking của một người dùng dựa trên userID và trạng thái.
- * @param userID ID của người dùng.
- * @param bookingStatus Trạng thái booking (có thể là null/undefined để lấy tất cả).
- * @returns Promise<any[]> Danh sách các booking đã được map thành plain object.
- */
 export const getAllBookingsByUserApi = async (
     userID: number,
     bookingStatus?: string | null
@@ -70,4 +65,70 @@ export const cancelBookingApi = async (bookingID: number): Promise<BookingRespon
 export const requestRefundApi = async (bookingID: number, refundInfo: RefundInformationRequestDTO): Promise<BookingResponseDTO> => {
     const response = await api.post(`/bookings/refund-request/${bookingID}`, refundInfo);
     return BookingResponseDTO.fromApiResponse(response.data);
+};
+
+// Định nghĩa cấu trúc response của Spring Page
+interface SpringPageResponse {
+    content: any[];
+    totalPages: number;
+    totalElements: number;
+    number: number; 
+    size: number;
+    // ... các trường khác
+}
+
+/**
+ * Gọi API tìm kiếm Bookings cho Admin với phân trang.
+ */
+export const searchBookingsForAdminApi = async (
+    searchDTO: BookingSearchRequestDTO,
+    pageable: PageableRequest
+): Promise<SpringPageResponse> => {
+    try {
+        console.log('Searching bookings with DTO:', searchDTO, 'and Pageable:', pageable);
+        
+        const response = await api.post(`/bookings/admin/search`, searchDTO, { 
+            params: {
+                page: pageable.page || 0,
+                size: pageable.size || 10,
+                sortBy: pageable.sortBy || 'bookingDate',
+                sortDir: pageable.sortDir || 'DESC'
+            }
+        });
+
+        const data: SpringPageResponse = response.data;
+        
+        // Map content (list of raw bookings) to DTO Plain Objects
+        data.content = data.content.map((item: any) => {
+            const dto = BookingResponseDTO.fromApiResponse(item);
+            return dto.toPlain();
+        });
+
+        console.log('Admin search response:', data);
+        return data;
+
+    } catch (error) {
+        console.error('Error searching bookings:', error);
+        throw error;
+    }
+};
+
+// NEW: API cập nhật trạng thái booking
+export interface BookingUpdateStatusRequestDTO {
+    bookingID: number;
+    bookingStatus: string;
+    cancelReason?: string;
+}
+
+export const updateBookingStatusApi = async (
+    requestDTO: BookingUpdateStatusRequestDTO
+): Promise<any> => {
+    try {
+        const response = await api.post('/bookings/admin/update-status', requestDTO);
+        const dto = BookingResponseDTO.fromApiResponse(response.data);
+        return dto.toPlain();
+    } catch (error) {
+        console.error('Error updating booking status:', error);
+        throw error;
+    }
 };

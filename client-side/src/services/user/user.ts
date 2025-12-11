@@ -57,3 +57,17 @@ export const updateUserApi = async (userID: number, updateData: UpdatePayload): 
         throw error;
     }
 };
+
+export const searchUsersApi = async (searchDTO: any, page: number, size: number) => {
+    const response = await api.post(`/users/admin/search`, searchDTO, {
+        params: { page, size }
+    });
+    // Map content sang DTO plain object
+    const content = response.data.content.map((item: any) => UserRequestDTO.fromApiResponse(item).toPlain());
+    return { ...response.data, content };
+};
+
+export const lockUnlockUserApi = async (userID: number, status: boolean, reason: string) => {
+    const response = await api.post(`/users/admin/update-status`, { userID, status, reason });
+    return UserRequestDTO.fromApiResponse(response.data).toPlain();
+};

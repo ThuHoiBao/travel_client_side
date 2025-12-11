@@ -34,7 +34,12 @@ export class BookingResponseDTO {
     private _amount: number = 0;
     private _timeLimit: string = ""; // LocalDateTime -> string ISO
     private _passengers: BookingPassengerResponseDTO[] = [];
-    
+    private _bank: string = "";
+    private _accountNumber: string = "";
+    private _accountName: string = "";
+    private _refundBank: string = "";
+    private _refundAccountNumber: string = "";
+    private _refundAccountName: string = "";
 
     // Getters
     get bookingID() { return this._bookingID; }
@@ -69,7 +74,12 @@ export class BookingResponseDTO {
     get amount() { return this._amount; }
     get timeLimit() { return this._timeLimit; }
     get passengers() { return this._passengers; }
-
+    get bank() { return this._bank; }
+    get accountNumber() { return this._accountNumber; }
+    get accountName() { return this._accountName; }
+    get refundBank() { return this._refundBank; }
+    get refundAccountNumber() { return this._refundAccountNumber; }
+    get refundAccountName() { return this._refundAccountName; }
     /**
      * Phương thức ánh xạ từ API Response
      * @param data Dữ liệu raw từ API
@@ -108,6 +118,12 @@ export class BookingResponseDTO {
         dto._paymentID = data.paymentID || -1;
         dto._amount = data.amount || 0;
         dto._timeLimit = data.timeLimit || "";
+        dto._bank = data.bank || "";
+        dto._accountNumber = data.accountNumber || "";
+        dto._accountName = data.accountName || "";
+        dto._refundBank = data.refundBank || "";
+        dto._refundAccountNumber = data.refundAccountNumber || "";
+        dto._refundAccountName = data.refundAccountName || "";
         // Map danh sách hành khách
         dto._passengers = (data.passengers || []).map((p: any) => BookingPassengerResponseDTO.fromApiResponse(p));
         return dto;
@@ -143,6 +159,12 @@ export class BookingResponseDTO {
             paymentID: this.paymentID,
             amount: this.amount,
             timeLimit: this.timeLimit,
+            bank: this.bank,
+            accountNumber: this.accountNumber,
+            accountName: this.accountName,
+            refundBank: this.refundBank,
+            refundAccountNumber: this.refundAccountNumber,
+            refundAccountName: this.refundAccountName,
             passengers: this.passengers.map(p => p.toPlain())
         };
     }

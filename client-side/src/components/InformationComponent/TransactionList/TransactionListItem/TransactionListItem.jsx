@@ -269,6 +269,7 @@ const TransactionListItem = ({ booking, refetch }) => {
             )}
             {isCancelModalOpen && (
                 <CancelOptionModal
+                    booking={booking}
                     bookingID={booking.bookingID}
                     onClose={handleCloseCancelModal}
                     onRefetch={refetch} // <--- LỖI: refetch chưa được truyền
