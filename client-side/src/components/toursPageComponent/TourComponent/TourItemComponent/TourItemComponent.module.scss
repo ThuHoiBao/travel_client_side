@@ -21,21 +21,42 @@
 .imageContainer {
     flex: 0 0 38%; 
     position: relative;
-    max-height: 250px;
+    max-height: 280px;
     overflow: hidden;
 }
 
-.heartIcon {
+.heartIconToggle {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    color: white; 
-    font-size: 1.2em;
+    top: 0px;
+    right: 15px;
     cursor: pointer;
-    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5); 
-    z-index: 2;
+    z-index: 10;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease-in-out;
+
+    &:hover {
+        transform: scale(1.15);
+        
+        svg {
+            filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.8)) !important;
+        }
+    }
 }
 
+.isFavorite {
+    &:hover svg {
+        fill: #ff7875 !important;
+    }
+}
+
+.isProcessing {
+    opacity: 0.5;
+    pointer-events: none;
+}
 .tourImage {
     width: 100%;
     height: 100%;

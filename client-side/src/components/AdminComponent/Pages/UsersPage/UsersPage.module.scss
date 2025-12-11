@@ -1,0 +1,85 @@
+// src/components/AdminComponent/Pages/UsersPage/UsersPage.module.scss
+$primary-blue: #2c70f8;
+$text-default: #333;
+$border-color: #e0e0e0;
+$white: #ffffff;
+$light-bg: #f7fafc;
+
+.pageContainer {
+    padding: 20px;
+    background-color: $white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    min-height: 630px;
+    display: flex;
+    flex-direction: column;
+}
+
+.pageTitle {
+    font-size: 2em;
+    color: #1a202c;
+    border-bottom: 2px solid #edf2f7;
+    padding-bottom: 15px;
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+}
+
+.icon { margin-right: 10px; color: $primary-blue; }
+
+.filterBar {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: $light-bg;
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.filterItem { flex: 1 1 200px;
+margin-right: 40px; }
+
+.filterInput {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    &:focus { border-color: $primary-blue; outline: none; }
+}
+
+.searchButton, .resetButton {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+}
+
+.searchButton { background-color: $primary-blue; &:hover { background-color: darken($primary-blue, 10%); } }
+.resetButton { background-color: #6c757d; &:hover { background-color: darken(#6c757d, 10%); } }
+
+.tableWrapper { flex-grow: 1; overflow-x: auto; }
+
+.usersTable {
+    width: 100%;
+    border-collapse: collapse;
+    th, td { padding: 15px 10px; border-bottom: 1px solid $border-color; text-align: left; }
+    th { background-color: $light-bg; font-weight: 600; font-size: 13px; text-transform: uppercase; color: #666; }
+}
+
+.loadingState, .emptyState { text-align: center; padding: 40px; color: #666; }
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 10px;
+    border-top: 1px solid $border-color;
+    align-items: center;
+    .paginationControls { display: flex; gap: 10px; align-items: center; }
+    .pageButton { padding: 8px 12px; border: 1px solid $border-color; background: white; cursor: pointer; border-radius: 4px; &:disabled { opacity: 0.5; } }
+}

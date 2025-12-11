@@ -15,13 +15,14 @@ import PaymentError from './components/BookingPaymentComponent/PaymentError';
 import Register from './components/RegisterComponent/Register';
 import VerifyEmail from './components/VerifyEmail/VerifyEmail';
 import Login from './components/Login/Login';
-// Các trang giả định
-const HotelPage = () => <div>Trang Khách sạn</div>; 
-const FlightsPage = () => <div>Trang Vé máy bay</div>; 
-const EntertainmentPage = () => <div>Trang Vui chơi giải trí</div>;
-const TrainsPage = () => <div>Trang Vé tàu</div>;
-const LoginPage = () => <div>Trang Đăng nhập</div>; 
-const AdminPage = () => <div>Trang Quản trị</div>; 
+import AdminComponent from './components/AdminComponent/AdminComponent';
+// // Các trang giả định
+// const HotelPage = () => <div>Trang Khách sạn</div>; 
+// const FlightsPage = () => <div>Trang Vé máy bay</div>; 
+// const EntertainmentPage = () => <div>Trang Vui chơi giải trí</div>;
+// const TrainsPage = () => <div>Trang Vé tàu</div>;
+// const LoginPage = () => <div>Trang Đăng nhập</div>; 
+// const AdminPage = () => <div>Trang Quản trị</div>; 
 
 function App() {
   return (
@@ -41,11 +42,11 @@ function App() {
             <Route path="/information" element={<InformationComponent />} />
             <Route path="/information/:tab" element={<InformationComponent />} />
             
-            {/* Các trang khác */}
+            {/* Các trang khác
             <Route path="/hotel" element={<HotelPage />} />
             <Route path="/flights" element={<FlightsPage />} />
             <Route path="/entertainment" element={<EntertainmentPage />} />
-            <Route path="/trains" element={<TrainsPage />} />
+            <Route path="/trains" element={<TrainsPage />} /> */}
 
             <Route 
               path="/tour-detail" 
@@ -78,12 +79,11 @@ function App() {
         </Route>
           
         {/* CÁC TRANG KHÔNG SỬ DỤNG LAYOUT */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin/*" element={<AdminComponent />} /> 
+        
 
       </Routes>
     </Router>
   );
 }
-
 export default App;
