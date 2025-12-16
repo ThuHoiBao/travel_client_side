@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import styles from './TourBooking.module.scss';
 import axios from '../../utils/axiosCustomize';
+import { useAuth } from '../../context/AuthContext.jsx';
 import {
     FaUser, FaBarcode, FaPlane, FaTag, FaTimes, FaCheckCircle, FaSpinner, FaCoins
 } from 'react-icons/fa';
@@ -28,12 +29,7 @@ const TourBooking = () => {
   const [pointsUsed, setPointsUsed] = useState(0);
   
   // TODO: Thay bằng data thật từ auth context hoặc API
-  const userData = {
-      id: 1,
-      fullName: "Thoại Đức",
-      email: "thoaiduc@gmail.com",
-      points: 5000 
-  };
+  const { user } = useAuth(); 
  
   // Lấy params từ URL
   const tourCode = searchParams.get('tourCode');
@@ -912,7 +908,7 @@ const TourBooking = () => {
 
         {/* CARD: ĐIỂM THƯỞNG */}
         <PointRedemption 
-          userPoints={userData.points} 
+          userPoints={user.coinBalance || 0} 
           maxRedeemableAmount={calculateMaxRedeemable()}
           onRedeem={(amount, points) => {
             setPointDiscount(amount);

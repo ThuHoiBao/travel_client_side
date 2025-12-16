@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from '../SpecialTours.module.scss';
 import { FaMapMarkerAlt, FaCalendarAlt, FaClock } from 'react-icons/fa';
 // Thêm import format từ date-fns nếu bạn muốn format ngày
@@ -13,7 +14,7 @@ const formatPrice = (price) => {
 };
 
 const SpecialTourItem = ({ tour }) => {
-    
+    const navigate = useNavigate();
     const getFormattedDate = (dateString) => {
         if (!dateString) return 'Chưa xác định';
         
@@ -23,6 +24,14 @@ const SpecialTourItem = ({ tour }) => {
             return dateString; // Trả về nguyên gốc nếu không thể format
         }
     };
+
+      const handleDepartureClick = (e, departureID) => {
+        e.stopPropagation(); 
+        console.log(`Clicked Departure ID: ${departureID}`);
+        navigate(`/tour/${tour.tourCode}?departureId=${departureID}`);
+    };
+
+
     const imageUrl = tour.image || 'default-placeholder.jpg'; 
     
     // Giả lập Thời gian còn lại
@@ -87,7 +96,7 @@ const SpecialTourItem = ({ tour }) => {
                          {formatPrice(tour.salePrice)} đ
                     </div>
                     {/* {tour.departureID} */}
-                    <button className={styles.bookingButton}>
+                    <button className={styles.bookingButton}  onClick={(e) => handleDepartureClick(e, tour.departureID)}>
                         Đặt ngay 
                     </button>
                 </div>

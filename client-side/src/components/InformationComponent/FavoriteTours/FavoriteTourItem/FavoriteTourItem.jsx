@@ -1,15 +1,18 @@
 // src/components/InformationComponent/FavoriteTours/FavoriteTourItem/FavoriteTourItem.jsx
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './FavoriteTourItem.module.scss';
 
 // Chức năng format tiền tệ (VND)
 const formatCurrency = (amount) => {
+    
     if (amount === undefined || amount === null) return 'Liên hệ';
     return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }).replace('₫', 'đ');
 };
 
 const FavoriteTourItem = ({ tour, onRemove }) => {
+    const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
 
     if (!tour) return null;
@@ -27,12 +30,21 @@ const FavoriteTourItem = ({ tour, onRemove }) => {
         setShowModal(false);
     };
 
-    // Hàm xử lý khi click vào ngày khởi hành (Giống như TourItemComponent)
-    const handleDateClick = (departureID, date) => {
+    const handleDateClick = (e, departureID) => {
+        e.stopPropagation(); 
         console.log(`Clicked Departure ID: ${departureID}`);
-        console.log(`Clicked Date: ${date.fullDate} (${date.departureDate})`);
-        // Logic chọn ngày (nếu cần) sẽ nằm ở đây
+        navigate(`/tour/${tour.tourCode}?departureId=${departureID}`);
     };
+
+     const handleViewDetail = (e) => {
+        e.stopPropagation();
+        if(allDepartureDates && allDepartureDates.length > 0){
+            const firstDepature = allDepartureDates[0];
+             navigate(`/tour/${tour.tourCode}?departureId=${firstDepature.departureID}`);
+        } else {
+            navigate(`/tour/${tour.tourCode}`);
+        }
+    }
 
     return (
         <>
@@ -77,7 +89,7 @@ const FavoriteTourItem = ({ tour, onRemove }) => {
                                     key={index} 
                                     className={styles.dateBadge}
                                     title={`Ngày: ${date.fullDate}`}
-                                    onClick={() => handleDateClick(date.departureID, date)}
+                                    onClick={(e) => handleDateClick(e, date.departureID)}
                                 >
                                     {date.departureDate}
                                 </span>
@@ -93,7 +105,7 @@ const FavoriteTourItem = ({ tour, onRemove }) => {
                             <p className={styles.priceValue}>{formatCurrency(tour.money)}</p>
                         </div>
                         <div className={styles.buttonGroup}>
-                            <button className={styles.detailButton}>Xem chi tiết</button>
+                            <button className={styles.detailButton} onClick={handleViewDetail}>Xem chi tiết</button>
                             <button className={styles.removeButton} onClick={handleRemoveClick}>
                                 Bỏ yêu thích
                             </button>

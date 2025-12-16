@@ -12,8 +12,10 @@ import DashboardPage from './Pages/DashboardPage/DashboardPage';
 import ToursPage from './Pages/ToursPage/ToursPage';
 import UsersPage from './Pages/UsersPage/UsersPage';
 import BookingsPage from './Pages/BookingsPage/BookingsPage';
-import DiscountsPage from './Pages/DiscountsPage/DiscountsPage';
 import NotificationsPage from './Pages/NotificationsPage/NotificationsPage';
+import CouponManagement from './Pages/CounponsPage/CouponManagement';
+import LocationManager from './Pages/LocationsPage/LocationManager';
+import BranchPolicyManagement from './Pages/BranchPolicyPage/BranchPolicyManagement' 
 
 const AdminComponent = () => {
     return (
@@ -27,7 +29,9 @@ const AdminComponent = () => {
                 <Route path="tours" element={<ToursPage />} /> 
                 <Route path="users" element={<UsersPage />} />
                 <Route path="bookings" element={<BookingsPage />} />
-                <Route path="discounts" element={<DiscountsPage />} />
+                <Route path="coupons" element={<CouponManagement />} />
+                <Route path="locations" element={<LocationManager/> }/>
+                <Route path="branches-policies" element={<BranchPolicyManagement/> }/>
                 <Route path="notifications" element={<NotificationsPage />} />
 
                 {/* ROUTES CŨ */}

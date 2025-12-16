@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
     FaTachometerAlt, FaBox, FaChartLine, FaCog, FaSignOutAlt, FaUsers, 
-    FaTicketAlt, FaBell, FaCalendarCheck, FaTags 
+    FaTicketAlt, FaBell, FaCalendarCheck, FaTags , FaMapMarkerAlt, FaBuilding 
 } from 'react-icons/fa';
 import styles from './AdminSidebar.module.scss';
 
@@ -10,8 +10,10 @@ const navItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: FaTachometerAlt },
     { name: 'Quản lý Tours', path: '/admin/tours', icon: FaBox }, 
     { name: 'Quản lý Users', path: '/admin/users', icon: FaUsers }, 
-    { name: 'Quản lý Bookings', path: '/admin/bookings', icon: FaCalendarCheck }, 
-    { name: 'Quản lý Giảm giá', path: '/admin/discounts', icon: FaTags }, 
+    { name: 'Quản lý Bookings', path: '/admin/bookings', icon: FaCalendarCheck },
+    { name: 'Quản lý Giảm giá', path: '/admin/coupons', icon: FaTags }, 
+    {name: 'Quản lý Locations', path: '/admin/locations', icon: FaMapMarkerAlt } ,
+    {name: 'Quản lý Branches Policies', path: '/admin/branches-policies', icon: FaMapMarkerAlt } ,
     { name: 'Quản lý Thông báo', path: '/admin/notifications', icon: FaBell }, 
     { name: 'Analytics', path: '/admin/analytics', icon: FaChartLine },
 ];

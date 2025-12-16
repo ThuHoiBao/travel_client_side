@@ -3,7 +3,6 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import SidebarMenu from './SidebarMenu/SidebarMenu';
 import PersonalProfile from './PersonalProfile/PersonalProfile';
 import TransactionList from './TransactionList/TransactionList';
-import Notifications from './Notifications/Notifications';
 import FavoriteTours from './FavoriteTours/FavoriteTours';
 import styles from './InformationComponent.module.scss';
 import AvatarUploadModal from './AvatarUploadModal/AvatarUploadModal';
@@ -92,11 +91,9 @@ const InformationComponent = () => {
             case 'profile':
                 return <PersonalProfile />;
             case 'transaction':
-                return <TransactionList />;
-            case 'notifications':
-                return <Notifications />;
+                return <TransactionList user={user} />;
             case 'favorites':
-                return <FavoriteTours />;
+                return <FavoriteTours user={user}/>;
             default:
                 return <PersonalProfile />;
         }

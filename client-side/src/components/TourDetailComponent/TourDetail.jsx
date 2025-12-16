@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef} from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import styles from './TourDetail.module.scss';
 import Header from '../HeaderComponent/Header';
 import Footer from '../FooterComponent/Footer';
@@ -8,21 +8,26 @@ import TourCalendar from './TourCalendar/TourCalendar';
 import TourInformation from './TourInformation/TourInformation';
 import TourPolicy from './TourPolicy/TourPolicy';
 import TourItinerary from './TourItinerary/TourItinerary';
+import TourReviews from './TourReview/TourReviews';
 import RelatedTours from './RelatedTours/RelatedTours';
 import axios from '../../utils/axiosCustomize'; 
 import { FaMapMarkerAlt, FaCalendarAlt, FaClock, FaBarcode, FaPhoneAlt, FaPlay } from 'react-icons/fa';
 import { BsPeopleFill } from "react-icons/bs";
+import { set } from 'date-fns';
 
-const TourDetail = () => {
+  const TourDetail = () => {
   const { tourCode } = useParams(); 
   const navigate = useNavigate(); 
+  const [searchParams] = useSearchParams();
+  const departureIdFromUrl = searchParams.get('departureId');
+  
   const [tourData, setTourData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedDeparture, setSelectedDeparture] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [startImageIndex, setStartImageIndex] = useState(0);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  
+    
   // State mới để quản lý main display
   const [mainMediaType, setMainMediaType] = useState('video'); // 'video' hoặc 'image'
   const [mainImageIndex, setMainImageIndex] = useState(0);
@@ -50,11 +55,25 @@ const TourDetail = () => {
         setMainImageIndex(0);
       }
       
-      if (data?.departures && data.departures.length > 0) {
-        setSelectedDeparture(data.departures[0]);
-      } else {
-        setSelectedDeparture(null);
-      }
+       if (data?.departures && data.departures.length > 0) {
+          if (departureIdFromUrl) {
+            const foundDeparture = data.departures.find(
+              dep => dep.departureId === parseInt(departureIdFromUrl)
+            );
+            
+            if (foundDeparture) {
+              setSelectedDeparture(foundDeparture);
+              console.log('Selected departure from URL:', foundDeparture);
+            } else {
+              setSelectedDeparture(data.departures[0]);
+              console.warn('Departure ID not found, using first departure');
+            }
+          } else {
+            setSelectedDeparture(data.departures[0]);
+          }
+        } else {
+          setSelectedDeparture(null);
+        }
     }  catch (error) {
         console.error('Error fetching tour data:', error);
       } finally {
@@ -404,7 +423,9 @@ const TourDetail = () => {
           </div>
 
         </div> 
+        <TourReviews tourCode={tourData.tourCode} />
         <RelatedTours currentTourCode={tourData.tourCode} />
+      
 
         {/* Modal Ảnh */}
         <ImageModal 
