@@ -16,6 +16,9 @@ import Register from './components/RegisterComponent/Register';
 import VerifyEmail from './components/VerifyEmail/VerifyEmail';
 import Login from './components/Login/Login';
 import AdminComponent from './components/AdminComponent/AdminComponent';
+import CouponManagement from './components/AdminComponent/Pages/CounponsPage/CouponManagement';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // // Các trang giả định
 // const HotelPage = () => <div>Trang Khách sạn</div>; 
 // const FlightsPage = () => <div>Trang Vé máy bay</div>; 
@@ -28,9 +31,11 @@ function App() {
   return (
     <Router>
       <Routes>
+
         
         {/* LAYOUT CHÍNH: Bọc tất cả các trang cần Header và Footer */}
         <Route element={<MainLayout />}>
+                
              
             {/* Trang Chủ (Landing page) */}
             <Route path="/" element={<HomePage />} /> 
@@ -83,6 +88,19 @@ function App() {
         
 
       </Routes>
+
+        <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+        />
     </Router>
   );
 }

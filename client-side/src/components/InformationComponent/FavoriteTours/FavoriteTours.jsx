@@ -1,17 +1,19 @@
 
 // src/components/InformationComponent/FavoriteTours/FavoriteTours.jsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, use } from 'react';
 import { getUserFavoriteToursApi, removeFavoriteTourApi } from '../../../services/favoriteTour/favoriteTour.ts';
 import FavoriteTourItem from './FavoriteTourItem/FavoriteTourItem.jsx';
 import styles from './FavoriteTours.module.scss';
 import { FaHeartBroken } from 'react-icons/fa'; // Dùng icon fa-heart-broken cho empty state
+import { useNavigate } from 'react-router-dom';
 
 const FavoriteTours = ({ user }) => {
+    console.log('👤 FavoriteTours for user:', user);
     const [tours, setTours] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const currentUserId = user?.userID;
+    const currentUserId = user?.userId || user?.userID || user?.id  || null;
 
     // Hàm fetch data, sử dụng useCallback để đảm bảo ổn định
     const fetchFavoriteTours = useCallback(async () => {
@@ -27,6 +29,7 @@ const FavoriteTours = ({ user }) => {
         try {
             // Gọi API mới
             const data = await getUserFavoriteToursApi(currentUserId);
+            console.log("Fetched favorite tours:", data);
             setTours(data);
         } catch (err) {
             console.error("Error fetching favorite tours:", err);

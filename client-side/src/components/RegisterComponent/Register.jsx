@@ -19,7 +19,6 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [touched, setTouched] = useState({});
   
-  // State cho tỉnh/huyện
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +26,6 @@ const Register = () => {
   const [showSucessModal, setShowSuccessModal] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
 
-  // Tải dữ liệu tỉnh thành khi component mount
   useEffect(() => {
     fetchProvinces();
   }, []);
@@ -61,7 +59,6 @@ const Register = () => {
     return response.data;
   }
 
-  // Validation functions
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) return 'Email không được để trống';
@@ -182,7 +179,6 @@ const Register = () => {
     setRegisteredEmail(formData.email);
     setShowSuccessModal(true);
 
-    // Reset form
     setFormData({
       fullName: '',
       email: '',
@@ -198,7 +194,6 @@ const Register = () => {
   } catch (error) {
     console.error("Register error:", error);
 
-    // Axios lỗi sẽ nằm trong error.response.data
     alert(
       error.response?.data?.message ||
       error.message ||
@@ -225,7 +220,7 @@ const Register = () => {
       <div className={styles.formCard}>
         <h1 className={styles.title}>Đăng ký hội viên</h1>
         <p className={styles.description}>
-          Để hoàn tất đăng ký Hội viên VietravelPlus, vui lòng điền đầy đủ thông tin vào mẫu dưới đây
+          Để hoàn tất đăng ký Hội viên Future Travel, vui lòng điền đầy đủ thông tin vào mẫu dưới đây
         </p>
 
         <div className={styles.formWrapper}>
@@ -367,7 +362,8 @@ const Register = () => {
                 onChange={handleChange}
                 onBlur={handleBlur}
                 disabled={!formData.province || districts.length === 0}
-                className={`${styles.input} ${styles.select} ${errors.district && touched.district ? styles.error : ''} ${!formData.province ? styles.disabled : ''}`}
+                className={`${styles.input} ${styles.select} ${errors.district && touched.district ? styles.error : ''} 
+                ${!formData.province ? styles.disabled : ''}`}
               >
                 <option value="">
                   {!formData.province ? 'Chọn Tỉnh/Thành trước' : 'Chọn Quận/Huyện'}
@@ -417,7 +413,7 @@ const Register = () => {
 
         <p className={styles.footer}>
           Đã có tài khoản?{' '}
-          <a href="#" className={styles.linkBold}>
+          <a href="/login" className={styles.linkBold}>
             Đăng nhập ngay
           </a>
         </p>

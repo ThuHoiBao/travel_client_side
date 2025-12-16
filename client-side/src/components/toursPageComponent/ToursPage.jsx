@@ -7,7 +7,7 @@ import { useLocations } from '../../hook/useLocations.ts';
 import FilterAndSearchInput from './FilterAndSearchInput/FilterAndSearchInput.jsx'; 
 import TourComponent from './TourComponent/TourComponent.jsx'; 
 import styles from './ToursPage.module.scss'; 
-import useUser from '../../hook/useUser.ts';
+import { useAuth } from '../../context/AuthContext.jsx';
 // Định nghĩa các Tùy chọn Sắp xếp
 const SORT_OPTIONS = [
     { value: 'ALL', label: 'Tất cả' },
@@ -24,9 +24,8 @@ const ToursPage = () => {
     const [currentSort, setCurrentSort] = useState(SORT_OPTIONS[0]); // Mặc định: 'Tất cả'
     const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
     const currentSearchParams = Object.fromEntries(searchParams.entries());
-    const mockUserId = 4; // Thay thế bằng logic thực tế! 
-    const { user: currentUser } = useUser(mockUserId); // Hook của bạn đã có, ta dùng nó
-    const currentUserId = currentUser?.userID;
+    const {user} = useAuth();
+    const currentUserId = user?.userId || user?.userID || user?.id  || null;
     const currentEndPointInfo = useMemo(() => {
         const endLocationId = currentSearchParams.endLocationID || '-1';
         return endLocations.find(loc => loc.locationID.toString() === endLocationId);

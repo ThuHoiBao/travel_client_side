@@ -24,7 +24,6 @@ const SidebarMenu = ({ activeTab, onMenuClick, onAvatarClick }) => {
     const menuItems = [
         { id: 'profile', label: 'Hồ sơ cá nhân', icon: FaEdit },
         { id: 'transaction', label: 'Danh sách giao dịch', icon: FaListAlt },
-        { id: 'notifications', label: 'Thông báo', icon: FaBell },
         { id: 'favorites', label: 'Tour yêu thích', icon: FaInfoCircle },
     ];
 

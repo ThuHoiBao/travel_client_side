@@ -80,8 +80,8 @@ const Login = () => {
       
       const result = await login(formData.email, formData.password);
       
-      console.log('✅ Login result:', result);
-      console.log('📦 Tokens saved:', {
+      console.log('Login result:', result);
+      console.log('Tokens saved:', {
         accessToken: localStorage.getItem('accessToken') ? 'Có' : 'Không',
         refreshToken: localStorage.getItem('refreshToken') ? 'Có' : 'Không',
         user: localStorage.getItem('user') ? 'Có' : 'Không'
@@ -97,7 +97,7 @@ const Login = () => {
       }
       
     } catch (error) {
-      console.error('❌ Login error:', error);
+      console.error('Login error:', error);
       
       let errorMessage = 'Đã xảy ra lỗi. Vui lòng thử lại!';
       
@@ -143,15 +143,15 @@ const Login = () => {
       
       const result = await loginWithGoogle(credentialResponse.credential);
       
-      console.log('✅ Google login result:', result);
-      console.log('📦 Tokens saved:', {
+      console.log('Google login result:', result);
+      console.log('Tokens saved:', {
         accessToken: localStorage.getItem('accessToken') ? 'Có' : 'Không',
         refreshToken: localStorage.getItem('refreshToken') ? 'Có' : 'Không',
         user: localStorage.getItem('user') ? 'Có' : 'Không'
       });
       
       const userRole = result.user.role;
-      console.log('👤 User role:', userRole);
+      console.log('User role:', userRole);
       
       if (userRole === 'ADMIN') {
         navigate('/admin/dashboard', { replace: true });
@@ -160,7 +160,7 @@ const Login = () => {
       }
       
     } catch (error) {
-      console.error('❌ Google login error:', error);
+      console.error('Google login error:', error);
       const errorMessage = error.response?.data?.message || error.message || 'Đăng nhập Google thất bại';
       setErrors({ general: errorMessage });
     } finally {
@@ -169,7 +169,7 @@ const Login = () => {
   };
 
   const handleGoogleError = () => {
-    console.error('❌ Google login failed');
+    console.error('Google login failed');
     setErrors({ general: 'Đăng nhập Google thất bại. Vui lòng thử lại!' });
   };
 
@@ -190,7 +190,6 @@ const Login = () => {
       <div className={styles.formCard}>
         <div className={styles.brandLogo}>
           <h2 style={{ textAlign: 'center', color: '#d97706', marginBottom: '0.5rem' }}>
-            🌴 Future Travel
           </h2>
         </div>
 

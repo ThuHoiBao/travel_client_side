@@ -1,10 +1,16 @@
 // src/components/homPageComponent/ExploreProductsComponent/ExploreProductItem/ExploreProductItem.jsx (ĐÃ CHỈNH SỬA)
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from '../ExploreProducts.module.scss'; 
 
 const ExploreProductItem = ({ tour }) => {
-    
+    console.log('ExploreProductItem tour prop:', tour);
+    const navigate = useNavigate()
+    const handleDepartureClick = (e) => {
+        e.stopPropagation(); 
+        navigate(`/tour/${tour.tourCode}`);
+    };
     const backgroundImage = tour.image 
         ? tour.image
         : '/images/default-tour.jpg'; 
@@ -12,7 +18,7 @@ const ExploreProductItem = ({ tour }) => {
     return (
         <div 
             className={styles.productCard} 
-            onClick={() => console.log(`Chuyển đến tour ID: ${tour.id || tour.tourID}`)} 
+            onClick={(e) => handleDepartureClick(e)} 
         >
             <div 
                 className={styles.imageWrapper}
