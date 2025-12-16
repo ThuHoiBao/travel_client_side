@@ -2,6 +2,7 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './BookingsPage.module.scss';
 import { FaCalendarCheck, FaSearch, FaRedoAlt, FaChevronLeft, FaChevronRight, FaCalendarAlt, FaChevronDown, FaCheck } from 'react-icons/fa';
+import { useLocation } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import useAdminBookings from '../../../../hook/useAdminBookings.ts';
@@ -76,12 +77,45 @@ const StatusDropdown = ({ value, onChange, options }) => {
 };
 
 const BookingsPage = () => {
-    const [bookingCode, setBookingCode] = useState('');
-    const [bookingStatus, setBookingStatus] = useState(null);
+    // const [bookingCode, setBookingCode] = useState('');
+    // const [bookingStatus, setBookingStatus] = useState(null);
     const [bookingDate, setBookingDate] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const pageSize = 5;
+    const location = useLocation();
     
+    //  Khởi tạo state bookingStatus dựa trên URL params
+    const [bookingStatus, setBookingStatus] = useState(() => {
+        const params = new URLSearchParams(location.search);
+        return params.get('status') || null;
+    });
+    const [bookingCode, setBookingCode] = useState(() => {
+        const params = new URLSearchParams(location.search);
+        return params.get('search') || ''; // Nếu có ?search=... thì lấy, không thì rỗng
+    });
+   useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        
+        // 1. Xử lý Status
+        const statusParam = params.get('status');
+        if (statusParam) {
+            setBookingStatus(statusParam);
+        } else {
+            setBookingStatus(null); // Reset nếu không có param
+        }
+
+        // 2. Xử lý Search (Booking Code)
+        const searchParam = params.get('search');
+        if (searchParam) {
+            setBookingCode(searchParam);
+        } else {
+            setBookingCode(''); // Reset nếu không có param
+        }
+
+        // Reset trang về 0 khi URL thay đổi để đảm bảo tìm kiếm từ đầu
+        setCurrentPage(0);
+        
+    }, [location.search]);
     const searchDTO = useMemo(() => ({
         bookingCode: bookingCode.trim() === '' ? null : bookingCode,
         bookingStatus: bookingStatus,
