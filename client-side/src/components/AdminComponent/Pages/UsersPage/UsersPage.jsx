@@ -1,31 +1,64 @@
 // src/components/AdminComponent/Pages/UsersPage/UsersPage.jsx
-import React, { useState, useMemo, useCallback } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import styles from './UsersPage.module.scss';
 import { FaUsers, FaSearch, FaRedoAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import useAdminUsers from '../../../../hook/useAdminUsers.ts';
 import useWebSocket from '../../../../hook/useWebSocket.ts';
 import UsersItem from './UsersItem';
+import { useLocation, useNavigate } from 'react-router-dom'; // Thêm useNavigate để xóa URL khi reset
 
 const UsersPage = () => {
-    const [searchForm, setSearchForm] = useState({ fullName: '', phone: '', email: '' });
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    // 1. Logic lấy tham số từ URL ngay lập tức (Synchronous)
+    // Giúp state có dữ liệu ngay từ lần render đầu tiên
+    const getInitialEmail = () => {
+        const params = new URLSearchParams(location.search);
+        return params.get('search') || '';
+    };
+
+    const initialEmail = getInitialEmail();
+
+    // 2. Khởi tạo state với giá trị từ URL
+    const [searchForm, setSearchForm] = useState({ 
+        fullName: '', 
+        phone: '', 
+        email: initialEmail // Điền sẵn vào ô input
+    });
+
     const [currentPage, setCurrentPage] = useState(0);
     const pageSize = 5;
 
-    // Dùng useMemo để tránh re-render hook khi gõ phím liên tục (chỉ khi nhấn tìm kiếm mới update thực tế nếu muốn, ở đây tôi debounce bằng cách chỉ truyền state khi nhấn Search hoặc giữ nguyên reactive)
-    // Để đơn giản theo yêu cầu: "tìm kiếm thì là 3 trường text... load tất cả user theo tìm kiếm"
-    // Tôi sẽ truyền thẳng state vào hook, nhưng hook sẽ chạy mỗi khi state đổi. 
-    // Tốt nhất là có nút Search để kích hoạt.
-    
-    const [activeSearch, setActiveSearch] = useState({ fullName: null, phone: null, email: null });
+    // 3. Quan trọng: activeSearch có giá trị ngay lập tức -> Hook useAdminUsers sẽ chạy search luôn
+    const [activeSearch, setActiveSearch] = useState({ 
+        fullName: null, 
+        phone: null, 
+        email: initialEmail || null // Nếu có email thì search luôn
+    });
 
+    // 4. Hook API (Giả định hook này đã có useEffect phụ thuộc vào activeSearch)
     const { users, loading, totalPages, totalElements, refetch } = useAdminUsers(activeSearch, currentPage, pageSize);
 
-    // WebSocket lắng nghe cập nhật User
+    // 5. WebSocket
     useWebSocket({
-        topic: '/topic/admin/users', // Nhớ config BE gửi vào topic này
+        topic: '/topic/admin/users',
         onMessage: () => refetch(),
         enabled: true
     });
+
+    // 6. Xử lý trường hợp User đang ở trang này mà click vào thông báo khác (URL thay đổi nhưng không reload component)
+    useEffect(() => {
+        const newEmailParam = getInitialEmail();
+        
+        // Chỉ cập nhật nếu URL khác với state hiện tại để tránh loop
+        if (newEmailParam !== searchForm.email) {
+            setSearchForm(prev => ({ ...prev, email: newEmailParam }));
+            setActiveSearch(prev => ({ ...prev, email: newEmailParam || null }));
+            setCurrentPage(0);
+        }
+    }, [location.search]);
 
     const handleSearch = () => {
         setCurrentPage(0);
@@ -37,9 +70,13 @@ const UsersPage = () => {
     };
 
     const handleReset = () => {
+        // Reset form và state tìm kiếm
         setSearchForm({ fullName: '', phone: '', email: '' });
         setActiveSearch({ fullName: null, phone: null, email: null });
         setCurrentPage(0);
+        
+        // Xóa param ?search=... trên URL để nhìn cho sạch
+        navigate('/admin/users', { replace: true });
     };
 
     const handlePageChange = (newPage) => {
@@ -92,13 +129,22 @@ const UsersPage = () => {
                         <tbody>
                             {users.length > 0 ? users.map(user => (
                                 <UsersItem key={user.userID} user={user} refetch={refetch} />
-                            )) : <tr><td colSpan="6" className={styles.emptyState}>Không tìm thấy user nào</td></tr>}
+                            )) : (
+                                <tr>
+                                    <td colSpan="6">
+                                        <div className={styles.emptyState}>
+                                            {activeSearch.email 
+                                                ? `Không tìm thấy user có email: ${activeSearch.email}` 
+                                                : "Không tìm thấy user nào"}
+                                        </div>
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 )}
             </div>
 
-            {/* Pagination Controls Reuse from BookingsPage */}
             {!loading && totalElements > 0 && (
                 <div className={styles.pagination}>
                     <span>Showing {Math.min(totalElements, currentPage * pageSize + 1)} - {Math.min(totalElements, (currentPage + 1) * pageSize)} of {totalElements}</span>
@@ -112,4 +158,5 @@ const UsersPage = () => {
         </div>
     );
 };
+
 export default UsersPage;

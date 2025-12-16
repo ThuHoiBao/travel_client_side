@@ -1,0 +1,177 @@
+// src/components/AdminComponent/Pages/DashboardPage/components/RecentActivities/RecentActivities.module.scss
+
+.recentActivities {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    height: 100%;
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid #f7fafc;
+
+        h3 {
+            margin: 0;
+            font-size: 1.25em;
+            color: #1a202c;
+            font-weight: 700;
+        }
+
+        .badge {
+            background: #4299e1;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+    }
+
+    .activitiesList {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 600px;
+        overflow-y: auto;
+        padding-right: 8px;
+
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: #f7fafc;
+            border-radius: 3px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+
+            &:hover {
+                background: #a0aec0;
+            }
+        }
+
+        .activityItem {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+
+            &:hover {
+                transform: translateX(4px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            }
+
+            &.urgent {
+                border-left: 4px solid #f56565;
+                background: linear-gradient(90deg, #fff5f5 0%, white 100%);
+
+                .activityIcon {
+                    color: #f56565;
+                }
+
+                .severityBadge {
+                    background: #f56565;
+                }
+            }
+
+            &.warning {
+                border-left: 4px solid #ed8936;
+                background: linear-gradient(90deg, #fffaf0 0%, white 100%);
+
+                .activityIcon {
+                    color: #ed8936;
+                }
+
+                .severityBadge {
+                    background: #ed8936;
+                }
+            }
+
+            &.info {
+                border-left: 4px solid #4299e1;
+                background: linear-gradient(90deg, #ebf8ff 0%, white 100%);
+
+                .activityIcon {
+                    color: #4299e1;
+                }
+
+                .severityBadge {
+                    background: #4299e1;
+                }
+            }
+
+            .activityIcon {
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                background: #f7fafc;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2em;
+                flex-shrink: 0;
+            }
+
+            .activityContent {
+                flex: 1;
+                min-width: 0;
+
+                .description {
+                    margin: 0 0 6px 0;
+                    color: #2d3748;
+                    font-size: 0.9em;
+                    font-weight: 500;
+                    line-height: 1.4;
+                    word-wrap: break-word;
+                }
+
+                .timestamp {
+                    display: inline-block;
+                    font-size: 0.75em;
+                    color: #a0aec0;
+                    font-weight: 500;
+                }
+            }
+
+            .severityBadge {
+                color: white;
+                padding: 4px 10px;
+                border-radius: 12px;
+                font-size: 0.7em;
+                font-weight: 700;
+                text-transform: uppercase;
+                flex-shrink: 0;
+                align-self: flex-start;
+            }
+        }
+
+        .emptyState {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a0aec0;
+
+            svg {
+                font-size: 3em;
+                margin-bottom: 16px;
+            }
+
+            p {
+                margin: 0;
+                font-size: 1em;
+            }
+        }
+    }
+}

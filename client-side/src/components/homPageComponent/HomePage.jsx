@@ -8,7 +8,7 @@ import ExploreProducts from './ExploreProductsComponent/ExploreProducts';
 import SpecialTours from './SpecialToursComponent/SpecialTours';
 import FavoriteDestinations from './FavoriteDestinationsComponent/FavoriteDestinations';
 import TrustAndStatsComponent from './TrustAndStatsComponent/TrustAndStatsComponent';
-
+import ChatbotWidget from '../ChatbotWidget/ChatbotWidget';
 const HomePage = () => {
   return (
     <div className={styles.homePageWrapper}> 
@@ -25,6 +25,7 @@ const HomePage = () => {
        <FavoriteDestinations/>
        <TrustAndStatsComponent/>
       </main>
+       <ChatbotWidget />
       {/* <Footer/> */}
     </div>
   );
