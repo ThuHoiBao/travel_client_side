@@ -159,7 +159,7 @@ const ChatbotWidget = () => {
                 </div>
                 
                 {/* Gợi ý Tour (Cards) */}
-                {message.tourSuggestions && message.tourSuggestions.length > 0 && (
+                {/* {message.tourSuggestions && message.tourSuggestions.length > 0 && (
                   <div className={styles.tourGrid}>
                     {message.tourSuggestions.map((tour) => (
                       <a key={tour.tourId} href={tour.detailUrl} className={styles.tourCard}>
@@ -183,7 +183,7 @@ const ChatbotWidget = () => {
                       </a>
                     ))}
                   </div>
-                )}
+                )} */}
 
                 {/* Quick Actions */}
                 {message.quickActions && message.quickActions.length > 0 && (

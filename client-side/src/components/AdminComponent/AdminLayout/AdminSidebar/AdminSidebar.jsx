@@ -9,7 +9,7 @@ import styles from './AdminSidebar.module.scss';
 const navItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: FaTachometerAlt },
     { name: 'Quản lý Tours', path: '/admin/tours', icon: FaBox }, 
-    { name: 'Quản lý Users', path: '/admin/users', icon: FaUsers }, 
+    { name: 'Quản lý người dùng', path: '/admin/users', icon: FaUsers }, 
     { name: 'Quản lý Bookings', path: '/admin/bookings', icon: FaCalendarCheck },
     { name: 'Quản lý Giảm giá', path: '/admin/coupons', icon: FaTags }, 
     {name: 'Quản lý Locations', path: '/admin/locations', icon: FaMapMarkerAlt } ,

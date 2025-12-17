@@ -117,11 +117,6 @@ const PersonalProfile = () => {
                 formDataPayload.append('dateOfBirth', dateOfBirth);
             }
 
-            console.log('Sending FormData:');
-            for (let [key, value] of formDataPayload.entries()) {
-                console.log(`  ${key}: ${value}`);
-            }
-
             const response = await updateUserApi(userID, formDataPayload);
 
             updateUser({
@@ -137,10 +132,8 @@ const PersonalProfile = () => {
                 text: 'Cập nhật thông tin thành công!'
             });
 
-
         } catch (error) {
             console.error('Error updating user:', error);
-            console.error('Error response:', error.response?.data);
             
             const errorMessage = error.response?.data?.message 
                 || error.response?.data?.error
@@ -158,32 +151,41 @@ const PersonalProfile = () => {
     if (!userData) {
         return (
             <div className={styles.personalProfile}>
-                <div className={styles.loading}>Đang tải thông tin ...</div>
+                <div className={styles.loading}>Đang tải thông tin...</div>
             </div>
         );
     }
 
     return (
         <div className={styles.personalProfile}>
-            <h1 className={styles.pageTitle}>Hồ Sơ Cá Nhân</h1>
-            
-            <div className={styles.tabs}>
-                <div className={`${styles.tab} ${styles.tabActive}`}>
-                    Thông tin tài khoản
-                </div>
+            {/* Header
+            <div className={styles.pageHeader}>
+                <h1 className={styles.pageTitle}>Hồ Sơ Cá Nhân</h1>
+                <p className={styles.pageSubtitle}>Quản lý thông tin cá nhân để bảo mật tài khoản</p>
             </div>
+             */}
+            {/* Success/Error Messages */}
+            {message.text && (
+                <div className={message.type === 'success' ? styles.successMessage : styles.errorMessage}>
+                    {message.text}
+                </div>
+            )}
             
+            {/* Thông tin cá nhân */}
             <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>Thông tin cá nhân</h2>
+                
                 <div className={styles.formGroup}>
-                    <label className={styles.label}>Tên đầy đủ</label>
+                    <label className={styles.label}>Họ và tên</label>
                     <input
                         type="text"
                         className={styles.input}
                         value={formData.fullName}
                         onChange={(e) => handleInputChange('fullName', e.target.value)}
+                        placeholder="Nhập họ và tên"
                     />
                     <p className={styles.helperText}>
-                        Tên trong hồ sơ được rút ngắn từ họ tên của bạn.
+                        Tên hiển thị trên hồ sơ và trong các giao dịch
                     </p>
                 </div>
                 
@@ -237,36 +239,29 @@ const PersonalProfile = () => {
                         </select>
                     </div>
                 </div>
-        
-                <div className={styles.section}>
-                    <h2 className={styles.label}>Email</h2>
-                    {email && (
-                        <div className={styles.formGroup}>
-                            <input
-                                type="email"
-                                className={`${styles.input} ${styles.inputReadOnly}`}
-                                value={email}
-                                readOnly
-                            />
-                        </div>
-                    )}
-                </div>
-                
-                {message.text && (
-                    <div className={message.type === 'success' ? styles.successMessage : styles.errorMessage}>
-                        {message.text}
+                <div className={styles.formGroup}>
+                        <label className={styles.label}>Email</label>
+                        <input
+                            type="email"
+                            className={`${styles.input} ${styles.inputReadOnly}`}
+                            value={email}
+                            readOnly
+                        />
+                        <p className={styles.helperText}>
+                            Email không thể thay đổi
+                        </p>
                     </div>
-                )}
-                
-                <div className={styles.buttonGroup}>
-                    <button 
-                        className={styles.buttonPrimary}
-                        onClick={handleSave}
-                        disabled={loading}
-                    >
-                        {loading ? 'Đang lưu...' : 'Cập nhật'}
-                    </button>
-                </div>
+            </div>
+        
+            {/* Action Buttons */}
+            <div className={styles.buttonGroup}>
+                <button 
+                    className={styles.buttonPrimary}
+                    onClick={handleSave}
+                    disabled={loading}
+                >
+                    {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
+                </button>
             </div>
         </div>
     );

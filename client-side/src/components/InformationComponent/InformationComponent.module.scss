@@ -1,57 +1,137 @@
+// InformationComponent.module.scss - Layout với header đẹp
+
 .informationWrapper {
     min-height: 100vh;
-    background-color: #f5f5f5;
-    padding: 20px 0;
-    padding-top: 90px; /* Cách top để không bị header che (header height 50px + padding) */
+    background: #fafafa;
+    padding: 0;
+    padding-top: 50px; // Khoảng cách cho navbar
     margin-top: 0;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    gap: 20px;
-    padding: 0 20px;
-    align-items: flex-start; /* Đảm bảo sidebar và content align từ đầu */
+// Page Header - Banner trên cùng
+.pageHeader {
+    background: white;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 30px 0;
+    margin-bottom: 10px;
 }
 
+.headerContainer {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.headerContent {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.headerIcon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.headerText {
+    h1 {
+        font-size: 24px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0 0 5px 0;
+        letter-spacing: -0.5px;
+    }
+
+    p {
+        font-size: 14px;
+        color: #999;
+        margin: 0;
+    }
+}
+
+// Breadcrumb
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #999;
+    margin-top: 15px;
+    
+    a {
+        color: #666;
+        text-decoration: none;
+        transition: color 0.2s;
+        
+        &:hover {
+            color: #1890ff;
+        }
+    }
+    
+    span {
+        color: #bdbdbd;
+    }
+}
+
+// Container chính
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    gap: 24px;
+    padding: 0 20px 40px;
+    align-items: flex-start;
+}
+
+// Sidebar wrapper
+.sidebarWrapper {
+    flex-shrink: 0;
+    width: 280px;
+}
+
+// Content area
 .contentArea {
     flex: 1;
     background: white;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 30px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    border: 1px solid #f0f0f0;
+    min-height: 500px;
 
-@media (max-width: 768px) {
-    .container {
-        flex-direction: column;
+    // Cho phép cuộn
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #e0e0e0;
+        border-radius: 4px;
+
+        &:hover {
+            background: #bdbdbd;
+        }
     }
 }
 
-.loadingContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 400px;
-    gap: 16px;
-    
-    .spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #3498db;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-    
-    p {
-        color: #666;
-        font-size: 16px;
-    }
-}
-
+// Loading và Error states
+.loadingContainer,
 .errorContainer {
     display: flex;
     flex-direction: column;
@@ -59,23 +139,51 @@
     justify-content: center;
     min-height: 400px;
     gap: 16px;
+    padding: 40px;
+}
+
+.loadingContainer {
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #f0f0f0;
+        border-top: 3px solid #1890ff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
     
     p {
-        color: #e74c3c;
+        color: #666;
+        font-size: 14px;
+        font-weight: 500;
+    }
+}
+
+.errorContainer {
+    p {
+        color: #ff4d4f;
         font-size: 16px;
+        font-weight: 600;
+        text-align: center;
     }
     
     button {
-        padding: 10px 20px;
-        background-color: #3498db;
+        padding: 10px 24px;
+        background: #1890ff;
         color: white;
         border: none;
-        border-radius: 4px;
+        border-radius: 8px;
         cursor: pointer;
         font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s ease;
         
         &:hover {
-            background-color: #2980b9;
+            background: #40a9ff;
+        }
+
+        &:active {
+            transform: scale(0.98);
         }
     }
 }
@@ -83,4 +191,71 @@
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+    .container {
+        gap: 20px;
+        padding: 0 15px 30px;
+    }
+
+    .sidebarWrapper {
+        width: 260px;
+    }
+
+    .contentArea {
+        padding: 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    .informationWrapper {
+        padding-top: 60px;
+    }
+
+    .pageHeader {
+        padding: 20px 0;
+        margin-bottom: 20px;
+    }
+
+    .headerContent {
+        gap: 15px;
+    }
+
+    .headerIcon {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .headerText h1 {
+        font-size: 20px;
+    }
+
+    .container {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .sidebarWrapper {
+        width: 100%;
+    }
+
+    .contentArea {
+        padding: 20px;
+        max-height: none;
+        overflow-y: visible;
+    }
+}
+
+@media (max-width: 480px) {
+    .contentArea {
+        padding: 16px;
+        border-radius: 10px;
+    }
+
+    .headerText h1 {
+        font-size: 18px;
+    }
 }

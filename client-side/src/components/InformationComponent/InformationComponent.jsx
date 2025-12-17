@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import SidebarMenu from './SidebarMenu/SidebarMenu';
 import PersonalProfile from './PersonalProfile/PersonalProfile';
@@ -7,6 +7,7 @@ import FavoriteTours from './FavoriteTours/FavoriteTours';
 import styles from './InformationComponent.module.scss';
 import AvatarUploadModal from './AvatarUploadModal/AvatarUploadModal';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { FiUser, FiHome, FiChevronRight } from 'react-icons/fi';
 
 const InformationComponent = () => {
     const navigate = useNavigate();
@@ -14,15 +15,14 @@ const InformationComponent = () => {
     const { tab } = useParams();
     const { user, updateUser, loading, isAuthenticated } = useAuth(); 
     
-    const sidebarRef = useRef(null);
-    const containerRef = useRef(null);
-    
+    // Redirect nếu chưa đăng nhập
     useEffect(() => {
         if (!loading && !isAuthenticated) {
             navigate('/login');
         }
     }, [loading, isAuthenticated, navigate]);
     
+    // Xác định tab đang active
     const getActiveTab = () => {
         if (tab) return tab;
         const path = location.pathname;
@@ -35,10 +35,39 @@ const InformationComponent = () => {
     const [activeTab, setActiveTab] = useState(getActiveTab());
     const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
     
+    // Lấy tên tab hiện tại để hiển thị
+    const getTabTitle = () => {
+        switch (activeTab) {
+            case 'profile':
+                return 'Hồ Sơ Cá Nhân';
+            case 'transaction':
+                return 'Danh Sách Giao Dịch';
+            case 'favorites':
+                return 'Tour Yêu Thích';
+            default:
+                return 'Thông Tin Tài Khoản';
+        }
+    };
+
+    const getTabDescription = () => {
+        switch (activeTab) {
+            case 'profile':
+                return 'Quản lý thông tin cá nhân';
+            case 'transaction':
+                return 'Theo dõi lịch sử giao dịch';
+            case 'favorites':
+                return 'Danh sách các tour du lịch yêu thích';
+            default:
+                return 'Quản lý tài khoản của bạn';
+        }
+    };
+    
+    // Callback khi cập nhật avatar thành công
     const handleAvatarUpdateSuccess = (updatedUserPlainObject) => {
         updateUser(updatedUserPlainObject);
     };
     
+    // Cập nhật active tab khi URL thay đổi
     useEffect(() => {
         const newTab = getActiveTab();
         if (newTab !== activeTab) {
@@ -46,46 +75,13 @@ const InformationComponent = () => {
         }
     }, [location.pathname, tab]);
     
-    useEffect(() => {
-        const handleScroll = () => {
-            if (!sidebarRef.current || !containerRef.current) return;
-            
-            const sidebar = sidebarRef.current;
-            const footer = document.querySelector('footer');
-            
-            if (!footer) return;
-            
-            const sidebarRect = sidebar.getBoundingClientRect();
-            const footerRect = footer.getBoundingClientRect();
-            
-            const footerTop = footerRect.top;
-            const sidebarBottom = sidebarRect.bottom;
-            const viewportHeight = window.innerHeight;
-            
-            if (footerTop < viewportHeight && sidebarBottom > footerTop) {
-                const offset = sidebarBottom - footerTop + 20;
-                const newTop = Math.max(90 - offset, -(sidebarRect.height - viewportHeight + 90));
-                sidebar.style.top = `${newTop}px`;
-            } else {
-                sidebar.style.top = '90px';
-            }
-        };
-        
-        window.addEventListener('scroll', handleScroll);
-        window.addEventListener('resize', handleScroll);
-        handleScroll();
-        
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-            window.removeEventListener('resize', handleScroll);
-        };
-    }, []);
-    
+    // Xử lý click menu
     const handleMenuClick = (tab) => {
         setActiveTab(tab);
         navigate(`/information/${tab}`);
     };
     
+    // Render nội dung theo tab
     const renderContent = () => {
         switch (activeTab) {
             case 'profile':
@@ -99,6 +95,7 @@ const InformationComponent = () => {
         }
     };
     
+    // Loading state
     if (loading) {
         return (
             <div className={styles.informationWrapper}>
@@ -110,6 +107,7 @@ const InformationComponent = () => {
         );
     }
     
+    // Error state - không có user
     if (!user) {
         return (
             <div className={styles.informationWrapper}>
@@ -123,10 +121,39 @@ const InformationComponent = () => {
         );
     }
     
+    // Main render
     return (
         <div className={styles.informationWrapper}>
-            <div className={styles.container} ref={containerRef}>
-                <div ref={sidebarRef}>
+            {/* Page Header - Banner trên cùng */}
+            <div className={styles.pageHeader}>
+                <div className={styles.headerContainer}>
+                    <div className={styles.headerContent}>
+                        <div className={styles.headerIcon}>
+                            <FiUser />
+                        </div>
+                        <div className={styles.headerText}>
+                            <h1>{getTabTitle()}</h1>
+                            <p>{getTabDescription()}</p>
+                        </div>
+                    </div>
+
+                    {/* Breadcrumb */}
+                    <div className={styles.breadcrumb}>
+                        <a href="/">
+                            <FiHome /> Trang chủ
+                        </a>
+                        <FiChevronRight />
+                        <span>Tài khoản</span>
+                        <FiChevronRight />
+                        <span>{getTabTitle()}</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Container chính */}
+            <div className={styles.container}>
+                {/* Sidebar - Cố định bên trái */}
+                <div className={styles.sidebarWrapper}>
                     <SidebarMenu 
                         user={user}
                         activeTab={activeTab}
@@ -135,11 +162,13 @@ const InformationComponent = () => {
                     />
                 </div>
                 
+                {/* Content Area - Có thể cuộn */}
                 <div className={styles.contentArea}>
                     {renderContent()}
                 </div>
             </div>
             
+            {/* Avatar Upload Modal */}
             {isAvatarModalOpen && user && (
                 <AvatarUploadModal
                     user={user}

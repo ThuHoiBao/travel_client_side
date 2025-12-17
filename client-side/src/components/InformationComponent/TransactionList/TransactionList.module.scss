@@ -1,62 +1,129 @@
-/* src/components/InformationComponent/TransactionList/TransactionList.module.scss */
-
-// --- Variables ---
-$primary-color: #1890ff;
-$text-default: #495057;
-$text-active: $primary-color;
-$bg-hover: #f0f0f0;
-$border-color: #e9ecef;
-
+/* TransactionList.module.scss - Header cố định với thanh tìm kiếm */
 
 .transactionList {
     width: 100%;
 }
 
-.pageTitle {
-    font-size: 26px; /* Hơi lớn hơn */
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 30px;
+// Header cố định - TĂNG Z-INDEX VÀ PADDING
+.pageHeader {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+    position: sticky;
+    top: -30px; 
+    background: #ffffff;
+    z-index: 999;
+    padding-top: 15px; 
+    margin-top: -30px; 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); 
+    
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -20px;
+        right: -20px;
+        bottom: 0;
+        background: #ffffff;
+        z-index: -1;
+    }
 }
 
-.statusTabs {
+.headerTop {
     display: flex;
-    flex-wrap: nowrap; 
-    overflow-x: auto; 
-    
-    // Custom scrollbar styling (cho trải nghiệm desktop tốt hơn)
-    &::-webkit-scrollbar {
-        height: 8px; /* Chiều cao thanh cuộn */
-    }
-    &::-webkit-scrollbar-thumb {
-        background: $border-color;
-        border-radius: 4px;
-        &:hover {
-            background: #ccc;
-        }
-    }
-    
-    // Loại bỏ border-bottom cũ để chuyển sang hiệu ứng underline trên tab active
-    border-bottom: 2px solid $border-color; 
-    padding-bottom: 0; /* Đẩy padding vào button */
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
 }
 
-.tab {
-    flex-shrink: 0; 
-    background: transparent;
-    border: none;
-    padding: 12px 18px; /* Tăng padding */
-    font-size: 15px;
-    cursor: pointer;
-    color: $text-default;
+.pageTitle {
+    font-size: 26px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.headerActions {
+    display: flex;
+    gap: 10px;
+}
+
+.searchBox {
     position: relative;
+    width: 100%;
+    max-width: 400px;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 10px 40px 10px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background: #fafafa;
+
+    &:focus {
+        outline: none;
+        border-color: #1890ff;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.08);
+    }
+
+    &::placeholder {
+        color: #bdbdbd;
+    }
+}
+
+.searchIcon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #bdbdbd;
+    font-size: 16px;
+    pointer-events: none;
+}
+
+// Status Tabs - Cố định dưới header
+.statusTabs {
+
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 2px;
+    
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+        height: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: #e0e0e0;
+        border-radius: 4px;
+        &:hover {
+            background: #bdbdbd;
+        }
+    }
+}
+
+.tab {
+    flex-shrink: 0;
+    background: white;
+    border: 1px solid #e0e0e0;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #666;
     font-weight: 500;
-    transition: all 0.3s ease; /* Transition cho hiệu ứng mượt mà */
+    transition: all 0.2s ease;
+    white-space: nowrap;
 
     &:hover {
-        color: $text-active;
-        background-color: $bg-hover; /* Hiệu ứng nền nhẹ khi hover */
+        border-color: #1890ff;
+        color: #1890ff;
     }
     
     &:focus {
@@ -64,48 +131,96 @@ $border-color: #e9ecef;
     }
 
     &.active {
-        color: $text-active;
+        background: #1890ff;
+        color: white;
+        border-color: #1890ff;
         font-weight: 600;
-        background-color: white; /* Đảm bảo nền trắng khi active */
-        
-        // Hiệu ứng underline hiện đại
-        &::after {
-            content: '';
-            position: absolute;
-            bottom: -2px; /* Dưới cùng của statusTabs border-bottom */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 70%; /* Độ rộng đường gạch nhỏ hơn */
-            height: 3px; /* Độ dày đường gạch */
-            background-color: $primary-color;
-            border-radius: 2px;
-            box-shadow: 0 0 8px rgba($primary-color, 0.5); /* Bóng đổ nhẹ cho đường gạch */
-        }
     }
 }
 
+// Booking List - Đảm bảo z-index thấp hơn header
 .bookingList {
     margin-top: 20px;
+    position: relative;
+    z-index: 1; // ⬅️ THÊM DÒNG NÀY
 }
 
+// States
 .loading, .error, .emptyState {
     text-align: center;
     padding: 60px 20px;
-    font-size: 18px;
+    font-size: 15px;
 }
 
 .loading {
-    color: $primary-color;
-    font-weight: 600;
+    color: #1890ff;
+    font-weight: 500;
 }
 
 .error {
-    color: #f5222d;
-    border: 1px solid #f5222d;
-    background-color: #fff1f0;
-    border-radius: 4px;
+    color: #ff4d4f;
+    background-color: #fff2f0;
+    border: 1px solid #ffccc7;
+    border-radius: 8px;
 }
 
 .emptyState {
     color: #999;
+    
+    strong {
+        color: #666;
+    }
+}
+
+// Summary Bar
+.summaryBar {
+    display: flex;
+    gap: 20px;
+    padding: 16px 0;
+    margin-bottom: 10px;
+}
+
+.summaryItem {
+    display: flex;
+    flex-direction: column;
+    
+    .label {
+        font-size: 12px;
+        color: #999;
+        margin-bottom: 4px;
+    }
+    
+    .value {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .headerTop {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .searchBox {
+        width: 100%;
+        max-width: none;
+    }
+
+    .statusTabs {
+        gap: 6px;
+    }
+
+    .tab {
+        padding: 7px 12px;
+        font-size: 12px;
+    }
+
+    .summaryBar {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
 }

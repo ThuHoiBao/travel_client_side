@@ -2,18 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import styles from './UsersPage.module.scss';
-import { FaUsers, FaSearch, FaRedoAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaUsers, FaSearch, FaRedoAlt } from 'react-icons/fa';
 import useAdminUsers from '../../../../hook/useAdminUsers.ts';
 import useWebSocket from '../../../../hook/useWebSocket.ts';
 import UsersItem from './UsersItem';
-import { useLocation, useNavigate } from 'react-router-dom'; // Thêm useNavigate để xóa URL khi reset
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const UsersPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // 1. Logic lấy tham số từ URL ngay lập tức (Synchronous)
-    // Giúp state có dữ liệu ngay từ lần render đầu tiên
     const getInitialEmail = () => {
         const params = new URLSearchParams(location.search);
         return params.get('search') || '';
@@ -21,38 +19,32 @@ const UsersPage = () => {
 
     const initialEmail = getInitialEmail();
 
-    // 2. Khởi tạo state với giá trị từ URL
     const [searchForm, setSearchForm] = useState({ 
         fullName: '', 
         phone: '', 
-        email: initialEmail // Điền sẵn vào ô input
+        email: initialEmail
     });
 
     const [currentPage, setCurrentPage] = useState(0);
-    const pageSize = 5;
+    const pageSize = 6;
 
-    // 3. Quan trọng: activeSearch có giá trị ngay lập tức -> Hook useAdminUsers sẽ chạy search luôn
     const [activeSearch, setActiveSearch] = useState({ 
         fullName: null, 
         phone: null, 
-        email: initialEmail || null // Nếu có email thì search luôn
+        email: initialEmail || null
     });
 
-    // 4. Hook API (Giả định hook này đã có useEffect phụ thuộc vào activeSearch)
     const { users, loading, totalPages, totalElements, refetch } = useAdminUsers(activeSearch, currentPage, pageSize);
 
-    // 5. WebSocket
     useWebSocket({
         topic: '/topic/admin/users',
         onMessage: () => refetch(),
         enabled: true
     });
 
-    // 6. Xử lý trường hợp User đang ở trang này mà click vào thông báo khác (URL thay đổi nhưng không reload component)
     useEffect(() => {
         const newEmailParam = getInitialEmail();
         
-        // Chỉ cập nhật nếu URL khác với state hiện tại để tránh loop
         if (newEmailParam !== searchForm.email) {
             setSearchForm(prev => ({ ...prev, email: newEmailParam }));
             setActiveSearch(prev => ({ ...prev, email: newEmailParam || null }));
@@ -70,12 +62,9 @@ const UsersPage = () => {
     };
 
     const handleReset = () => {
-        // Reset form và state tìm kiếm
         setSearchForm({ fullName: '', phone: '', email: '' });
         setActiveSearch({ fullName: null, phone: null, email: null });
         setCurrentPage(0);
-        
-        // Xóa param ?search=... trên URL để nhìn cho sạch
         navigate('/admin/users', { replace: true });
     };
 
@@ -83,75 +72,160 @@ const UsersPage = () => {
         if (newPage >= 0 && newPage < totalPages) setCurrentPage(newPage);
     };
 
-    return (
-        <div className={styles.pageContainer}>
-            <h1 className={styles.pageTitle}><FaUsers className={styles.icon} /> Quản Lý Users</h1>
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
 
-            <div className={styles.filterBar}>
-                <div className={styles.filterItem}>
-                    <input 
-                        className={styles.filterInput} placeholder="Họ và tên..." 
-                        value={searchForm.fullName} 
-                        onChange={e => setSearchForm({...searchForm, fullName: e.target.value})} 
-                    />
+    // Generate page numbers
+    const getPageRange = () => {
+        const range = [];
+        const maxVisible = 7;
+        
+        if (totalPages <= maxVisible) {
+            for (let i = 0; i < totalPages; i++) range.push(i);
+        } else {
+            if (currentPage < 4) {
+                for (let i = 0; i < 5; i++) range.push(i);
+                range.push('...');
+                range.push(totalPages - 1);
+            } else if (currentPage > totalPages - 5) {
+                range.push(0);
+                range.push('...');
+                for (let i = totalPages - 5; i < totalPages; i++) range.push(i);
+            } else {
+                range.push(0);
+                range.push('...');
+                for (let i = currentPage - 1; i <= currentPage + 1; i++) range.push(i);
+                range.push('...');
+                range.push(totalPages - 1);
+            }
+        }
+        return range;
+    };
+
+    return (
+        <div className={styles.container}>
+            {/* Header */}
+            <div className={styles.header}>
+                <div className={styles.headerLeft}>
+                    <FaUsers className={styles.headerIcon} />
+                    <div>
+                        <h1 className={styles.title}>Quản Lý Người Dùng</h1>
+                        <p className={styles.subtitle}>Tổng người dùng: {totalElements}</p>
+                    </div>
                 </div>
-                <div className={styles.filterItem}>
-                    <input 
-                        className={styles.filterInput} placeholder="Số điện thoại..." 
-                        value={searchForm.phone} 
-                        onChange={e => setSearchForm({...searchForm, phone: e.target.value})} 
-                    />
-                </div>
-                <div className={styles.filterItem}>
-                    <input 
-                        className={styles.filterInput} placeholder="Email..." 
-                        value={searchForm.email} 
-                        onChange={e => setSearchForm({...searchForm, email: e.target.value})} 
-                    />
-                </div>
-                <button className={styles.searchButton} onClick={handleSearch}><FaSearch /> Tìm kiếm</button>
-                <button className={styles.resetButton} onClick={handleReset}><FaRedoAlt /> Làm mới</button>
             </div>
 
-            <div className={styles.tableWrapper}>
-                {loading ? <div className={styles.loadingState}>Đang tải...</div> : (
-                    <table className={styles.usersTable}>
-                        <thead>
-                            <tr>
-                                <th>Khách Hàng</th>
-                                <th>Số điện thoại</th>
-                                <th>Email</th>
-                                <th>Ngày sinh</th>
-                                <th>Trạng thái</th>
-                                <th>Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {users.length > 0 ? users.map(user => (
-                                <UsersItem key={user.userID} user={user} refetch={refetch} />
-                            )) : (
-                                <tr>
-                                    <td colSpan="6">
-                                        <div className={styles.emptyState}>
-                                            {activeSearch.email 
-                                                ? `Không tìm thấy user có email: ${activeSearch.email}` 
-                                                : "Không tìm thấy user nào"}
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+            {/* Search Bar */}
+            <div className={styles.searchSection}>
+                <div className={styles.searchInputs}>
+                    <input 
+                        type="text"
+                        className={styles.searchInput} 
+                        placeholder="Tìm theo tên người dùng..." 
+                        value={searchForm.fullName} 
+                        onChange={e => setSearchForm({...searchForm, fullName: e.target.value})} 
+                        onKeyPress={handleKeyPress}
+                    />
+                    
+                    <input 
+                        type="text"
+                        className={styles.searchInput} 
+                        placeholder="Tìm theo số điện thoại..." 
+                        value={searchForm.phone} 
+                        onChange={e => setSearchForm({...searchForm, phone: e.target.value})} 
+                        onKeyPress={handleKeyPress}
+                    />
+                    
+                    <input 
+                        type="email"
+                        className={styles.searchInput} 
+                        placeholder="Tìm theo email..." 
+                        value={searchForm.email} 
+                        onChange={e => setSearchForm({...searchForm, email: e.target.value})} 
+                        onKeyPress={handleKeyPress}
+                    />
+                </div>
+
+                <div className={styles.searchActions}>
+                    <button className={styles.searchBtn} onClick={handleSearch}>
+                        <FaSearch />
+                        <span>Tìm kiếm</span>
+                    </button>
+                    <button className={styles.resetBtn} onClick={handleReset}>
+                        <FaRedoAlt />
+                        <span>Đặt lại</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* Users Grid */}
+            <div className={styles.content}>
+                {loading ? (
+                    <div className={styles.loading}>
+                        <div className={styles.spinner}></div>
+                        <p>Loading users...</p>
+                    </div>
+                ) : users.length > 0 ? (
+                    <div className={styles.usersGrid}>
+                        {users.map((user, index) => (
+                            <UsersItem key={user.userID} user={user} refetch={refetch} index={index} />
+                        ))}
+                    </div>
+                ) : (
+                    <div className={styles.empty}>
+                        <div className={styles.emptyIcon}>📭</div>
+                        <h3>No users found</h3>
+                        <p>
+                            {activeSearch.email 
+                                ? `No results for: ${activeSearch.email}` 
+                                : "Try adjusting your search filters"}
+                        </p>
+                    </div>
                 )}
             </div>
 
+            {/* Pagination */}
             {!loading && totalElements > 0 && (
                 <div className={styles.pagination}>
-                    <span>Showing {Math.min(totalElements, currentPage * pageSize + 1)} - {Math.min(totalElements, (currentPage + 1) * pageSize)} of {totalElements}</span>
+                    <div className={styles.paginationInfo}>
+                        Showing <strong>{currentPage * pageSize + 1}-{Math.min((currentPage + 1) * pageSize, totalElements)}</strong> of <strong>{totalElements}</strong>
+                    </div>
+                    
                     <div className={styles.paginationControls}>
-                        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 0} className={styles.pageButton}><FaChevronLeft /></button>
-                        <span className={styles.pageNumber}>{currentPage + 1} / {totalPages}</span>
-                        <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages - 1} className={styles.pageButton}><FaChevronRight /></button>
+                        <button 
+                            onClick={() => handlePageChange(currentPage - 1)} 
+                            disabled={currentPage === 0}
+                            className={styles.navBtn}
+                        >
+                            Previous
+                        </button>
+                        
+                        <div className={styles.pageNumbers}>
+                            {getPageRange().map((page, idx) => (
+                                page === '...' ? (
+                                    <span key={`ellipsis-${idx}`} className={styles.ellipsis}>...</span>
+                                ) : (
+                                    <button
+                                        key={page}
+                                        onClick={() => handlePageChange(page)}
+                                        className={`${styles.pageBtn} ${currentPage === page ? styles.active : ''}`}
+                                    >
+                                        {page + 1}
+                                    </button>
+                                )
+                            ))}
+                        </div>
+                        
+                        <button 
+                            onClick={() => handlePageChange(currentPage + 1)} 
+                            disabled={currentPage === totalPages - 1}
+                            className={styles.navBtn}
+                        >
+                            Next
+                        </button>
                     </div>
                 </div>
             )}

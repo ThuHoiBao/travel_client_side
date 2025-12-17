@@ -16,11 +16,15 @@ $radius-bubble: 18px;
   position: fixed;
   bottom: 20px; 
   right: 20px;
-  z-index: 14;
+  z-index: 9999;
   display: flex;
   flex-direction: column-reverse;
   align-items: flex-end;
   font-family: Helvetica, Arial, sans-serif;
+  
+  
+  // Làm cho container "trong suốt" với chuột, cho phép click xuyên qua
+  pointer-events: none; 
 }
 
 // --- Launcher Button (Nút tròn mở chat) ---
@@ -39,6 +43,9 @@ $radius-bubble: 18px;
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
   margin-top: 10px;
+
+  // ✅ FIX: Bật lại tương tác cho nút này (để bấm được)
+  pointer-events: auto; 
 
   &:hover {
     transform: scale(1.1);
@@ -79,17 +86,28 @@ $radius-bubble: 18px;
   flex-direction: column;
   overflow: hidden;
   transform-origin: bottom right;
+  
+  
   transform: scale(0);
   opacity: 0;
+  
+  
+  pointer-events: none; 
+  visibility: hidden; 
+
   transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
   margin-bottom: 10px;
 
+  // Trạng thái MỞ
   &.showWindow {
     transform: scale(1);
     opacity: 1;
+    
+    
+    pointer-events: auto; 
+    visibility: visible;
   }
 }
-
 // --- Header ---
 .header {
   background: $primary-gradient;

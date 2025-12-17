@@ -10,6 +10,7 @@ import searchIcon from '../../../assets/images/flight.png';
 import thumbsUpIcon from '../../../assets/images/rating.png';
 import creditCardIcon from '../../../assets/images/endow.png';
 import rightArrowImage from '../../../assets/images/right-arrow.png';
+import useFeaturedTours from '../../../hook/useFeaturedTours.ts';
 
 // --- Utils Functions ---
 
@@ -24,8 +25,10 @@ const budgetOptions = [
 
 const Banner = () => {
     // Hook để điều hướng
-    const navigate = useNavigate(); // 👈 SỬ DỤNG HOOK NAVIGATE
-
+    const navigate = useNavigate(); 
+    const { featuredTours } = useFeaturedTours(); 
+    console.log('Featured Tours in Banner:', featuredTours);
+    const displayTours = featuredTours.slice(0, 5); 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [validationError, setValidationError] = useState('');
@@ -39,6 +42,13 @@ const Banner = () => {
     const [isBudgetMenuOpen, setIsBudgetMenuOpen] = useState(false);
     const [isDestinationFocused, setIsDestinationFocused] = useState(false);
 
+    const formatCurrency = (amount) => {
+
+    if (amount === undefined || amount === null) return 'Liên hệ';
+
+    return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }).replace('₫', '');
+
+};
     const handleChange = (e) => {
         const { name, value } = e.target;
         setSearchData((prev) => ({
@@ -108,7 +118,10 @@ const Banner = () => {
         setLoading(false);
     };
 
-
+    const handleDepartureClick = (e) => {
+        e.stopPropagation(); 
+        navigate(`/tour/${displayTours[0]?.tourCode}`);
+    };
     return (
         <div className={styles.bannerContainer}>
             <div className={styles.overlay}></div>
@@ -196,13 +209,13 @@ const Banner = () => {
 
                 {/* Khối thông tin tour nổi bật bên phải banner (Giữ nguyên) */}
                 <div className={styles.sideInfoBox}>
-                    <p className={styles.sideTitle}>Tour Hàn Quốc 5N4Đ</p>
-                    <p className={styles.sideDetails}>HCM – Seoul – Đảo Nami</p>
-                    <p className={styles.sideDetails}>Công Viên Everland</p>
+                    <p className={styles.sideTitle}>{displayTours[0]?.tourName}</p>
+                    <p className={styles.sideDetails}>{displayTours[0]?.duration}</p>
                     <p className={styles.priceLabel}>Giá chỉ từ</p>
-                    <p className={styles.priceValue}>15.990.000 <small>VNĐ/khách</small></p>
+                    <p className={styles.priceValue}>{formatCurrency(displayTours[0]?.money)} <small>VNĐ/khách</small></p>
                     <div className={styles.arrowIcon}>
-                        <img src={rightArrowImage} alt="Mũi tên" style={{width: '20px', height: '20px'}} />
+                        <img src={rightArrowImage} alt="Mũi tên" style={{width: '20px', height: '20px'}} 
+                        onClick={(e) => handleDepartureClick(e)} />
                     </div>
                 </div>
             </div>
