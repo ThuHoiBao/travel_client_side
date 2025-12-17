@@ -1,21 +1,21 @@
-
 // src/components/InformationComponent/FavoriteTours/FavoriteTours.jsx
-import React, { useState, useEffect, useCallback, use } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getUserFavoriteToursApi, removeFavoriteTourApi } from '../../../services/favoriteTour/favoriteTour.ts';
 import FavoriteTourItem from './FavoriteTourItem/FavoriteTourItem.jsx';
 import styles from './FavoriteTours.module.scss';
-import { FaHeartBroken } from 'react-icons/fa'; // Dùng icon fa-heart-broken cho empty state
-import { useNavigate } from 'react-router-dom';
+
+// ✅ SỬA LỖI: Giữ FiHeart, nhưng lấy HeartOff từ bộ 'lu' (Lucide) vì 'fi' không có
+import { FiHeart } from 'react-icons/fi';
+import { LuHeartOff } from 'react-icons/lu'; 
 
 const FavoriteTours = ({ user }) => {
-    console.log('👤 FavoriteTours for user:', user);
     const [tours, setTours] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const currentUserId = user?.userId || user?.userID || user?.id  || null;
+    const currentUserId = user?.userId || user?.userID || user?.id || null;
 
-    // Hàm fetch data, sử dụng useCallback để đảm bảo ổn định
+    // Fetch favorite tours
     const fetchFavoriteTours = useCallback(async () => {
         if (!currentUserId) {
             setLoading(false);
@@ -27,9 +27,7 @@ const FavoriteTours = ({ user }) => {
         setLoading(true);
         setError(null);
         try {
-            // Gọi API mới
             const data = await getUserFavoriteToursApi(currentUserId);
-            console.log("Fetched favorite tours:", data);
             setTours(data);
         } catch (err) {
             console.error("Error fetching favorite tours:", err);
@@ -44,16 +42,13 @@ const FavoriteTours = ({ user }) => {
         fetchFavoriteTours();
     }, [fetchFavoriteTours]);
 
-    // Xử lý khi user xác nhận bỏ yêu thích (được gọi từ FavoriteTourItem)
+    // Handle remove tour
     const handleRemoveTour = async (tourId) => {
         if (!currentUserId) return;
         
-        setLoading(true); // Hiển thị loading trong khi xử lý xóa
+        setLoading(true);
         try {
             await removeFavoriteTourApi(currentUserId, tourId);
-            
-            // Cập nhật state local ngay lập tức hoặc load lại data
-            // Phương pháp load lại data đảm bảo trạng thái đồng bộ với BE
             await fetchFavoriteTours();
         } catch (err) {
             console.error("Error removing favorite tour:", err);
@@ -66,7 +61,6 @@ const FavoriteTours = ({ user }) => {
     if (loading) {
         return (
             <div className={styles.favoriteTours}>
-                <h1 className={styles.pageTitle}>Tour yêu thích</h1>
                 <div className={styles.loadingState}>
                     <p>Đang tải danh sách tour yêu thích...</p>
                 </div>
@@ -77,7 +71,6 @@ const FavoriteTours = ({ user }) => {
     if (error) {
         return (
             <div className={styles.favoriteTours}>
-                <h1 className={styles.pageTitle}>Tour yêu thích</h1>
                 <div className={styles.errorState}>
                     <p>Lỗi: {error}</p>
                 </div>
@@ -87,25 +80,26 @@ const FavoriteTours = ({ user }) => {
 
     return (
         <div className={styles.favoriteTours}>
-            <div className={styles.headerContainer}> 
-                <h1 className={styles.mainTitle}>
-                    {/* Sử dụng Icon trái tim */}
-                    <i className="fas fa-heart" /> 
-                    Tour yêu thích 
-                </h1>
-                
-                <div className={styles.blueDivider} /> 
-                
-                {/* Sử dụng thẻ p cho dòng phụ đề (số lượng) */}
-                <p className={styles.subtitleCount}>
+            {/* Header */}
+            <div className={styles.pageHeader}>
+                <div className={styles.headerTop}>
+                    <FiHeart className={styles.heartIcon} />
+                    <h1 className={styles.pageTitle}>Tour Yêu Thích</h1>
+                </div>
+                <p className={styles.pageSubtitle}>
                     Bạn có <span className={styles.countValue}>{tours.length}</span> chương trình tour yêu thích
                 </p>
             </div>
             
+            {/* Content */}
             {tours.length === 0 ? (
                 <div className={styles.emptyState}>
-                    <FaHeartBroken style={{ fontSize: '48px', color: '#ccc', marginBottom: '15px' }} />
-                    <p>Bạn chưa có tour yêu thích nào. Hãy thêm một vài tour để dễ dàng theo dõi nhé!</p>
+                    {/* ✅ SỬA LỖI: Dùng LuHeartOff thay cho FiHeartOff */}
+                    <LuHeartOff className={styles.emptyIcon} />
+                    <p>
+                        Bạn chưa có tour yêu thích nào.<br />
+                        Hãy thêm một vài tour để dễ dàng theo dõi nhé!
+                    </p>
                 </div>
             ) : (
                 <div className={styles.toursList}>

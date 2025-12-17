@@ -1,177 +1,300 @@
 // src/components/AdminComponent/Pages/DashboardPage/components/RecentActivities/RecentActivities.module.scss
 
 .recentActivities {
-    background: white;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
     height: 100%;
+    display: flex;
+    flex-direction: column;
 
     .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 16px;
-        border-bottom: 2px solid #f7fafc;
+        padding: 20px 24px;
+        border-bottom: 1px solid #f3f4f6;
 
         h3 {
             margin: 0;
-            font-size: 1.25em;
-            color: #1a202c;
-            font-weight: 700;
+            font-size: 1.125rem;
+            color: #111827;
+            font-weight: 600;
+            letter-spacing: -0.01em;
         }
 
         .badge {
-            background: #4299e1;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
+            background: #f3f4f6;
+            color: #6b7280;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8125rem;
             font-weight: 600;
+            min-width: 28px;
+            text-align: center;
         }
     }
 
     .activitiesList {
         display: flex;
         flex-direction: column;
-        gap: 12px;
-        max-height: 600px;
+        flex: 1;
         overflow-y: auto;
-        padding-right: 8px;
+        padding: 12px;
+        max-height: 600px;
 
         &::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
 
         &::-webkit-scrollbar-track {
-            background: #f7fafc;
-            border-radius: 3px;
+            background: transparent;
         }
 
         &::-webkit-scrollbar-thumb {
-            background: #cbd5e0;
-            border-radius: 3px;
+            background: #e5e7eb;
+            border-radius: 2px;
 
             &:hover {
-                background: #a0aec0;
+                background: #d1d5db;
             }
         }
 
         .activityItem {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-            padding: 16px;
+            gap: 14px;
+            padding: 14px 12px;
             border-radius: 10px;
-            border: 2px solid #e2e8f0;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
+            margin-bottom: 6px;
+            background: #ffffff;
 
             &:hover {
-                transform: translateX(4px);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                background: #f9fafb;
+                transform: translateX(2px);
             }
 
             &.urgent {
-                border-left: 4px solid #f56565;
-                background: linear-gradient(90deg, #fff5f5 0%, white 100%);
-
                 .activityIcon {
-                    color: #f56565;
+                    background: #fef2f2;
+                    color: #ef4444;
                 }
 
-                .severityBadge {
-                    background: #f56565;
+                .statusIndicator {
+                    background: #ef4444;
                 }
             }
 
             &.warning {
-                border-left: 4px solid #ed8936;
-                background: linear-gradient(90deg, #fffaf0 0%, white 100%);
-
                 .activityIcon {
-                    color: #ed8936;
+                    background: #fffbeb;
+                    color: #f59e0b;
                 }
 
-                .severityBadge {
-                    background: #ed8936;
+                .statusIndicator {
+                    background: #f59e0b;
                 }
             }
 
             &.info {
-                border-left: 4px solid #4299e1;
-                background: linear-gradient(90deg, #ebf8ff 0%, white 100%);
-
                 .activityIcon {
-                    color: #4299e1;
+                    background: #eff6ff;
+                    color: #3b82f6;
                 }
 
-                .severityBadge {
-                    background: #4299e1;
+                .statusIndicator {
+                    background: #3b82f6;
                 }
             }
 
+            .statusIndicator {
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 3px;
+                height: 24px;
+                border-radius: 0 2px 2px 0;
+            }
+
             .activityIcon {
-                width: 40px;
-                height: 40px;
-                border-radius: 10px;
-                background: #f7fafc;
+                width: 36px;
+                height: 36px;
+                border-radius: 8px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 1.2em;
+                font-size: 0.9rem;
                 flex-shrink: 0;
+                transition: transform 0.2s ease;
+            }
+
+            &:hover .activityIcon {
+                transform: scale(1.05);
             }
 
             .activityContent {
                 flex: 1;
                 min-width: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+
+                .topRow {
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: space-between;
+                    gap: 12px;
+                }
 
                 .description {
-                    margin: 0 0 6px 0;
-                    color: #2d3748;
-                    font-size: 0.9em;
+                    margin: 0;
+                    color: #374151;
+                    font-size: 0.875rem;
                     font-weight: 500;
-                    line-height: 1.4;
+                    line-height: 1.5;
                     word-wrap: break-word;
+                    flex: 1;
+                }
+
+                .severityBadge {
+                    color: #6b7280;
+                    font-size: 0.6875rem;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    flex-shrink: 0;
+                    opacity: 0.8;
+                }
+
+                .bottomRow {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
                 }
 
                 .timestamp {
-                    display: inline-block;
-                    font-size: 0.75em;
-                    color: #a0aec0;
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    font-size: 0.75rem;
+                    color: #9ca3af;
                     font-weight: 500;
-                }
-            }
 
-            .severityBadge {
-                color: white;
-                padding: 4px 10px;
-                border-radius: 12px;
-                font-size: 0.7em;
-                font-weight: 700;
-                text-transform: uppercase;
-                flex-shrink: 0;
-                align-self: flex-start;
+                    svg {
+                        font-size: 0.7rem;
+                        opacity: 0.7;
+                    }
+                }
+
+                .relatedCode {
+                    display: inline-flex;
+                    align-items: center;
+                    font-size: 0.75rem;
+                    color: #6b7280;
+                    background: #f9fafb;
+                    padding: 2px 8px;
+                    border-radius: 4px;
+                    font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+                    font-weight: 500;
+                    border: 1px solid #e5e7eb;
+                }
             }
         }
 
         .emptyState {
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             padding: 60px 20px;
-            color: #a0aec0;
+            color: #9ca3af;
+            flex: 1;
 
-            svg {
-                font-size: 3em;
+            .emptyIcon {
+                width: 64px;
+                height: 64px;
+                border-radius: 50%;
+                background: #f3f4f6;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 margin-bottom: 16px;
+
+                svg {
+                    font-size: 1.75rem;
+                    color: #d1d5db;
+                }
             }
 
             p {
                 margin: 0;
-                font-size: 1em;
+                font-size: 0.9375rem;
+                font-weight: 500;
+                color: #6b7280;
             }
         }
     }
+
+    // Responsive
+    @media (max-width: 768px) {
+        .header {
+            padding: 16px 20px;
+
+            h3 {
+                font-size: 1rem;
+            }
+        }
+
+        .activitiesList {
+            padding: 8px;
+
+            .activityItem {
+                padding: 12px 10px;
+                gap: 12px;
+
+                .activityIcon {
+                    width: 32px;
+                    height: 32px;
+                    font-size: 0.85rem;
+                }
+
+                .activityContent {
+                    .description {
+                        font-size: 0.8125rem;
+                    }
+
+                    .topRow {
+                        flex-direction: column;
+                        gap: 6px;
+                    }
+
+                    .severityBadge {
+                        align-self: flex-start;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Animation for new activities
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.activityItem {
+    animation: slideIn 0.3s ease-out;
 }

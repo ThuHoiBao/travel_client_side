@@ -1,29 +1,46 @@
+// PersonalProfile.module.scss - Thiết kế flat, tối giản, hiện đại
+
 .personalProfile {
     width: 100%;
 }
 
+// Header cố định cho page
+.pageHeader {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
 .pageTitle {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 600;
-    color: #333;
-    margin-bottom: 20px;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+}
+
+.pageSubtitle {
+    font-size: 14px;
+    color: #999;
+    margin: 0;
 }
 
 .tabs {
     display: flex;
     gap: 30px;
-    border-bottom: 2px solid #e0e0e0;
+    border-bottom: 2px solid #f0f0f0;
     margin-bottom: 30px;
 }
 
 .tab {
     padding: 12px 0;
-    font-size: 16px;
+    font-size: 15px;
     color: #666;
     cursor: pointer;
     border-bottom: 2px solid transparent;
     margin-bottom: -2px;
-    transition: all 0.3s;
+    transition: all 0.2s ease;
+    font-weight: 500;
     
     &:hover {
         color: #1890ff;
@@ -32,19 +49,23 @@
     &.tabActive {
         color: #1890ff;
         border-bottom-color: #1890ff;
-        font-weight: 500;
+        font-weight: 600;
     }
 }
 
+// Section - Flat design, không dùng card
 .section {
-    margin-bottom: 40px;
+    margin-bottom: 0px;
 }
 
 .sectionTitle {
-    font-size: 18px;
+    font-size: 19px;
     font-weight: 600;
-    color: #333;
+    margin-top: -10px;
+    color: #1a1a1a;
     margin-bottom: 20px;
+    padding-left: 12px;
+    border-left: 3px solid #1890ff;
 }
 
 .formGroup {
@@ -53,44 +74,55 @@
 
 .label {
     display: block;
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a1a;
     margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 12px;
 }
 
 .input,
 .select {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #d9d9d9;
-    border-radius: 4px;
+    padding: 12px 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
     font-size: 14px;
-    transition: border-color 0.3s;
+    transition: all 0.2s ease;
+    background: white;
+    color: #1a1a1a;
     
     &:focus {
         outline: none;
         border-color: #1890ff;
+        box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.08);
     }
     
-    // Style cho input readOnly (email)
+    &:hover:not(:focus):not(.inputReadOnly) {
+        border-color: #bdbdbd;
+    }
+    
+    // Input readonly
     &.inputReadOnly {
-        background-color: #f5f5f5;
+        background-color: #fafafa;
         color: #999;
         cursor: not-allowed;
-        opacity: 0.7;
+        border-color: #e0e0e0;
         
         &:focus {
-            border-color: #d9d9d9;
+            border-color: #e0e0e0;
+            box-shadow: none;
         }
     }
     
-    // Style cho input có lỗi
+    // Input có lỗi
     &.inputError {
         border-color: #ff4d4f;
         
         &:focus {
-            border-color: #ff4d4f;
+            box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.08);
         }
     }
 }
@@ -98,32 +130,41 @@
 .helperText {
     font-size: 12px;
     color: #999;
-    margin-top: 5px;
+    margin-top: 6px;
     margin-bottom: 0;
 }
 
 .errorText {
     font-size: 12px;
     color: #ff4d4f;
-    margin-top: 5px;
+    margin-top: 6px;
     margin-bottom: 0;
+    font-weight: 500;
 }
 
 .dateInputs {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
 }
 
 .dateSelect {
-    flex: 1;
-    padding: 10px 12px;
-    border: 1px solid #d9d9d9;
-    border-radius: 4px;
+    padding: 12px 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
     font-size: 14px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
     
     &:focus {
         outline: none;
         border-color: #1890ff;
+        box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.08);
+    }
+
+    &:hover {
+        border-color: #bdbdbd;
     }
 }
 
@@ -131,35 +172,48 @@
     display: flex;
     gap: 10px;
     justify-content: flex-end;
-    margin-top: 30px;
+
 }
 
 .buttonPrimary {
-    padding: 10px 24px;
-    background-color: #1890ff;
+    padding: 11px 28px;
+    background: #1890ff;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.2s ease;
     
     &:hover {
-        background-color: #40a9ff;
+        background: #40a9ff;
+    }
+
+    &:active {
+        transform: scale(0.98);
+    }
+
+    &:disabled {
+        background: #e0e0e0;
+        cursor: not-allowed;
+        
+        &:hover {
+            background: #e0e0e0;
+        }
     }
 }
 
 .buttonSecondary {
-    padding: 10px 24px;
+    padding: 11px 28px;
     background-color: white;
     color: #666;
-    border: 1px solid #d9d9d9;
-    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s ease;
     
     &:hover {
         border-color: #1890ff;
@@ -167,52 +221,55 @@
     }
 }
 
-.buttonAdd {
-    padding: 10px 20px;
-    background-color: white;
-    color: #1890ff;
-    border: 1px solid #1890ff;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s;
-    margin-top: 10px;
-    
-    &:hover {
-        background-color: #1890ff;
-        color: white;
-    }
-}
-
-.buttonPrimary {
-    &:disabled {
-        background-color: #d9d9d9;
-        cursor: not-allowed;
-        
-        &:hover {
-            background-color: #d9d9d9;
-        }
-    }
-}
-
 .successMessage {
-    padding: 12px 16px;
-    background-color: #f6ffed;
+    padding: 14px 16px;
+    background: #f6ffed;
     border: 1px solid #b7eb8f;
-    border-radius: 4px;
-    color: #52c41a;
+    border-left: 3px solid #52c41a;
+    border-radius: 6px;
+    color: #389e0d;
     font-size: 14px;
     margin-bottom: 20px;
+    font-weight: 500;
 }
 
 .errorMessage {
-    padding: 12px 16px;
-    background-color: #fff2f0;
+    padding: 14px 16px;
+    background: #fff2f0;
     border: 1px solid #ffccc7;
-    border-radius: 4px;
-    color: #ff4d4f;
+    border-left: 3px solid #ff4d4f;
+    border-radius: 6px;
+    color: #cf1322;
     font-size: 14px;
     margin-bottom: 20px;
+    font-weight: 500;
 }
 
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    font-size: 14px;
+    color: #999;
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .dateInputs {
+        grid-template-columns: 1fr;
+    }
+
+    .buttonGroup {
+        flex-direction: column;
+        
+        .buttonPrimary,
+        .buttonSecondary {
+            width: 100%;
+        }
+    }
+
+    .pageTitle {
+        font-size: 22px;
+    }
+}

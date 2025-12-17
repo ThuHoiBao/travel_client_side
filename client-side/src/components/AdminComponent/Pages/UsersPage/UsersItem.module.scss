@@ -1,45 +1,224 @@
 // src/components/AdminComponent/Pages/UsersPage/UsersItem.module.scss
-$success-color: #52c41a;
-$danger-color: #ff4d4f;
-$primary-color: #2c70f8;
 
-.userRow {
-    &:hover { background-color: #f9f9f9; }
-    td { vertical-align: middle; font-size: 14px; color: #333; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+$primary: #0f172a;
+$secondary: #64748b;
+$border: #e2e8f0;
+$success: #10b981;
+$danger: #ef4444;
+$warning: #f59e0b;
+$bg: #ffffff;
+
+.userCard {
+    background: $bg;
+    border: 1px solid $border;
+    border-radius: 12px;
+    padding: 16px;
+    display: grid;
+    grid-template-columns: 100px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    transition: all 0.2s ease;
+    animation: fadeIn 0.4s ease backwards;
+
+    &:hover {
+        border-color: darken($border, 10%);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        transform: translateY(-1px);
+    }
 }
 
-.userInfo {
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Avatar Section
+.avatarSection {
+    position: relative;
+}
+
+.avatarWrapper {
+    position: relative;
+    width: 100px;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.statusDot {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+    
+    &.active {
+        background: $success;
+    }
+    
+    &.inactive {
+        background: $secondary;
+    }
+}
+
+// Content Section
+.contentSection {
+    flex: 1;
+    min-width: 0;
+}
+
+.nameRow {
     display: flex;
     align-items: center;
-    gap: 10px;
-    .avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd; }
-    .fullName { font-weight: 600; }
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.userName {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: $primary;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .statusBadge {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
     font-weight: 600;
-    &.active { background-color: #f6ffed; color: $success-color; border: 1px solid $success-color; }
-    &.locked { background-color: #fff1f0; color: $danger-color; border: 1px solid $danger-color; }
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    flex-shrink: 0;
+    
+    &.statusActive {
+        background: #ecfdf5;
+        color: #059669;
+    }
+    
+    &.statusLocked {
+        background: #fef2f2;
+        color: #dc2626;
+    }
 }
 
-.actions {
+.infoGrid {
     display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.infoItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.infoIcon {
+    font-size: 13px;
+    color: $secondary;
+    flex-shrink: 0;
+}
+
+.infoText {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: $secondary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+// Actions Section
+.actionsSection {
+    display: flex;
+    flex-direction: column;
     gap: 8px;
 }
 
 .actionBtn {
-    border: 1px solid #ccc;
-    background: white;
-    padding: 6px 8px;
-    border-radius: 4px;
+    width: 40px;
+    height: 40px;
+    border: 1px solid $border;
+    background: $bg;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    transition: all 0.2s;
-    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 15px;
 
-    &.btnLock { color: $danger-color; border-color: $danger-color; &:hover { background: #fff1f0; } }
-    &.btnUnlock { color: $success-color; border-color: $success-color; &:hover { background: #f6ffed; } }
-    &.btnOrders { color: $primary-color; border-color: $primary-color; &:hover { background: #e6f7ff; } }
+    &:hover {
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+
+    &.btnLock {
+        color: $danger;
+        
+        &:hover {
+            background: #fef2f2;
+            border-color: $danger;
+        }
+    }
+
+    &.btnUnlock {
+        color: $success;
+        
+        &:hover {
+            background: #ecfdf5;
+            border-color: $success;
+        }
+    }
+
+    &.btnOrders {
+        color: $primary;
+        
+        &:hover {
+            background: #f8fafc;
+            border-color: $primary;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .userCard {
+        grid-template-columns: 80px 1fr;
+        gap: 12px;
+    }
+
+    .avatarWrapper {
+        width: 80px;
+        height: 100px;
+    }
+
+    .actionsSection {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        justify-content: flex-end;
+    }
 }
