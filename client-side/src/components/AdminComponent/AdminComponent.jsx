@@ -15,7 +15,8 @@ import BookingsPage from './Pages/BookingsPage/BookingsPage';
 import NotificationsPage from './Pages/NotificationsPage/NotificationsPage';
 import CouponManagement from './Pages/CounponsPage/CouponManagement';
 import LocationManager from './Pages/LocationsPage/LocationManager';
-import BranchPolicyManagement from './Pages/BranchPolicyPage/BranchPolicyManagement' 
+import BranchPolicyManagement from './Pages/BranchPolicyPage/BranchPolicyManagement';
+import DepartureList from './Pages/DepartureManagement/DepartureList' 
 
 const AdminComponent = () => {
     return (
@@ -27,6 +28,7 @@ const AdminComponent = () => {
                 
                 {/* ✨ ROUTES MỚI ✨ */}
                 <Route path="tours" element={<ToursPage />} /> 
+                <Route path="departures" element={<DepartureList/>} />
                 <Route path="users" element={<UsersPage />} />
                 <Route path="bookings" element={<BookingsPage />} />
                 <Route path="coupons" element={<CouponManagement />} />

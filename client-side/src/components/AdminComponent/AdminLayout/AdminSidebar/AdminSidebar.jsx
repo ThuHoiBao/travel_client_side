@@ -2,12 +2,13 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
     FaTachometerAlt, FaBox, FaChartLine, FaCog, FaSignOutAlt, FaUsers, 
-    FaTicketAlt, FaBell, FaCalendarCheck, FaTags , FaMapMarkerAlt, FaBuilding 
+    FaTicketAlt, FaBell, FaCalendarCheck, FaTags , FaMapMarkerAlt, FaBuilding , FaPlaneDeparture
 } from 'react-icons/fa';
 import styles from './AdminSidebar.module.scss';
 
 const navItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: FaTachometerAlt },
+    { name: "Quản lý Departure", path: '/admin/departures', icon: FaPlaneDeparture },
     { name: 'Quản lý Tours', path: '/admin/tours', icon: FaBox }, 
     { name: 'Quản lý Users', path: '/admin/users', icon: FaUsers }, 
     { name: 'Quản lý Bookings', path: '/admin/bookings', icon: FaCalendarCheck },

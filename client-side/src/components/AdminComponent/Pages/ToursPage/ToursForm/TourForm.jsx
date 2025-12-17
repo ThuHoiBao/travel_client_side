@@ -12,9 +12,8 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [locations, setLocations] = useState([]);
-  const [tourData, setTourData] = useState(null); // Store full tour data
+  const [currentTourId, setCurrentTourId] = useState(tourId);
   
-  // Separate state for each tab
   const [formData, setFormData] = useState({
     tourName: '',
     tourCode: '',
@@ -36,7 +35,6 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
   const [itineraryDays, setItineraryDays] = useState([]);
   const [errors, setErrors] = useState({});
 
-  // Track which tabs have been saved
   const [savedTabs, setSavedTabs] = useState({
     general: false,
     gallery: false,
@@ -48,10 +46,10 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
   }, []);
 
   useEffect(() => {
-    if (tourId && locations.length > 0) {
+    if (currentTourId && locations.length > 0) {
       loadTourData();
     }
-  }, [tourId, locations]);
+  }, [currentTourId, locations]);
 
   const loadLocations = async () => {
     try {
@@ -68,10 +66,9 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
   const loadTourData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/admin/tours/${tourId}`);
+      const response = await axios.get(`/admin/tours/${currentTourId}`);
       if (response.data.success) {
         const tour = response.data.data;
-        setTourData(tour);
         
         setFormData({
           tourName: tour.tourName || '',
@@ -91,9 +88,17 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
 
         setImages(tour.images || []);
         setMediaList(tour.mediaList || []);
-        setItineraryDays(tour.itineraryDays || []);
+        
+        // FIX: Sort itinerary by dayNumber và đảm bảo không duplicate
+        const sortedItinerary = (tour.itineraryDays || [])
+          .sort((a, b) => a.dayNumber - b.dayNumber)
+          // Remove duplicates based on itineraryDayID
+          .filter((day, index, self) => 
+            index === self.findIndex(d => d.itineraryDayID === day.itineraryDayID)
+          );
+        
+        setItineraryDays(sortedItinerary);
 
-        // Mark all tabs as saved initially for edit mode
         setSavedTabs({
           general: true,
           gallery: true,
@@ -111,33 +116,18 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
   const validateGeneralInfo = () => {
     const newErrors = {};
     
-    if (!formData.tourName.trim()) {
-      newErrors.tourName = 'Tên tour không được để trống';
-    }
-    if (!formData.tourCode.trim()) {
-      newErrors.tourCode = 'Mã tour không được để trống';
-    }
-    if (!formData.duration.trim()) {
-      newErrors.duration = 'Thời gian không được để trống';
-    }
-    if (!formData.transportation.trim()) {
-      newErrors.transportation = 'Phương tiện không được để trống';
-    }
-    if (!formData.startLocationId) {
-      newErrors.startLocationId = 'Vui lòng chọn điểm khởi hành';
-    }
-    if (!formData.endLocationId) {
-      newErrors.endLocationId = 'Vui lòng chọn điểm đến';
-    }
-    if (!formData.attractions.trim()) {
-      newErrors.attractions = 'Điểm tham quan không được để trống';
-    }
+    if (!formData.tourName.trim()) newErrors.tourName = 'Tên tour không được để trống';
+    if (!formData.tourCode.trim()) newErrors.tourCode = 'Mã tour không được để trống';
+    if (!formData.duration.trim()) newErrors.duration = 'Thời gian không được để trống';
+    if (!formData.transportation.trim()) newErrors.transportation = 'Phương tiện không được để trống';
+    if (!formData.startLocationId) newErrors.startLocationId = 'Vui lòng chọn điểm khởi hành';
+    if (!formData.endLocationId) newErrors.endLocationId = 'Vui lòng chọn điểm đến';
+    if (!formData.attractions.trim()) newErrors.attractions = 'Điểm tham quan không được để trống';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Save General Info Tab
   const handleSaveGeneralInfo = async () => {
     if (!validateGeneralInfo()) {
       toast.error('Vui lòng kiểm tra lại thông tin!');
@@ -153,11 +143,10 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
       };
 
       let response;
-      if (tourId) {
-        // Update existing tour - general info only
-        response = await axios.put(`/admin/tours/${tourId}/general-info`, payload);
+      if (currentTourId) {
+        response = await axios.put(`/admin/tours/${currentTourId}/general-info`, payload);
+        toast.success('Cập nhật thông tin chung thành công!');
       } else {
-        // Create new tour with general info only
         response = await axios.post('/admin/tours', {
           generalInfo: payload,
           images: [],
@@ -165,21 +154,17 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
           itineraryDays: []
         });
         
-        // If this is a new tour, we need to update the tourId
         if (response.data.data && response.data.data.tourID) {
-          // Update parent component or navigate to edit mode
-          window.location.href = `/admin/tours/edit/${response.data.data.tourID}`;
-          return;
+          setCurrentTourId(response.data.data.tourID);
+          toast.success('Tạo tour thành công!');
+          setActiveTab('gallery'); 
         }
       }
 
       if (response.data.success) {
-        toast.success('Lưu thông tin chung thành công!');
         setSavedTabs(prev => ({ ...prev, general: true }));
-        
-        // Reload tour data to get updated info
-        if (tourId) {
-          loadTourData();
+        if (currentTourId) {
+          await loadTourData();
         }
       }
     } catch (error) {
@@ -191,9 +176,33 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
     }
   };
 
-  // Save Gallery Tab
+  const uploadImageFile = async (tourId, file, isMain) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('isMain', isMain);
+
+    const response = await axios.post(`/admin/tours/${tourId}/upload-image`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+
+    return response.data.data;
+  };
+
+  const uploadVideoFile = async (tourId, file, title, description) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('title', title || '');
+    formData.append('description', description || '');
+
+    const response = await axios.post(`/admin/tours/${tourId}/upload-video`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+
+    return response.data.data;
+  };
+
   const handleSaveGallery = async () => {
-    if (!tourId) {
+    if (!currentTourId) {
       toast.warning('Vui lòng lưu thông tin chung trước!');
       setActiveTab('general');
       return;
@@ -201,30 +210,46 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
 
     setSaving(true);
     try {
-      // Filter out empty images/media
-      const validImages = images.filter(img => img.imageURL?.trim() || img.file);
-      const validMedia = mediaList.filter(m => m.mediaUrl?.trim() || m.file);
+      const uploadedImages = [];
+      const uploadedMedia = [];
 
-      // Save images
-      await axios.put(`/admin/tours/${tourId}/images`, validImages.map(img => ({
-        imageURL: img.imageURL || '', // Will be updated after file upload
-        isMainImage: img.isMainImage || false
-      })));
+      for (const image of images) {
+        if (image.file) {
+          const result = await uploadImageFile(currentTourId, image.file, image.isMainImage);
+          uploadedImages.push(result);
+          toast.info(`Đã upload: ${image.file.name}`);
+        } else if (image.imageURL) {
+          uploadedImages.push({
+            imageURL: image.imageURL,
+            isMainImage: image.isMainImage
+          });
+        }
+      }
 
-      // Save media
-      await axios.put(`/admin/tours/${tourId}/media`, validMedia.map(m => ({
-        mediaUrl: m.mediaUrl || '', // Will be updated after file upload
-        thumbnailUrl: m.thumbnailUrl || '',
-        title: m.title || '',
-        description: m.description || '',
-        isPrimary: m.isPrimary || false
-      })));
+      for (const media of mediaList) {
+        if (media.file) {
+          const result = await uploadVideoFile(
+            currentTourId, 
+            media.file, 
+            media.title, 
+            media.description
+          );
+          uploadedMedia.push(result);
+          toast.info(`Đã upload: ${media.file.name}`);
+        } else if (media.mediaUrl) {
+          uploadedMedia.push({
+            mediaUrl: media.mediaUrl,
+            thumbnailUrl: media.thumbnailUrl,
+            title: media.title,
+            description: media.description,
+            isPrimary: media.isPrimary
+          });
+        }
+      }
 
       toast.success('Lưu hình ảnh & media thành công!');
       setSavedTabs(prev => ({ ...prev, gallery: true }));
-      
-      // Reload tour data
-      loadTourData();
+      await loadTourData();
     } catch (error) {
       console.error('Error saving gallery:', error);
       const msg = error.response?.data?.message || 'Có lỗi xảy ra!';
@@ -234,19 +259,26 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
     }
   };
 
-  // Save Itinerary Tab
+  // FIX: Cải thiện handleSaveItinerary
   const handleSaveItinerary = async () => {
-    if (!tourId) {
+    if (!currentTourId) {
       toast.warning('Vui lòng lưu thông tin chung trước!');
       setActiveTab('general');
       return;
     }
 
-    // Validate itinerary
-    const validDays = itineraryDays.filter(day => {
-      const plainText = day.details?.replace(/<[^>]*>/g, '').trim();
-      return day.title?.trim() && day.meals?.trim() && plainText;
-    });
+    // Validate và normalize data
+    const validDays = itineraryDays
+      .filter(day => {
+        const plainText = day.details?.replace(/<[^>]*>/g, '').trim();
+        return day.title?.trim() && day.meals?.trim() && plainText;
+      })
+      .map((day, index) => ({
+        dayNumber: index + 1, // Đảm bảo dayNumber liên tục từ 1
+        title: day.title.trim(),
+        meals: day.meals.trim(),
+        details: day.details
+      }));
 
     if (validDays.length === 0 && itineraryDays.length > 0) {
       toast.error('Vui lòng điền đầy đủ thông tin cho các ngày!');
@@ -255,13 +287,14 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
 
     setSaving(true);
     try {
-      await axios.put(`/admin/tours/${tourId}/itinerary`, validDays);
+      // Gửi request update
+      await axios.put(`/admin/tours/${currentTourId}/itinerary`, validDays);
 
       toast.success('Lưu lịch trình thành công!');
       setSavedTabs(prev => ({ ...prev, itinerary: true }));
       
-      // Reload tour data
-      loadTourData();
+      // Load lại data để đồng bộ với backend
+      await loadTourData();
     } catch (error) {
       console.error('Error saving itinerary:', error);
       const msg = error.response?.data?.message || 'Có lỗi xảy ra!';
@@ -271,38 +304,22 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
     }
   };
 
-  // Get save handler based on active tab
   const getSaveHandler = () => {
     switch (activeTab) {
-      case 'general':
-        return handleSaveGeneralInfo;
-      case 'gallery':
-        return handleSaveGallery;
-      case 'itinerary':
-        return handleSaveItinerary;
-      default:
-        return null;
+      case 'general': return handleSaveGeneralInfo;
+      case 'gallery': return handleSaveGallery;
+      case 'itinerary': return handleSaveItinerary;
+      default: return null;
     }
   };
 
   const handleSaveCurrentTab = () => {
     const handler = getSaveHandler();
-    if (handler) {
-      handler();
-    }
+    if (handler) handler();
   };
 
   const handleClose = () => {
-    const hasUnsavedChanges = !savedTabs.general || !savedTabs.gallery || !savedTabs.itinerary;
-    
-    if (hasUnsavedChanges && tourId) {
-      const confirm = window.confirm('Có thay đổi chưa được lưu. Bạn có chắc muốn đóng?');
-      if (!confirm) return;
-    }
-    
-    if (onSuccess) {
-      onSuccess();
-    }
+    if (onSuccess) onSuccess();
     onClose();
   };
 
@@ -326,10 +343,9 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
   return (
     <div className={styles.modalOverlay} onClick={handleClose}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
         <div className={styles.modalHeader}>
           <div>
-            <h2>{tourId ? 'Chỉnh sửa Tour' : 'Tạo Tour Mới'}</h2>
+            <h2>{currentTourId ? 'Chỉnh sửa Tour' : 'Tạo Tour Mới'}</h2>
             <p>{formData.tourCode || 'Chưa có mã tour'}</p>
           </div>
           <button className={styles.closeBtn} onClick={handleClose} type="button">
@@ -337,7 +353,6 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
           </button>
         </div>
 
-        {/* Tabs */}
         <div className={styles.tabs}>
           {tabs.map(tab => {
             const Icon = tab.icon;
@@ -352,7 +367,7 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
               >
                 <Icon size={20} />
                 {tab.label}
-                {isSaved && tourId && (
+                {isSaved && currentTourId && (
                   <Check size={16} className={styles.checkIcon} />
                 )}
               </button>
@@ -360,7 +375,6 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
           })}
         </div>
 
-        {/* Tab Content */}
         <div className={styles.tabContent}>
           {activeTab === 'general' && (
             <GeneralInfoTab
@@ -389,7 +403,6 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
           )}
         </div>
 
-        {/* Actions */}
         <div className={styles.modalActions}>
           <button
             type="button"
@@ -397,30 +410,29 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
             onClick={handleClose}
             disabled={saving}
           >
-            {tourId ? 'Đóng' : 'Hủy'}
+            {currentTourId ? 'Đóng' : 'Hủy'}
           </button>
           <button
             type="button"
             className={styles.btnSubmit}
             onClick={handleSaveCurrentTab}
-            disabled={saving}
+            disabled={saving || (activeTab !== 'general' && !currentTourId)}
           >
             {saving ? (
               <>
                 <Loader className={styles.spinner} size={18} />
-                Đang lưu...
+                {activeTab === 'gallery' ? 'Đang upload...' : 'Đang lưu...'}
               </>
             ) : (
               <>
                 <Save size={18} />
-                {tourId ? `Lưu ${tabs.find(t => t.id === activeTab)?.label}` : 'Tạo tour'}
+                {!currentTourId ? 'Tạo tour' : `Lưu ${tabs.find(t => t.id === activeTab)?.label}`}
               </>
             )}
           </button>
         </div>
 
-        {/* Save Status Indicator */}
-        {tourId && (
+        {currentTourId && (
           <div className={styles.saveStatus}>
             <p className={styles.saveStatusTitle}>Trạng thái lưu:</p>
             <div className={styles.saveStatusList}>
