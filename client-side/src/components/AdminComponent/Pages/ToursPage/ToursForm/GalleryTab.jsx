@@ -1,51 +1,70 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Star, Image, Video, Link, Upload, Youtube } from 'lucide-react';
+import { Plus, Trash2, Star, Image, Video, Link, Upload, Youtube, Grid } from 'lucide-react';
 import styles from './TabStyles.module.scss';
 import { toast } from 'react-toastify'; 
 
-// Hàm đơn giản để lấy ID video YouTube (chỉ hoạt động với format phổ biến)
-const getYoutubeEmbedUrl = (url) => {
-    if (!url) return null;
-    try {
-        const urlObj = new URL(url);
-        if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
-            let videoId = '';
-            if (urlObj.searchParams.has('v')) {
-                videoId = urlObj.searchParams.get('v');
-            } else if (urlObj.hostname === 'youtu.be') {
-                videoId = urlObj.pathname.substring(1);
-            }
-            if (videoId) {
-                return `https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0`;
-            }
-        }
-    } catch (e) {
-        // console.error("Invalid URL:", e);
+const getVideoEmbedInfo = (url) => {
+  if (!url) return null;
+
+  try {
+    const urlObj = new URL(url);
+
+    if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
+      let videoId = '';
+      if (urlObj.searchParams.has('v')) {
+        videoId = urlObj.searchParams.get('v');
+      } else if (urlObj.hostname === 'youtu.be') {
+        videoId = urlObj.pathname.substring(1);
+      }
+      if (videoId) {
+        return {
+          type: 'youtube',
+          embedUrl: `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&fs=0&loop=1&playlist=${videoId}`
+        };
+      }
     }
+
+    if (urlObj.hostname.includes('vimeo.com')) {
+      const videoId = urlObj.pathname.split('/').filter(Boolean).pop();
+      if (videoId) {
+        return {
+          type: 'vimeo',
+          embedUrl: `https://player.vimeo.com/video/${videoId}?autoplay=1&muted=1&controls=0&title=0&byline=0&portrait=0&loop=1`
+        };
+      }
+    }
+
+    if (url.match(/\.(mp4|webm|ogg)$/i)) {
+      return {
+        type: 'direct',
+        embedUrl: url
+      };
+    }
+
     return null;
+  } catch (error) {
+    console.error('Invalid video URL:', error);
+    return null;
+  }
 };
 
 const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
     
-    // Cleanup local preview URLs on component unmount
     useEffect(() => {
         return () => {
-            // Clean up image previews
             images.forEach(image => {
-                if (image.previewUrl) {
-                    URL.revokeObjectURL(image.previewUrl);
-                }
+                if (image.previewUrl) URL.revokeObjectURL(image.previewUrl);
             });
-            // Clean up media previews
             mediaList.forEach(media => {
-                if (media.previewUrl) {
-                    URL.revokeObjectURL(media.previewUrl);
-                }
+                if (media.previewUrl) URL.revokeObjectURL(media.previewUrl);
             });
         };
     }, []);
 
-    // --- Image handlers (Giữ nguyên) ---
+    // ============================================
+    // IMAGE HANDLERS - MULTI UPLOAD SUPPORT
+    // ============================================
+
     const handleAddImage = () => {
         const newImage = {
             imageURL: '',
@@ -54,6 +73,30 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
             previewUrl: null
         };
         setImages([...images, newImage]);
+    };
+
+    const handleMultipleImageUpload = (files) => {
+        const fileArray = Array.from(files);
+        const newImages = [];
+
+        fileArray.forEach((file, idx) => {
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error(`${file.name}: Kích thước file quá lớn (tối đa 5MB)`);
+                return;
+            }
+
+            newImages.push({
+                imageURL: '',
+                isMainImage: images.length === 0 && idx === 0, // First image is main if no images exist
+                file: file,
+                previewUrl: URL.createObjectURL(file)
+            });
+        });
+
+        if (newImages.length > 0) {
+            setImages([...images, ...newImages]);
+            toast.success(`Đã thêm ${newImages.length} ảnh`);
+        }
     };
 
     const handleImageChange = (index, field, value) => {
@@ -78,7 +121,7 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
                 return;
             }
 
-            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            if (file.size > 5 * 1024 * 1024) {
                 toast.error("Kích thước file quá lớn (tối đa 5MB).");
                 return;
             }
@@ -115,7 +158,10 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
         setImages(newImages);
     };
 
-    // --- Media handlers (ĐÃ SỬA) ---
+    // ============================================
+    // MEDIA HANDLERS
+    // ============================================
+
     const handleAddMedia = () => {
         const newMedia = {
             mediaUrl: '',
@@ -123,8 +169,8 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
             title: '',
             description: '',
             isPrimary: mediaList.length === 0,
-            file: null,          // NEW: Lưu trữ file video
-            previewUrl: null     // NEW: URL xem trước cục bộ
+            file: null,
+            previewUrl: null
         };
         setMediaList([...mediaList, newMedia]);
     };
@@ -136,7 +182,6 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
         if (field === 'isPrimary' && value) {
             newMedia.forEach((m, i) => { m.isPrimary = i === index; });
         } 
-        // NEW LOGIC FOR FILE UPLOAD
         else if (field === 'file') {
             const file = value;
             
@@ -148,7 +193,7 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
                 return;
             }
 
-            if (file.size > 50 * 1024 * 1024) { // Ví dụ: Giới hạn 50MB cho video
+            if (file.size > 50 * 1024 * 1024) {
                 toast.error("Kích thước file quá lớn (tối đa 50MB).");
                 return;
             }
@@ -156,17 +201,15 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
             if (currentMedia.previewUrl) URL.revokeObjectURL(currentMedia.previewUrl);
             
             currentMedia.file = file;
-            currentMedia.mediaUrl = ''; // Xóa URL khi upload file
+            currentMedia.mediaUrl = '';
             currentMedia.previewUrl = URL.createObjectURL(file);
         }
-        // NEW LOGIC FOR URL INPUT
         else if (field === 'mediaUrl') {
             currentMedia.mediaUrl = value;
-            currentMedia.file = null; // Xóa file khi nhập URL
+            currentMedia.file = null;
             if (currentMedia.previewUrl) URL.revokeObjectURL(currentMedia.previewUrl);
             currentMedia.previewUrl = null;
         }
-        // END NEW LOGIC
         else {
             currentMedia[field] = value;
         }
@@ -176,7 +219,6 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
 
     const handleRemoveMedia = (index) => {
         const removedMedia = mediaList[index];
-        // Clean up object URL for uploaded video
         if (removedMedia.previewUrl) URL.revokeObjectURL(removedMedia.previewUrl);
         
         const newMedia = mediaList.filter((_, i) => i !== index);
@@ -187,14 +229,16 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
         setMediaList(newMedia);
     };
 
-    // --- Render Functions ---
+    // ============================================
+    // RENDER FUNCTIONS
+    // ============================================
+
     const renderImageInput = (image, index) => {
         const isUrlActive = image.imageURL || !image.file;
         const isFileActive = image.file;
         
         return (
             <div className={styles.imageInputGroup}>
-                {/* Input URL */}
                 <div className={styles.formGroup}>
                     <label className={styles.labelWithIcon}>
                         <Link size={14} className={styles.inputIcon} />
@@ -212,7 +256,6 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
                 
                 <p className={styles.separator}>HOẶC</p>
 
-                {/* Input File Upload */}
                 <div className={styles.formGroup}>
                     <label className={styles.labelWithIcon}>
                         <Upload size={14} className={styles.inputIcon} />
@@ -234,24 +277,22 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
 
     const getSourceUrl = (item) => item.previewUrl || item.imageURL || item.mediaUrl;
     
-    // NEW: Render Media Input
     const renderMediaInput = (media, index) => {
         const hasUrl = !!media.mediaUrl;
         const hasFile = !!media.file;
         
         return (
             <div className={styles.imageInputGroup}>
-                {/* Input URL */}
                 <div className={styles.formGroup}>
                     <label className={styles.labelWithIcon}>
                         <Youtube size={14} className={styles.inputIcon} />
-                        URL Video (Youtube)
+                        URL Video (Youtube, Vimeo, Direct URL)
                     </label>
                     <input
                         type="text"
                         value={media.mediaUrl}
                         onChange={(e) => handleMediaChange(index, 'mediaUrl', e.target.value)}
-                        placeholder="Dán URL Youtube (vd: https://youtu.be/abcde)"
+                        placeholder="VD: https://youtu.be/abc hoặc https://example.com/video.mp4"
                         className={hasFile ? styles.inputDisabled : ''}
                         disabled={hasFile}
                     />
@@ -259,7 +300,6 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
                 
                 <p className={styles.separator}>HOẶC</p>
 
-                {/* Input File Upload */}
                 <div className={styles.formGroup}>
                     <label className={styles.labelWithIcon}>
                         <Upload size={14} className={styles.inputIcon} />
@@ -279,77 +319,166 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
         );
     };
 
+    const renderVideoPreview = (media) => {
+        // Priority: uploaded file > URL
+        if (media.previewUrl) {
+            return (
+                <div className={styles.videoWrapper}>
+                    <video 
+                        muted 
+                        autoPlay 
+                        loop 
+                        playsInline 
+                        className={styles.videoElement}
+                    >
+                        <source 
+                            src={media.previewUrl} 
+                            type={media.file ? media.file.type : 'video/mp4'} 
+                        />
+                        Trình duyệt của bạn không hỗ trợ video.
+                    </video>
+                </div>
+            );
+        }
+        
+        if (media.mediaUrl) {
+            const videoInfo = getVideoEmbedInfo(media.mediaUrl);
+            
+            if (videoInfo) {
+                if (videoInfo.type === 'youtube' || videoInfo.type === 'vimeo') {
+                    return (
+                        <div className={styles.videoWrapper}>
+                            <iframe
+                                src={videoInfo.embedUrl}
+                                title="Video player"
+                                frameBorder="0"
+                                allow="autoplay; fullscreen"
+                                allowFullScreen
+                            ></iframe>
+                        </div>
+                    );
+                } else if (videoInfo.type === 'direct') {
+                    return (
+                        <div className={styles.videoWrapper}>
+                            <video 
+                                muted 
+                                autoPlay 
+                                loop 
+                                playsInline 
+                                className={styles.videoElement}
+                            >
+                                <source src={videoInfo.embedUrl} type="video/mp4" />
+                                <source src={videoInfo.embedUrl} type="video/webm" />
+                                <source src={videoInfo.embedUrl} type="video/ogg" />
+                                Trình duyệt của bạn không hỗ trợ video.
+                            </video>
+                        </div>
+                    );
+                }
+            }
+        }
+        
+        return (
+            <div className={styles.previewPlaceholder}>
+                <Video size={32} />
+                <p>Nhập URL Youtube/Vimeo hoặc Upload file để xem trước</p>
+            </div>
+        );
+    };
+
     return (
         <div className={styles.tabContainer}>
-            {/* 1. Images Section */}
+            {/* IMAGES SECTION */}
             <div className={styles.section}>
-                {/* ... (Image Section code giữ nguyên) ... */}
                 <div className={styles.sectionHeader}>
                     <h3>Bộ sưu tập Hình ảnh</h3>
-                    <button className={styles.btnAdd} onClick={handleAddImage}>
-                        <Plus size={18} />
-                        Thêm ảnh
-                    </button>
+                    <div className={styles.headerActions}>
+                        <label className={styles.btnAdd}>
+                            <Grid size={18} />
+                            <span>Upload nhiều ảnh</span>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                onChange={(e) => handleMultipleImageUpload(e.target.files)}
+                                style={{ display: 'none' }}
+                            />
+                        </label>
+                        <button className={styles.btnAdd} type="button" onClick={handleAddImage}>
+                            <Plus size={18} />
+                            Thêm ảnh
+                        </button>
+                    </div>
                 </div>
 
                 {images.length === 0 ? (
                     <div className={styles.emptyState}>
                         <Image size={48} />
                         <p>Chưa có hình ảnh nào</p>
-                        <button className={styles.btnPrimary} onClick={handleAddImage}>
-                            Thêm ảnh đầu tiên
-                        </button>
+                        <div className={styles.emptyActions}>
+                            <label className={styles.btnPrimary}>
+                                <Grid size={18} />
+                                Upload nhiều ảnh
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={(e) => handleMultipleImageUpload(e.target.files)}
+                                    style={{ display: 'none' }}
+                                />
+                            </label>
+                            <button className={styles.btnSecondary} type="button" onClick={handleAddImage}>
+                                <Plus size={18} />
+                                Thêm từng ảnh
+                            </button>
+                        </div>
                     </div>
                 ) : (
-                    <div className={styles.itemList}>
+                    <div className={styles.imageGrid}>
                         {images.map((image, index) => {
                             const sourceUrl = getSourceUrl(image);
                             return (
-                                <div key={index} className={styles.itemCard}>
-                                    <div className={styles.cardHeader}>
-                                        <h4>Ảnh #{index + 1}</h4>
-                                        <div className={styles.itemActions}>
+                                <div key={index} className={styles.imageCard}>
+                                    <div className={styles.imageCardHeader}>
+                                        <span className={styles.imageBadge}>#{index + 1}</span>
+                                        <div className={styles.imageActions}>
                                             <button 
-                                                className={`${styles.btnAction} ${image.isMainImage ? styles.starred : ''}`}
+                                                type="button"
+                                                className={`${styles.btnIcon} ${image.isMainImage ? styles.active : ''}`}
                                                 onClick={() => handleImageChange(index, 'isMainImage', !image.isMainImage)}
                                                 title={image.isMainImage ? 'Ảnh chính' : 'Đặt làm ảnh chính'}
                                             >
-                                                <Star size={18} />
+                                                <Star size={16} />
                                             </button>
-                                            
                                             <button
-                                                className={styles.btnDelete}
+                                                type="button"
+                                                className={styles.btnIconDelete}
                                                 onClick={() => handleRemoveImage(index)}
+                                                title="Xóa"
                                             >
-                                                <Trash2 size={18} />
+                                                <Trash2 size={16} />
                                             </button>
                                         </div>
                                     </div>
 
-                                    <div className={styles.grid2}>
-                                        {/* Cột 1: Input */}
-                                        <div>
-                                            {renderImageInput(image, index)}
-                                        </div>
-
-                                        {/* Cột 2: Preview */}
-                                        <div className={styles.previewBox}>
-                                            {sourceUrl ? (
-                                                <img 
-                                                    src={sourceUrl} 
-                                                    alt={`Preview ${index + 1}`} 
-                                                    onError={(e) => e.target.style.display = 'none'} 
-                                                    className={styles.imagePreview}
-                                                />
-                                            ) : (
-                                                <div className={styles.previewPlaceholder}>
-                                                    <Image size={32} />
-                                                    <p>Xem trước ảnh</p>
-                                                </div>
-                                            )}
-                                        </div>
+                                    <div className={styles.imagePreviewWrapper}>
+                                        {sourceUrl ? (
+                                            <img 
+                                                src={sourceUrl} 
+                                                alt={`Preview ${index + 1}`} 
+                                                onError={(e) => e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23ddd"/%3E%3C/svg%3E'} 
+                                                className={styles.imagePreview}
+                                            />
+                                        ) : (
+                                            <div className={styles.imagePlaceholder}>
+                                                <Image size={32} />
+                                            </div>
+                                        )}
                                     </div>
-                                    
+
+                                    <div className={styles.imageCardBody}>
+                                        {renderImageInput(image, index)}
+                                    </div>
                                 </div>
                             );
                         })}
@@ -357,11 +486,11 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
                 )}
             </div>
 
-            {/* 2. Media Section (Video) - ĐÃ SỬA */}
+            {/* MEDIA SECTION (VIDEO) */}
             <div className={styles.section}>
                 <div className={styles.sectionHeader}>
                     <h3>Media (Video)</h3>
-                    <button className={styles.btnAdd} onClick={handleAddMedia}>
+                    <button className={styles.btnAdd} type="button" onClick={handleAddMedia}>
                         <Plus size={18} />
                         Thêm video
                     </button>
@@ -371,22 +500,20 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
                     <div className={styles.emptyState}>
                         <Video size={48} />
                         <p>Chưa có video nào</p>
-                        <button className={styles.btnPrimary} onClick={handleAddMedia}>
+                        <button className={styles.btnPrimary} type="button" onClick={handleAddMedia}>
                             Thêm video đầu tiên
                         </button>
                     </div>
                 ) : (
                     <div className={styles.itemList}>
                         {mediaList.map((media, index) => {
-                            const embedUrl = getYoutubeEmbedUrl(media.mediaUrl);
-                            const isUploadedVideo = !!media.previewUrl;
-                            
                             return (
                                 <div key={index} className={styles.itemCard}>
                                     <div className={styles.cardHeader}>
                                         <h4>Video #{index + 1}</h4>
                                         <div className={styles.itemActions}>
                                             <button 
+                                                type="button"
                                                 className={`${styles.btnAction} ${media.isPrimary ? styles.starred : ''}`}
                                                 onClick={() => handleMediaChange(index, 'isPrimary', !media.isPrimary)}
                                                 title={media.isPrimary ? 'Video chính' : 'Đặt làm video chính'}
@@ -394,6 +521,7 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
                                                 <Star size={18} />
                                             </button>
                                             <button
+                                                type="button"
                                                 className={styles.btnDelete}
                                                 onClick={() => handleRemoveMedia(index)}
                                             >
@@ -403,17 +531,16 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
                                     </div>
                                     
                                     <div className={styles.grid2}>
-                                        {/* Cột 1: Thông tin video */}
                                         <div>
-                                            {renderMediaInput(media, index)} {/* Thêm input upload/URL mới */}
+                                            {renderMediaInput(media, index)}
                                             
                                             <div className={styles.formGroup}>
-                                                <label>Thumbnail URL</label>
+                                                <label>Thumbnail URL (Tùy chọn)</label>
                                                 <input
                                                     type="text"
                                                     value={media.thumbnailUrl}
                                                     onChange={(e) => handleMediaChange(index, 'thumbnailUrl', e.target.value)}
-                                                    placeholder="URL ảnh đại diện video (nếu có)"
+                                                    placeholder="URL ảnh đại diện video"
                                                 />
                                             </div>
                                             <div className={styles.formGroup}>
@@ -437,34 +564,8 @@ const GalleryTab = ({ images, setImages, mediaList, setMediaList }) => {
                                             </div>
                                         </div>
 
-                                        {/* Cột 2: Preview Video */}
                                         <div className={styles.previewBox}>
-                                            {embedUrl ? (
-                                                <div className={styles.videoWrapper}>
-                                                    <iframe
-                                                        src={embedUrl}
-                                                        title="YouTube video player"
-                                                        frameBorder="0"
-                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                        allowFullScreen
-                                                    ></iframe>
-                                                </div>
-                                            ) : isUploadedVideo ? (
-                                                <div className={styles.videoWrapper}>
-                                                    <video controls className={styles.videoElement}>
-                                                        <source 
-                                                            src={media.previewUrl} 
-                                                            type={media.file ? media.file.type : 'video/mp4'} 
-                                                        />
-                                                        Trình duyệt của bạn không hỗ trợ video.
-                                                    </video>
-                                                </div>
-                                            ) : (
-                                                <div className={styles.previewPlaceholder}>
-                                                    <Video size={32} />
-                                                    <p>Nhập URL Youtube hoặc Upload file để xem trước</p>
-                                                </div>
-                                            )}
+                                            {renderVideoPreview(media)}
                                         </div>
                                     </div>
                                 </div>
