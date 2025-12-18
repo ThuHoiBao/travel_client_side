@@ -28,6 +28,8 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
   ]);
 
   const [outboundTransport, setOutboundTransport] = useState({
+    type: 'OUTBOUND',
+    vehicleType: 'PLANE',
     transportCode: '',
     vehicleName: '',
     startPoint: '',
@@ -37,6 +39,8 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
   });
 
   const [inboundTransport, setInboundTransport] = useState({
+    type: 'INBOUND',
+    vehicleType: 'PLANE',
     transportCode: '',
     vehicleName: '',
     startPoint: '',
@@ -96,6 +100,8 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
       // Fill outbound transport
       if (departure.outboundTransport) {
         setOutboundTransport({
+          type: 'OUTBOUND',
+          vehicleType: departure.outboundTransport.vehicleType || 'PLANE',
           transportCode: departure.outboundTransport.transportCode || '',
           vehicleName: departure.outboundTransport.vehicleName || '',
           startPoint: departure.outboundTransport.startPoint || '',
@@ -108,6 +114,8 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
       // Fill inbound transport
       if (departure.inboundTransport) {
         setInboundTransport({
+          type: 'INBOUND',
+          vehicleType: departure.inboundTransport.vehicleType || 'PLANE',
           transportCode: departure.inboundTransport.transportCode || '',
           vehicleName: departure.inboundTransport.vehicleName || '',
           startPoint: departure.inboundTransport.startPoint || '',
@@ -419,17 +427,31 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
                     <Plane size={20} className={styles.iconOutbound} />
                     <h3>Vận chuyển chiều đi</h3>
                   </div>
-
                   <div className={styles.grid2}>
-                    <div className={styles.formGroup}>
-                      <label>Mã chuyến</label>
-                      <input
-                        type="text"
-                        value={outboundTransport.transportCode}
-                        onChange={(e) => setOutboundTransport({ ...outboundTransport, transportCode: e.target.value })}
-                        placeholder="VD: VN123"
-                      />
-                    </div>
+                          <div className={styles.formGroup}>
+                            <label>Loại phương tiện</label>
+                            <select
+                              value={outboundTransport.vehicleType}
+                              onChange={(e) => setOutboundTransport({ ...outboundTransport, vehicleType: e.target.value })}
+                            >
+                              <option value="PLANE">Máy bay</option>
+                              <option value="BUS">Xe khách</option>
+                              <option value="TRAIN">Tàu hỏa</option>
+                              <option value="CAR">Xe du lịch</option>
+                            </select>
+                          </div>
+
+                          <div className={styles.formGroup}>
+                            <label>Mã chuyến</label>
+                            <input
+                              type="text"
+                              value={outboundTransport.transportCode}
+                              onChange={(e) => setOutboundTransport({ ...outboundTransport, transportCode: e.target.value })}
+                              placeholder="VD: VN123"
+                            />
+                          </div>
+
+
 
                     <div className={styles.formGroup}>
                       <label>Tên phương tiện</label>
@@ -489,6 +511,18 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
                   </div>
 
                   <div className={styles.grid2}>
+                    <div className={styles.formGroup}>
+                        <label>Loại phương tiện</label>
+                        <select
+                           value={outboundTransport.vehicleType}
+                           onChange={(e) => setOutboundTransport({ ...outboundTransport, vehicleType: e.target.value })}
+                         >
+                          <option value="PLANE">Máy bay</option>
+                          <option value="BUS">Xe khách</option>
+                          <option value="TRAIN">Tàu hỏa</option>
+                          <option value="CAR">Xe du lịch</option>
+                        </select>
+                     </div>
                     <div className={styles.formGroup}>
                       <label>Mã chuyến</label>
                       <input

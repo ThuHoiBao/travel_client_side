@@ -15,8 +15,6 @@ const navItems = [
     { name: 'Quản lý Giảm giá', path: '/admin/coupons', icon: FaTags }, 
     {name: 'Quản lý Locations', path: '/admin/locations', icon: FaMapMarkerAlt } ,
     {name: 'Quản lý Branches Policies', path: '/admin/branches-policies', icon: FaMapMarkerAlt } ,
-    { name: 'Quản lý Thông báo', path: '/admin/notifications', icon: FaBell }, 
-    { name: 'Analytics', path: '/admin/analytics', icon: FaChartLine },
 ];
 
 const AdminSidebar = () => {
