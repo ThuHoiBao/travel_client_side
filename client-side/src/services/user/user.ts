@@ -38,6 +38,7 @@ export const updateUserApi = async (userID: number, updateData: UpdatePayload): 
         }
 
         const userDto = UserRequestDTO.fromApiResponse(response.data);
+        console.log("UserDTO", userDto);
         
         return userDto.toPlain() as any;
     } catch (error) {

@@ -11,7 +11,7 @@ const PersonalProfile = () => {
     
     const [formData, setFormData] = useState({
         fullName: '',
-        phoneNumber: '',
+        phone: '',
         day: '',
         month: '',
         year: ''
@@ -50,7 +50,7 @@ const PersonalProfile = () => {
         if (userData) {
             setFormData({
                 fullName: userData.fullName || '',
-                phoneNumber: userData.phoneNumber || '',
+                phone: userData.phone || '',
                 day: parsedDate.day,
                 month: parsedDate.month,
                 year: parsedDate.year
@@ -59,7 +59,7 @@ const PersonalProfile = () => {
     }, [userData, parsedDate]); 
     
     const handleInputChange = (field, value) => {
-        if (field === 'phoneNumber') {
+        if (field === 'phone') {
             const numericValue = value.replace(/\D/g, '');
             
             if (numericValue.length > 10) {
@@ -93,7 +93,7 @@ const PersonalProfile = () => {
             setLoading(true);
             setMessage({ type: '', text: '' });
 
-            if (formData.phoneNumber && formData.phoneNumber.length !== 10) {
+            if (formData.phone && formData.phone.length !== 10) {
                 setPhoneError('Số điện thoại phải có đúng 10 chữ số');
                 setLoading(false);
                 return;
@@ -105,8 +105,8 @@ const PersonalProfile = () => {
                 formDataPayload.append('fullName', formData.fullName);
             }
             
-            if (formData.phoneNumber) {
-                formDataPayload.append('phoneNumber', formData.phoneNumber);
+            if (formData.phone) {
+                formDataPayload.append('phone', formData.phone);
             }
 
             if (formData.day && formData.month && formData.year) {
@@ -121,7 +121,7 @@ const PersonalProfile = () => {
 
             updateUser({
                 fullName: formData.fullName,
-                phoneNumber: formData.phoneNumber,
+                phone: formData.phone,
                 dateOfBirth: formData.day && formData.month && formData.year 
                     ? `${formData.year}-${formData.month.padStart(2, '0')}-${formData.day.padStart(2, '0')}`
                     : userData?.dateOfBirth
@@ -194,8 +194,8 @@ const PersonalProfile = () => {
                     <input
                         type="text"
                         className={`${styles.input} ${phoneError ? styles.inputError : ''}`}
-                        value={formData.phoneNumber}
-                        onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                        value={formData.phone}
+                        onChange={(e) => handleInputChange('phone', e.target.value)}
                         placeholder="Nhập 10 chữ số"
                         maxLength={10}
                     />
