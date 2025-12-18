@@ -283,12 +283,11 @@ const LocationManager = () => {
         <table className="data-table">
           <thead>
             <tr>
-              <th style={{ width: '80px' }}>Hình ảnh</th>
+              <th style={{ width: '100px' }}>Hình ảnh</th>
               <th style={{ width: '200px' }}>Tên địa điểm</th>
-              <th style={{ width: '100px' }}>Khu vực</th>
-              <th style={{ width: '200px' }}>Sân bay</th>
+              <th style={{ width: '200px' }}>Khu vực</th>
               <th style={{ width: '300px' }}>Mô tả</th>
-              <th style={{ width: '100px', textAlign: 'center' }}>Tours</th>
+              <th style={{ width: '200px', textAlign: 'center' }}>Tours</th>
             
               <th style={{ width: '140px', textAlign: 'center' }}>Hành động</th>
             </tr>
@@ -327,16 +326,6 @@ const LocationManager = () => {
                     <span className={`badge ${getRegionBadge(location.region).class}`}>
                       {getRegionBadge(location.region).label}
                     </span>
-                  </td>
-                  <td>
-                    {location.airportCode ? (
-                      <div>
-                        <div className="airport-code">{location.airportCode}</div>
-                        <div className="airport-name">{location.airportName}</div>
-                      </div>
-                    ) : (
-                      <span style={{ color: '#999' }}>Chưa có thông tin</span>
-                    )}
                   </td>
                   <td>
                     <div className="description-cell">
@@ -499,31 +488,6 @@ const LocationManager = () => {
                   <option value="CENTRAL">Miền Trung</option>
                   <option value="SOUTH">Miền Nam</option>
                 </select>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group" style={{ flex: '0 0 30%' }}>
-                  <label>Mã sân bay</label>
-                  <input
-                    type="text"
-                    value={formData.airportCode}
-                    onChange={(e) =>
-                      setFormData({ ...formData, airportCode: e.target.value.toUpperCase() })
-                    }
-                    placeholder="HAN, DAD..."
-                    maxLength={10}
-                  />
-                </div>
-
-                <div className="form-group" style={{ flex: '1' }}>
-                  <label>Tên sân bay</label>
-                  <input
-                    type="text"
-                    value={formData.airportName}
-                    onChange={(e) => setFormData({ ...formData, airportName: e.target.value })}
-                    placeholder="Sân bay Quốc tế..."
-                  />
-                </div>
               </div>
 
               <div className="form-group">

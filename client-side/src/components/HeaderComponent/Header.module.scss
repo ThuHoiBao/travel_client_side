@@ -133,6 +133,7 @@ $coin-color: #ffc107; // Màu vàng coin
 }
 
 .loginButton, .registerButton {
+    text-decoration: none;
     border: 1px solid white;
     padding: 8px 15px;
     border-radius: 4px;
