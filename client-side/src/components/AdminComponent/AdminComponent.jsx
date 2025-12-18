@@ -34,8 +34,6 @@ const AdminComponent = () => {
                 <Route path="coupons" element={<CouponManagement />} />
                 <Route path="locations" element={<LocationManager/> }/>
                 <Route path="branches-policies" element={<BranchPolicyManagement/> }/>
-                <Route path="notifications" element={<NotificationsPage />} />
-
                 {/* ROUTES CŨ */}
                 {/* <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="settings" element={<SettingsPage />} /> */}
