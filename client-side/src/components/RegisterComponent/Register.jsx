@@ -23,7 +23,7 @@ const Register = () => {
   const [districts, setDistricts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [showSucessModal, setShowSuccessModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
 
   useEffect(() => {
@@ -33,8 +33,11 @@ const Register = () => {
   const fetchProvinces = async () => {
     try {
       setLoading(true);
-      const response = await fetch('https://provinces.open-api.vn/api/p/');
+      // Sử dụng API từ GitHub (static JSON, luôn available)
+      const response = await fetch('https://raw.githubusercontent.com/kenzouno1/DiaGioiHanhChinhVN/master/data.json');
       const data = await response.json();
+      
+      console.log('Provinces loaded:', data.length);
       setProvinces(data);
       setLoading(false);
     } catch (error) {
@@ -45,9 +48,15 @@ const Register = () => {
 
   const fetchDistricts = async (provinceCode) => {
     try {
-      const response = await fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`);
-      const data = await response.json();
-      setDistricts(data.districts || []);
+      console.log('Fetching districts for province:', provinceCode);
+      
+      const selectedProvince = provinces.find(p => p.Id === provinceCode);
+      if (selectedProvince && selectedProvince.Districts) {
+        console.log('Districts loaded:', selectedProvince.Districts.length);
+        setDistricts(selectedProvince.Districts);
+      } else {
+        setDistricts([]);
+      }
     } catch (error) {
       console.error('Lỗi tải quận huyện:', error);
       setDistricts([]);
@@ -141,66 +150,66 @@ const Register = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const newErrors = {};
-  Object.keys(formData).forEach(key => {
-    const error = validateField(key, formData[key]);
-    if (error) newErrors[key] = error;
-  });
-
-  setErrors(newErrors);
-  setTouched(Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {}));
-
-  if (Object.keys(newErrors).length > 0) return;
-
-  try {
-    const provinceCode = Number(formData.province);
-    const districtCode = Number(formData.district);
-
-    const selectedProvince = provinces.find(p => Number(p.code) === provinceCode);
-    const selectedDistrict = districts.find(d => Number(d.code) === districtCode);
-
-    const requestData = {
-      fullName: formData.fullName,
-      email: formData.email,
-      password: formData.password,
-      confirmPassword: formData.confirmPassword,
-      provinceCode: String(provinceCode),
-      provinceName: selectedProvince?.name || "",
-      districtCode: String(districtCode),
-      districtName: selectedDistrict?.name || ""
-    };
-
-    console.log("Sending request:", requestData);
-
-    const response = await register(requestData);
-
-    setRegisteredEmail(formData.email);
-    setShowSuccessModal(true);
-
-    setFormData({
-      fullName: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      province: '',
-      district: '',
-      agreeTerms: false
+    const newErrors = {};
+    Object.keys(formData).forEach(key => {
+      const error = validateField(key, formData[key]);
+      if (error) newErrors[key] = error;
     });
-    setTouched({});
-    setDistricts([]);
 
-  } catch (error) {
-    console.error("Register error:", error);
+    setErrors(newErrors);
+    setTouched(Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {}));
 
-    alert(
-      error.response?.data?.message ||
-      error.message ||
-      "Đăng ký thất bại. Vui lòng thử lại!"
-    );
-  }
-};
+    if (Object.keys(newErrors).length > 0) return;
+
+    try {
+      const selectedProvince = provinces.find(p => p.Id === formData.province);
+      const selectedDistrict = districts.find(d => d.Id === formData.district);
+
+      console.log('Selected Province:', selectedProvince);
+      console.log('Selected District:', selectedDistrict);
+
+      const requestData = {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        provinceCode: formData.province,
+        provinceName: selectedProvince?.Name || "",
+        districtCode: formData.district,
+        districtName: selectedDistrict?.Name || ""
+      };
+
+      console.log("Sending request:", requestData);
+
+      const response = await register(requestData);
+
+      setRegisteredEmail(formData.email);
+      setShowSuccessModal(true);
+
+      setFormData({
+        fullName: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        province: '',
+        district: '',
+        agreeTerms: false
+      });
+      setTouched({});
+      setDistricts([]);
+
+    } catch (error) {
+      console.error("Register error:", error);
+
+      alert(
+        error.response?.data?.message ||
+        error.message ||
+        "Đăng ký thất bại. Vui lòng thử lại!"
+      );
+    }
+  };
 
   if (loading) {
     return (
@@ -328,7 +337,9 @@ const Register = () => {
 
           {/* Province */}
           <div className={styles.formGroup}>
-            <label className={styles.label}>Tỉnh / Thành</label>
+            <label className={styles.label}>
+              Tỉnh / Thành <span className={styles.required}>*</span>
+            </label>
             <div className={styles.inputWrapper}>
               <MapPin className={styles.icon} />
               <select
@@ -339,9 +350,12 @@ const Register = () => {
                 className={`${styles.input} ${styles.select} ${errors.province && touched.province ? styles.error : ''}`}
               >
                 <option value="">Chọn Tỉnh/Thành</option>
-                {provinces.map(province => (
-                  <option key={province.code} value={province.code}>
-                    {province.name}
+                {provinces.map((province) => (
+                  <option 
+                    key={`province-${province.Id}`} 
+                    value={province.Id}
+                  >
+                    {province.Name}
                   </option>
                 ))}
               </select>
@@ -353,7 +367,9 @@ const Register = () => {
 
           {/* District */}
           <div className={styles.formGroup}>
-            <label className={styles.label}>Quận / Huyện</label>
+            <label className={styles.label}>
+              Quận / Huyện <span className={styles.required}>*</span>
+            </label>
             <div className={styles.inputWrapper}>
               <MapPin className={styles.icon} />
               <select
@@ -368,9 +384,12 @@ const Register = () => {
                 <option value="">
                   {!formData.province ? 'Chọn Tỉnh/Thành trước' : 'Chọn Quận/Huyện'}
                 </option>
-                {districts.map(district => (
-                  <option key={district.code} value={district.code}>
-                    {district.name}
+                {districts.map((district) => (
+                  <option 
+                    key={`district-${district.Id}`} 
+                    value={district.Id}
+                  >
+                    {district.Name}
                   </option>
                 ))}
               </select>
@@ -418,7 +437,8 @@ const Register = () => {
           </a>
         </p>
       </div>
-       {showSucessModal && (
+
+      {showSuccessModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
             <div className={styles.modalIcon}>
