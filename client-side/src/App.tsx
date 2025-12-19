@@ -19,6 +19,7 @@ import AdminComponent from './components/AdminComponent/AdminComponent';
 import CouponManagement from './components/AdminComponent/Pages/CounponsPage/CouponManagement';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ScrollToTop from './utils/ScrollToTop';
 // // Các trang giả định
 // const HotelPage = () => <div>Trang Khách sạn</div>; 
 // const FlightsPage = () => <div>Trang Vé máy bay</div>; 
@@ -30,6 +31,7 @@ import 'react-toastify/dist/ReactToastify.css';
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
 
         

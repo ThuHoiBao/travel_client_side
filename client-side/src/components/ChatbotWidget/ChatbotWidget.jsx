@@ -186,7 +186,7 @@ const ChatbotWidget = () => {
                 )} */}
 
                 {/* Quick Actions */}
-                {message.quickActions && message.quickActions.length > 0 && (
+                {/* {message.quickActions && message.quickActions.length > 0 && (
                   <div className={styles.quickActions}>
                     {message.quickActions.map((action, idx) => (
                       <button 
@@ -198,7 +198,7 @@ const ChatbotWidget = () => {
                       </button>
                     ))}
                   </div>
-                )}
+                )} */}
                 
                 <span className={styles.timestamp}>
                   {new Date(message.timestamp).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
