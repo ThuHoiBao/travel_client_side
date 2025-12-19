@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
-import { X, Copy, Calendar } from 'lucide-react';
+import { X, Copy, Calendar, Clock } from 'lucide-react';
 import styles from './CloneModal.module.scss';
 
 const CloneModal = ({ isOpen, onClose, onClone, loading }) => {
-  const [newDate, setNewDate] = useState('');
+  const [newDateTime, setNewDateTime] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (newDate) {
-      onClone(newDate);
+    if (newDateTime) {
+      onClone(newDateTime);
     }
+  };
+
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    return now.toISOString().slice(0, 16);
   };
 
   if (!isOpen) return null;
@@ -32,22 +38,24 @@ const CloneModal = ({ isOpen, onClose, onClone, loading }) => {
         <form onSubmit={handleSubmit}>
           <div className={styles.body}>
             <p className={styles.description}>
-              Vui lòng chọn ngày khởi hành mới cho bản sao này. 
-              Toàn bộ thông tin về giá vé, vận chuyển và chính sách sẽ được giữ nguyên.
+              Vui lòng chọn <strong>ngày và giờ</strong> khởi hành mới cho bản sao này. 
+              Toàn bộ cấu hình giá và dịch vụ sẽ được giữ nguyên.
             </p>
 
             <div className={styles.formGroup}>
-              <label htmlFor="newDate">Ngày khởi hành mới <span className={styles.required}>*</span></label>
+              <label htmlFor="newDateTime">
+                Ngày & Giờ khởi hành mới <span className={styles.required}>*</span>
+              </label>
               <div className={styles.inputWrapper}>
-                <Calendar size={18} className={styles.inputIcon} />
+                <Clock size={18} className={styles.inputIcon} />
                 <input
-                  id="newDate"
-                  type="date"
-                  value={newDate}
-                  onChange={(e) => setNewDate(e.target.value)}
+                  id="newDateTime"
+                  type="datetime-local"
+                  value={newDateTime}
+                  onChange={(e) => setNewDateTime(e.target.value)}
                   required
                   className={styles.input}
-                  min={new Date().toISOString().split('T')[0]} // Không cho chọn ngày quá khứ
+                  min={getCurrentDateTime()} 
                 />
               </div>
             </div>
@@ -65,7 +73,7 @@ const CloneModal = ({ isOpen, onClose, onClone, loading }) => {
             <button 
               type="submit" 
               className={styles.btnSubmit}
-              disabled={loading || !newDate}
+              disabled={loading || !newDateTime}
             >
               {loading ? <span className={styles.spinner}></span> : 'Sao chép ngay'}
             </button>

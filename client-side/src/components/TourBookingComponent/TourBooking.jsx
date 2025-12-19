@@ -30,7 +30,6 @@ const TourBooking = () => {
   
   // TODO: Thay bằng data thật từ auth context hoặc API
   const { user } = useAuth(); 
- 
   // Lấy params từ URL
   const tourCode = searchParams.get('tourCode');
   const departureId = searchParams.get('departureId');

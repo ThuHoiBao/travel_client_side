@@ -220,7 +220,7 @@ const renderCalendarDays = () => {
             inbound ? (
               <>
                   <div className={styles.topRow}>
-                    <span className={styles.label}>Ngày về - ...</span> {/* Logic ngày về tùy bạn tính toán */}
+                    <span className={styles.label}>Ngày về - {new Date(inbound.departTime).toLocaleDateString('vi-VN')}</span> 
                     <div className={styles.flightCode}>
                       <FaPlane className={styles.icon} /> {inbound.transportCode}
                     </div>
@@ -241,17 +241,17 @@ const renderCalendarDays = () => {
                     <div className={styles.routeInfo}>
                           <span 
                               className={styles.airportCode} 
-                              data-tooltip={outbound.startPointName || 'Sân bay'} 
+                              data-tooltip={inbound.startPointName || 'Sân bay'} 
                               title={outbound.startPointName} 
                           >
-                            {outbound.startPoint}
+                            {inbound.startPoint}
                         </span>
                         <span 
                             className={styles.airportCode} 
-                            data-tooltip={outbound.endPointName || 'Sân bay'}
-                            title={outbound.endPointName}
+                            data-tooltip={inbound.endPointName || 'Sân bay'}
+                            title={inbound.endPointName}
                         >
-                            {outbound.endPoint}
+                            {inbound.endPoint}
                         </span>
                       </div>
               </>

@@ -19,6 +19,7 @@ const DepartureList = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const [pageSize] = useState(10);
+  const [locations, setLocations] = useState([]);
 
   // Modal states
   const [showFormModal, setShowFormModal] = useState(false);
@@ -36,6 +37,23 @@ const DepartureList = () => {
     totalSlots: 0,
     bookedSlots: 0
   });
+
+   useEffect(() => {
+      loadLocations();
+    }, []);
+
+     const loadLocations = async () => {
+    try {
+      const response = await axios.get('/admin/locations/national');
+      if (response.data.content) {
+        setLocations(response.data.content);
+      }
+      console.log(response.data.content);
+    } catch (error) {
+      console.error('Error loading locations:', error);
+      toast.error('Không thể tải danh sách địa điểm');
+    }
+  };
 
   useEffect(() => {
     fetchDepartures();
@@ -407,6 +425,7 @@ const DepartureList = () => {
       {showFormModal && (
         <DepartureFormModal
           departure={selectedDeparture}
+          locations={locations}
           onClose={() => {
             setShowFormModal(false);
             setSelectedDeparture(null);

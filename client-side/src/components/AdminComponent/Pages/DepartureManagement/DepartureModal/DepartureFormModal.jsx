@@ -4,7 +4,8 @@ import axios from '../../../../../utils/axiosCustomize';
 import { toast } from 'react-toastify';
 import styles from './DepartureFormModal.module.scss';
 
-const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
+const DepartureFormModal = ({ departure, locations, onClose, onSuccess }) => {
+  console.log('locations ',  locations);
   const [activeTab, setActiveTab] = useState('basic');
   const [loading, setLoading] = useState(false);
   const [tours, setTours] = useState([]);
@@ -70,7 +71,7 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
       // Fill basic info
       setFormData({
         tourId: departure.tourId || '',
-        departureDate: departure.departureDate ? departure.departureDate.split('T')[0] : '',
+        departureDate: departure.departureDate ? departure.departureDate.slice(0, 16) : '',
         availableSlots: departure.availableSlots || '',
         status: departure.status !== undefined ? departure.status : true,
         tourGuideInfo: departure.tourGuideInfo || '',
@@ -138,9 +139,16 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
 
   const fetchTours = async () => {
     try {
-      const response = await axios.get('/admin/tours');
+      const response = await axios.get('/admin/tours', {
+        params: {
+          page: 0,
+          size: 1000 
+        }
+      });
+      
       if (response.data.success) {
-        setTours(response.data.data);
+        const tourData = response.data.data?.content || response.data.data || [];
+        setTours(tourData);
       }
     } catch (error) {
       console.error('Error fetching tours:', error);
@@ -183,18 +191,14 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
         salePrice: parseFloat(p.salePrice)
       }));
 
-      const formatDateTimeForBackend = (dateString) => {
-        if (!dateString) return null;
-        
-        let formatted = dateString.replace(' ', 'T');
-        
-        if (formatted.split(':').length === 2) {
-          formatted += ':00';
-        }
-        
-        return formatted;
-      };
-
+   const formatDateTimeForBackend = (dateString) => {
+      if (!dateString) return null;
+      let formatted = dateString.replace(' ', 'T');
+      if (formatted.split(':').length === 2) {
+        formatted += ':00'; 
+      }
+      return formatted;
+    };
       let processedOutbound = null;
       if (outboundTransport.transportCode) {
         processedOutbound = {
@@ -215,6 +219,7 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
 
       const payload = {
         ...formData,
+        departureDate: formatDateTimeForBackend(formData.departureDate),
         tourId: formData.tourId ? parseInt(formData.tourId) : null,
         policyTemplateId: formData.policyTemplateId ? parseInt(formData.policyTemplateId) : null,
         availableSlots: parseInt(formData.availableSlots),
@@ -269,6 +274,36 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
       setActiveTab(tabs[newIndex]);
     }
   };
+
+
+  const renderPointInput = (transportType, field, value, onChange) => {
+  const isPlane = transportType === 'PLANE';
+
+  if (isPlane) {
+    return (
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        <option value="">-- Chọn sân bay --</option>
+        {locations.map(loc => (
+          <option key={loc.locationID || loc.airportCode} value={loc.airportCode}>
+            {loc.airportName} ({loc.airportCode})
+          </option>
+        ))}
+      </select>
+    );
+  }
+
+  return (
+    <input
+      type="text"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={field === 'startPoint' ? "VD: Bến xe Miền Đông" : "VD: Điểm hẹn trung tâm"}
+    />
+  );
+};
 
   return (
     <div className={styles.overlay}>
@@ -337,12 +372,12 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
                     <label>
                       Ngày khởi hành <span className={styles.required}>*</span>
                     </label>
-                    <input
-                      type="date"
-                      value={formData.departureDate}
-                      onChange={(e) => setFormData({ ...formData, departureDate: e.target.value })}
-                      required
-                    />
+                 <input
+                    type="datetime-local"
+                    value={formData.departureDate}
+                    onChange={(e) => setFormData({ ...formData, departureDate: e.target.value })}
+                    required
+                  />
                   </div>
 
                   <div className={styles.formGroup}>
@@ -502,26 +537,25 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
                       />
                     </div>
 
-                    <div className={styles.formGroup}>
+                   <div className={styles.formGroup}>
                       <label>Điểm đi</label>
-                      <input
-                        type="text"
-                        value={outboundTransport.startPoint}
-                        onChange={(e) => setOutboundTransport({ ...outboundTransport, startPoint: e.target.value })}
-                        placeholder="VD: Sân bay Nội Bài"
-                      />
+                      {renderPointInput(
+                        outboundTransport.vehicleType, 
+                        'startPoint', 
+                        outboundTransport.startPoint, 
+                        (val) => setOutboundTransport({ ...outboundTransport, startPoint: val })
+                      )}
                     </div>
 
                     <div className={styles.formGroup}>
                       <label>Điểm đến</label>
-                      <input
-                        type="text"
-                        value={outboundTransport.endPoint}
-                        onChange={(e) => setOutboundTransport({ ...outboundTransport, endPoint: e.target.value })}
-                        placeholder="VD: Sân bay Đà Nẵng"
-                      />
+                      {renderPointInput(
+                        outboundTransport.vehicleType, 
+                        'endPoint', 
+                        outboundTransport.endPoint, 
+                        (val) => setOutboundTransport({ ...outboundTransport, endPoint: val })
+                      )}
                     </div>
-
                     <div className={styles.formGroup}>
                       <label>Thời gian khởi hành</label>
                       <input
@@ -583,24 +617,24 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
                       />
                     </div>
 
-                    <div className={styles.formGroup}>
+                   <div className={styles.formGroup}>
                       <label>Điểm đi</label>
-                      <input
-                        type="text"
-                        value={inboundTransport.startPoint}
-                        onChange={(e) => setInboundTransport({ ...inboundTransport, startPoint: e.target.value })}
-                        placeholder="VD: Sân bay Đà Nẵng"
-                      />
+                      {renderPointInput(
+                        inboundTransport.vehicleType, 
+                        'startPoint', 
+                        inboundTransport.startPoint, 
+                        (val) => setInboundTransport({ ...inboundTransport, startPoint: val })
+                      )}
                     </div>
 
                     <div className={styles.formGroup}>
                       <label>Điểm đến</label>
-                      <input
-                        type="text"
-                        value={inboundTransport.endPoint}
-                        onChange={(e) => setInboundTransport({ ...inboundTransport, endPoint: e.target.value })}
-                        placeholder="VD: Sân bay Nội Bài"
-                      />
+                      {renderPointInput(
+                        inboundTransport.vehicleType, 
+                        'endPoint', 
+                        inboundTransport.endPoint, 
+                        (val) => setInboundTransport({ ...inboundTransport, endPoint: val })
+                      )}
                     </div>
 
                     <div className={styles.formGroup}>
