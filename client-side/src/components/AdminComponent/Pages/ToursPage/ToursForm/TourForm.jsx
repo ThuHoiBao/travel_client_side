@@ -41,6 +41,23 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
     itinerary: false
   });
 
+  const sanitizeHTML = (html) => {
+  if (!html) return '';
+  
+  let cleaned = html
+    .replace(/(<br\s*\/?>){2,}/gi, '<br>')
+    .replace(/^(<br\s*\/?>)+/gi, '')
+    .replace(/(<br\s*\/?>)+$/gi, '')
+    .replace(/(<br\s*\/?>)+(<\/(p|ul|ol|h[1-6]|div)>)/gi, '$2')
+    .replace(/(<br\s*\/?>)+(<(p|ul|ol|h[1-6]|div))/gi, '$2')
+    .replace(/\s+/g, ' ')
+    .replace(/<p>(&nbsp;|\s|<br\s*\/?>)*<\/p>/gi, '')
+    .replace(/\s*style="[^"]*"/gi, '')
+    .trim();
+  
+  return cleaned;
+};
+
   useEffect(() => {
     loadLocations();
   }, []);
@@ -259,50 +276,47 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
     }
   };
 
-  // FIX: Cải thiện handleSaveItinerary
   const handleSaveItinerary = async () => {
-    if (!currentTourId) {
-      toast.warning('Vui lòng lưu thông tin chung trước!');
-      setActiveTab('general');
-      return;
-    }
+  if (!currentTourId) {
+    toast.warning('Vui lòng lưu thông tin chung trước!');
+    setActiveTab('general');
+    return;
+  }
 
-    // Validate và normalize data
-    const validDays = itineraryDays
-      .filter(day => {
-        const plainText = day.details?.replace(/<[^>]*>/g, '').trim();
-        return day.title?.trim() && day.meals?.trim() && plainText;
-      })
-      .map((day, index) => ({
-        dayNumber: index + 1, // Đảm bảo dayNumber liên tục từ 1
-        title: day.title.trim(),
-        meals: day.meals.trim(),
-        details: day.details
-      }));
+  const validDays = itineraryDays
+    .filter(day => {
+      const sanitized = sanitizeHTML(day.details);
+      const plainText = sanitized.replace(/<[^>]*>/g, '').trim();
+      return day.title?.trim() && day.meals?.trim() && plainText;
+    })
+    .map((day, index) => ({
+      dayNumber: index + 1,
+      title: day.title.trim(),
+      meals: day.meals.trim(),
+      details: sanitizeHTML(day.details) 
+    }));
 
-    if (validDays.length === 0 && itineraryDays.length > 0) {
-      toast.error('Vui lòng điền đầy đủ thông tin cho các ngày!');
-      return;
-    }
+  if (validDays.length === 0 && itineraryDays.length > 0) {
+    toast.error('Vui lòng điền đầy đủ thông tin cho các ngày!');
+    return;
+  }
 
-    setSaving(true);
-    try {
-      // Gửi request update
-      await axios.put(`/admin/tours/${currentTourId}/itinerary`, validDays);
+  setSaving(true);
+  try {
+    await axios.put(`/admin/tours/${currentTourId}/itinerary`, validDays);
 
-      toast.success('Lưu lịch trình thành công!');
-      setSavedTabs(prev => ({ ...prev, itinerary: true }));
-      
-      // Load lại data để đồng bộ với backend
-      await loadTourData();
-    } catch (error) {
-      console.error('Error saving itinerary:', error);
-      const msg = error.response?.data?.message || 'Có lỗi xảy ra!';
-      toast.error(msg);
-    } finally {
-      setSaving(false);
-    }
-  };
+    toast.success('Lưu lịch trình thành công!');
+    setSavedTabs(prev => ({ ...prev, itinerary: true }));
+    
+    await loadTourData();
+  } catch (error) {
+    console.error('Error saving itinerary:', error);
+    const msg = error.response?.data?.message || 'Có lỗi xảy ra!';
+    toast.error(msg);
+  } finally {
+    setSaving(false);
+  }
+};
 
   const getSaveHandler = () => {
     switch (activeTab) {

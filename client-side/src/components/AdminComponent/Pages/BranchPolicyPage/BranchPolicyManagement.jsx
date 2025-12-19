@@ -349,6 +349,7 @@ const BranchPolicyManagement = () => {
 
       {showPolicyModal && (
         <PolicyModal
+          key={editingPolicy ? editingPolicy.policyTemplateID : 'create'}
           isOpen={showPolicyModal}
           onClose={() => {
             setShowPolicyModal(false);
