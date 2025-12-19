@@ -6,18 +6,35 @@ import RichTextEditor from '../../RichTextEditor/RichTextEditor';
 import styles from './PolicyModal.module.scss';
 
 const PolicyModal = ({ isOpen, onClose, onSuccess, editingPolicy, branches }) => {
-  const [formData, setFormData] = useState({
-    templateName: '',
-    contactId: '',
-    tourPriceIncludes: '',
-    tourPriceExcludes: '',
-    childPricingNotes: '',
-    paymentConditions: '',
-    registrationConditions: '',
-    regularDayCancellationRules: '',
-    holidayCancellationRules: '',
-    forceMajeureRules: '',
-    packingList: ''
+const [formData, setFormData] = useState(() => {
+    if (editingPolicy) {
+      return {
+        templateName: editingPolicy.templateName || '',
+        contactId: editingPolicy.branchInfo?.contactID || '',
+        tourPriceIncludes: editingPolicy.tourPriceIncludes || '',
+        tourPriceExcludes: editingPolicy.tourPriceExcludes || '',
+        childPricingNotes: editingPolicy.childPricingNotes || '',
+        paymentConditions: editingPolicy.paymentConditions || '',
+        registrationConditions: editingPolicy.registrationConditions || '',
+        regularDayCancellationRules: editingPolicy.regularDayCancellationRules || '',
+        holidayCancellationRules: editingPolicy.holidayCancellationRules || '',
+        forceMajeureRules: editingPolicy.forceMajeureRules || '',
+        packingList: editingPolicy.packingList || ''
+      };
+    }
+    return {
+      templateName: '',
+      contactId: '',
+      tourPriceIncludes: '',
+      tourPriceExcludes: '',
+      childPricingNotes: '',
+      paymentConditions: '',
+      registrationConditions: '',
+      regularDayCancellationRules: '',
+      holidayCancellationRules: '',
+      forceMajeureRules: '',
+      packingList: ''
+    };
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -29,11 +46,11 @@ const PolicyModal = ({ isOpen, onClose, onSuccess, editingPolicy, branches }) =>
     }
   }, [isOpen]);
 
-  useEffect(() => {
+useEffect(() => {
     if (editingPolicy) {
       setFormData({
         templateName: editingPolicy.templateName || '',
-        contactId: editingPolicy.branchInfo?.contactID || '',
+        contactId: editingPolicy.branchInfo?.contactID || '', 
         tourPriceIncludes: editingPolicy.tourPriceIncludes || '',
         tourPriceExcludes: editingPolicy.tourPriceExcludes || '',
         childPricingNotes: editingPolicy.childPricingNotes || '',
@@ -60,7 +77,7 @@ const PolicyModal = ({ isOpen, onClose, onSuccess, editingPolicy, branches }) =>
       });
     }
     setErrors({});
-  }, [editingPolicy, isOpen]);
+  }, [editingPolicy]); 
 
   const fetchBranches = async () => {
     try {

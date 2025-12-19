@@ -10,6 +10,14 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
   const [tours, setTours] = useState([]);
   const [policies, setPolicies] = useState([]);
 
+  // Passenger type mapping
+  const PASSENGER_TYPES = {
+    ADULT: { label: 'Người lớn', description: 'Từ 12 tuổi' },
+    CHILD: { label: 'Trẻ em', description: 'Từ 5-11 tuổi' },
+    INFANT: { label: 'Trẻ nhỏ', description: 'Dưới 5 tuổi' },
+    SINGLE_SUPPLEMENT: { label: 'Phòng đơn', description: 'Phòng đơn' }
+  };
+
   // Form data
   const [formData, setFormData] = useState({
     tourId: '',
@@ -22,9 +30,10 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
   });
 
   const [pricings, setPricings] = useState([
-    { passengerType: 'Người lớn', ageDescription: 'Từ 12 tuổi', originalPrice: '', salePrice: '' },
-    { passengerType: 'Trẻ em', ageDescription: 'Từ 5-11 tuổi', originalPrice: '', salePrice: '' },
-    { passengerType: 'Trẻ nhỏ', ageDescription: 'Dưới 5 tuổi', originalPrice: '', salePrice: '' }
+    { passengerType: 'ADULT', originalPrice: '', salePrice: '' },
+    { passengerType: 'CHILD', originalPrice: '', salePrice: '' },
+    { passengerType: 'INFANT', originalPrice: '', salePrice: '' },
+    { passengerType: 'SINGLE_SUPPLEMENT', originalPrice: '', salePrice: '' }
   ]);
 
   const [outboundTransport, setOutboundTransport] = useState({
@@ -72,9 +81,10 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
       // Fill pricings - merge with existing passenger types
       if (departure.pricings && departure.pricings.length > 0) {
         const defaultPricings = [
-          { passengerType: 'Người lớn', ageDescription: 'Từ 12 tuổi', originalPrice: '', salePrice: '' },
-          { passengerType: 'Trẻ em', ageDescription: 'Từ 5-11 tuổi', originalPrice: '', salePrice: '' },
-          { passengerType: 'Trẻ nhỏ', ageDescription: 'Dưới 5 tuổi', originalPrice: '', salePrice: '' }
+          { passengerType: 'ADULT', originalPrice: '', salePrice: '' },
+          { passengerType: 'CHILD', originalPrice: '', salePrice: '' },
+          { passengerType: 'INFANT', originalPrice: '', salePrice: '' },
+          { passengerType: 'SINGLE_SUPPLEMENT', originalPrice: '', salePrice: '' }
         ];
 
         const mergedPricings = defaultPricings.map(defaultPricing => {
@@ -85,7 +95,6 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
           if (existingPricing) {
             return {
               passengerType: existingPricing.passengerType,
-              ageDescription: existingPricing.ageDescription || defaultPricing.ageDescription,
               originalPrice: existingPricing.originalPrice || '',
               salePrice: existingPricing.salePrice || ''
             };
@@ -150,26 +159,68 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
     }
   };
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Validate pricing
+      // Validate and filter pricing - only include items with both prices filled
       const validPricings = pricings.filter(p => p.originalPrice && p.salePrice);
+      
       for (const pricing of validPricings) {
         if (parseFloat(pricing.salePrice) > parseFloat(pricing.originalPrice)) {
-          toast.error(`Giá bán của ${pricing.passengerType} không được lớn hơn giá gốc!`);
+          const typeInfo = PASSENGER_TYPES[pricing.passengerType];
+          toast.error(`Giá bán của ${typeInfo.label} không được lớn hơn giá gốc!`);
           setLoading(false);
           return;
         }
       }
 
+      // Format pricings to send only passengerType, originalPrice, salePrice
+      const formattedPricings = validPricings.map(p => ({
+        passengerType: p.passengerType,
+        originalPrice: parseFloat(p.originalPrice),
+        salePrice: parseFloat(p.salePrice)
+      }));
+
+      const formatDateTimeForBackend = (dateString) => {
+        if (!dateString) return null;
+        
+        let formatted = dateString.replace(' ', 'T');
+        
+        if (formatted.split(':').length === 2) {
+          formatted += ':00';
+        }
+        
+        return formatted;
+      };
+
+      let processedOutbound = null;
+      if (outboundTransport.transportCode) {
+        processedOutbound = {
+          ...outboundTransport,
+          departTime: formatDateTimeForBackend(outboundTransport.departTime),
+          arrivalTime: formatDateTimeForBackend(outboundTransport.arrivalTime)
+        };
+      }
+
+      let processedInbound = null;
+      if (inboundTransport.transportCode) {
+        processedInbound = {
+          ...inboundTransport,
+          departTime: formatDateTimeForBackend(inboundTransport.departTime),
+          arrivalTime: formatDateTimeForBackend(inboundTransport.arrivalTime)
+        };
+      }
+
       const payload = {
         ...formData,
-        pricings: validPricings,
-        outboundTransport: outboundTransport.transportCode ? outboundTransport : null,
-        inboundTransport: inboundTransport.transportCode ? inboundTransport : null
+        tourId: formData.tourId ? parseInt(formData.tourId) : null,
+        policyTemplateId: formData.policyTemplateId ? parseInt(formData.policyTemplateId) : null,
+        availableSlots: parseInt(formData.availableSlots),
+        pricings: formattedPricings,
+        outboundTransport: processedOutbound, 
+        inboundTransport: processedInbound    
       };
 
       console.log('Submitting payload:', payload);
@@ -275,7 +326,7 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
                     >
                       <option value="">-- Chọn tour --</option>
                       {tours.map(tour => (
-                        <option key={tour.tourId} value={tour.tourId}>
+                        <option key={tour.tourID} value={tour.tourID}>
                           {tour.tourCode} - {tour.tourName}
                         </option>
                       ))}
@@ -323,17 +374,6 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
                     </select>
                   </div>
                 </div>
-
-                <div className={styles.formGroup}>
-                  <label>Mã giảm giá</label>
-                  <input
-                    type="text"
-                    value={formData.couponCode}
-                    onChange={(e) => setFormData({ ...formData, couponCode: e.target.value })}
-                    placeholder="Nhập mã giảm giá (nếu có)"
-                  />
-                </div>
-
                 <div className={styles.formGroup}>
                   <label>Thông tin hướng dẫn viên</label>
                   <textarea
@@ -365,15 +405,16 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
 
                 <div className={styles.pricingList}>
                   {pricings.map((pricing, index) => {
+                    const typeInfo = PASSENGER_TYPES[pricing.passengerType];
                     const discount = calculateDiscount(pricing.originalPrice, pricing.salePrice);
                     const isValid = !pricing.salePrice || !pricing.originalPrice || 
                                     parseFloat(pricing.salePrice) <= parseFloat(pricing.originalPrice);
                     
                     return (
-                      <div key={index} className={styles.pricingCard}>
+                      <div key={pricing.passengerType} className={styles.pricingCard}>
                         <div className={styles.pricingHeader}>
-                          <h4>{pricing.passengerType}</h4>
-                          <p>{pricing.ageDescription}</p>
+                          <h4>{typeInfo.label}</h4>
+                          <p>{typeInfo.description}</p>
                         </div>
 
                         <div className={styles.grid2}>
@@ -428,30 +469,28 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
                     <h3>Vận chuyển chiều đi</h3>
                   </div>
                   <div className={styles.grid2}>
-                          <div className={styles.formGroup}>
-                            <label>Loại phương tiện</label>
-                            <select
-                              value={outboundTransport.vehicleType}
-                              onChange={(e) => setOutboundTransport({ ...outboundTransport, vehicleType: e.target.value })}
-                            >
-                              <option value="PLANE">Máy bay</option>
-                              <option value="BUS">Xe khách</option>
-                              <option value="TRAIN">Tàu hỏa</option>
-                              <option value="CAR">Xe du lịch</option>
-                            </select>
-                          </div>
+                    <div className={styles.formGroup}>
+                      <label>Loại phương tiện</label>
+                      <select
+                        value={outboundTransport.vehicleType}
+                        onChange={(e) => setOutboundTransport({ ...outboundTransport, vehicleType: e.target.value })}
+                      >
+                        <option value="PLANE">Máy bay</option>
+                        <option value="BUS">Xe khách</option>
+                        <option value="TRAIN">Tàu hỏa</option>
+                        <option value="CAR">Xe du lịch</option>
+                      </select>
+                    </div>
 
-                          <div className={styles.formGroup}>
-                            <label>Mã chuyến</label>
-                            <input
-                              type="text"
-                              value={outboundTransport.transportCode}
-                              onChange={(e) => setOutboundTransport({ ...outboundTransport, transportCode: e.target.value })}
-                              placeholder="VD: VN123"
-                            />
-                          </div>
-
-
+                    <div className={styles.formGroup}>
+                      <label>Mã chuyến</label>
+                      <input
+                        type="text"
+                        value={outboundTransport.transportCode}
+                        onChange={(e) => setOutboundTransport({ ...outboundTransport, transportCode: e.target.value })}
+                        placeholder="VD: VN123"
+                      />
+                    </div>
 
                     <div className={styles.formGroup}>
                       <label>Tên phương tiện</label>
@@ -512,17 +551,18 @@ const DepartureFormModal = ({ departure, onClose, onSuccess }) => {
 
                   <div className={styles.grid2}>
                     <div className={styles.formGroup}>
-                        <label>Loại phương tiện</label>
-                        <select
-                           value={outboundTransport.vehicleType}
-                           onChange={(e) => setOutboundTransport({ ...outboundTransport, vehicleType: e.target.value })}
-                         >
-                          <option value="PLANE">Máy bay</option>
-                          <option value="BUS">Xe khách</option>
-                          <option value="TRAIN">Tàu hỏa</option>
-                          <option value="CAR">Xe du lịch</option>
-                        </select>
-                     </div>
+                      <label>Loại phương tiện</label>
+                      <select
+                        value={inboundTransport.vehicleType}
+                        onChange={(e) => setInboundTransport({ ...inboundTransport, vehicleType: e.target.value })}
+                      >
+                        <option value="PLANE">Máy bay</option>
+                        <option value="BUS">Xe khách</option>
+                        <option value="TRAIN">Tàu hỏa</option>
+                        <option value="CAR">Xe du lịch</option>
+                      </select>
+                    </div>
+
                     <div className={styles.formGroup}>
                       <label>Mã chuyến</label>
                       <input

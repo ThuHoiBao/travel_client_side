@@ -372,7 +372,7 @@ const Header = () => {
     return (
         <div className={headerClasses}>
             <div className={styles.headerLeft}>
-                <Link className={styles.logo} to="/"><span>Future</span></Link>
+                <Link className={styles.logo} to="/"><img className={styles.logos} src='https://res.cloudinary.com/dnt8vx1at/image/upload/v1766129500/Future_Travel-removebg-preview_vkldki.png'/></Link>
                 <Link to="/" className={getNavLinkClass('/')}>Trang chủ</Link>
                 <Link to="/tours" className={getNavLinkClass('/tours')}>Tours</Link>
                 <Link to="/flights" className={getNavLinkClass('/flights')}><IoIosAirplane /> Vé máy bay</Link>

@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import styles from './DepartureList.module.scss';
 import DepartureFormModal from './DepartureModal/DepartureFormModal';
 import DepartureDetailModal from './DepartureModal/DepartureDetailModal';
+import CloneModal from './CloneModal/CloneModal'
 
 const DepartureList = () => {
   const [departures, setDepartures] = useState([]);
@@ -23,6 +24,10 @@ const DepartureList = () => {
   const [showFormModal, setShowFormModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedDeparture, setSelectedDeparture] = useState(null);
+
+  const [showCloneModal, setShowCloneModal] = useState(false);
+  const [cloneLoading, setCloneLoading] = useState(false);
+  const [idToClone, setIdToClone] = useState(null);
 
   // Stats
   const [stats, setStats] = useState({
@@ -108,21 +113,31 @@ const DepartureList = () => {
   };
 
   const handleClone = async (departureId) => {
-    const newDate = prompt('Nhập ngày khởi hành mới (YYYY-MM-DD):');
-    if (!newDate) return;
+    setIdToClone(departureId);
+    setShowCloneModal(true);
+  };
 
+  const handleCloneSubmit = async (newDate) => {
+    if (!idToClone || !newDate) return;
+    
+    setCloneLoading(true);
     try {
-      const response = await axios.post(`/admin/departures/${departureId}/clone`, null, {
+      const response = await axios.post(`/admin/departures/${idToClone}/clone`, null, {
         params: { newDepartureDate: newDate }
       });
 
       if (response.data.success) {
         toast.success('Sao chép lịch khởi hành thành công!');
+        setShowCloneModal(false);
+        setIdToClone(null);
         fetchDepartures();
       }
     } catch (error) {
       console.error('Error cloning departure:', error);
-      toast.error('Không thể sao chép lịch khởi hành');
+      const msg = error.response?.data?.message || 'Không thể sao chép lịch khởi hành';
+      toast.error(msg);
+    } finally {
+      setCloneLoading(false);
     }
   };
 
@@ -403,6 +418,16 @@ const DepartureList = () => {
           }}
         />
       )}
+
+      <CloneModal
+        isOpen={showCloneModal}
+        onClose={() => {
+          setShowCloneModal(false);
+          setIdToClone(null);
+        }}
+        onClone={handleCloneSubmit}
+        loading={cloneLoading}
+      />
 
       {showDetailModal && (
         <DepartureDetailModal
