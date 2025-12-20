@@ -87,7 +87,9 @@ const LocationDropdown = ({ query, onSelect, onClose }) => {
             <div>
               <p className={styles.locationName}>{location.name}</p>
               {location.description && (
-                <p className={styles.locationDescription}>{location.description}</p>
+                <p className={styles.locationDescription} title={location.description}>
+                  {location.description}
+                </p>
               )}
             </div>
           </li>
