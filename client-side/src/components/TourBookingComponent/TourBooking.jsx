@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import styles from './TourBooking.module.scss';
 import axios from '../../utils/axiosCustomize';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { toast } from 'react-toastify';
 import {
     FaUser, FaBarcode, FaPlane, FaTag, FaTimes, FaCheckCircle, FaSpinner, FaCoins
 } from 'react-icons/fa';
@@ -151,7 +152,7 @@ const TourBooking = () => {
         const isOccupyingSeat = type !== 'infant'; 
 
         if (isOccupyingSeat && currentSeats >= maxSlots) {
-          alert(`Chuyến đi chỉ còn lại ${maxSlots} chỗ nhận!`);
+          toast.error(`Chuyến đi chỉ còn lại ${maxSlots} chỗ nhận!`);
           return prev;
         }
 
@@ -160,7 +161,7 @@ const TourBooking = () => {
           const currentInfantCount = prev.infant.length;
           
           if (currentInfantCount >= adultCount) {
-            alert("Mỗi người lớn chỉ được đi kèm 1 em bé (dưới 2 tuổi)!");
+            toast.warning("Mỗi người lớn chỉ được đi kèm 1 em bé (dưới 2 tuổi)!");
             return prev; 
           }
         }
@@ -172,7 +173,7 @@ const TourBooking = () => {
           const infantCount = prev.infant.length;
 
           if (newAdultCount < infantCount) {
-            alert("Không thể giảm người lớn vì đang có quá nhiều em bé đi kèm!");
+            toast.warning("Không thể giảm người lớn vì đang có quá nhiều em bé đi kèm!");
             return {
               ...prev,
               adult: prev.adult.slice(0, -1),
@@ -257,7 +258,7 @@ const TourBooking = () => {
 
   const handleApplyGlobalCoupon = (coupon) => {
     if (coupon.minOrderValue && subTotal < coupon.minOrderValue) {
-      alert(`Đơn hàng cần tối thiểu ${formatCurrency(coupon.minOrderValue)} để áp dụng mã này!`);
+      toast.warning(`Đơn hàng cần tối thiểu ${formatCurrency(coupon.minOrderValue)} để áp dụng mã này!`);
       return;
     }
    
@@ -282,7 +283,7 @@ const TourBooking = () => {
       });
       setCouponInput('');
     } else {
-      alert("Mã giảm giá không tồn tại hoặc đã hết hạn!");
+      toast.warning("Mã giảm giá không tồn tại hoặc đã hết hạn!");
     }
   };
 
@@ -294,37 +295,37 @@ const TourBooking = () => {
     const availableSlots = bookingData?.availableSlots || 0;
     
     if (totalSeatsNeeded > availableSlots) {
-      alert(`Không đủ chỗ trống!\n\nBạn đang đặt cho ${totalSeatsNeeded} người nhưng chỉ còn ${availableSlots} chỗ.\nVui lòng giảm số lượng hành khách hoặc chọn ngày khởi hành khác.`);
+      toast.warning(`Không đủ chỗ trống!\n\nBạn đang đặt cho ${totalSeatsNeeded} người nhưng chỉ còn ${availableSlots} chỗ.\nVui lòng giảm số lượng hành khách hoặc chọn ngày khởi hành khác.`);
       return;
     }
 
     if (totalSeatsNeeded === 0) {
-      alert('Vui lòng chọn ít nhất 1 hành khách!');
+      toast.warning('Vui lòng chọn ít nhất 1 hành khách!');
       return;
     }
 
     if (!contactInfo.fullName.trim()) {
-      alert('Vui lòng nhập họ tên liên lạc!');
+      toast.warning('Vui lòng nhập họ tên liên lạc!');
       return;
     }
     if (!contactInfo.phone.trim()) {
-      alert('Vui lòng nhập số điện thoại!');
+      toast.warning('Vui lòng nhập số điện thoại!');
       return;
     }
     if (!contactInfo.email.trim()) {
-      alert('Vui lòng nhập email!');
+      toast.warning('Vui lòng nhập email!');
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(contactInfo.email)) {
-      alert('Email không hợp lệ!');
+      toast.warning('Email không hợp lệ!');
       return;
     }
 
     const phoneRegex = /^[0-9]{10,11}$/;
     if (!phoneRegex.test(contactInfo.phone)) {
-      alert('Số điện thoại phải có 10-11 chữ số!');
+      toast.warning('Số điện thoại phải có 10-11 chữ số!');
       return;
     }
 
@@ -339,18 +340,18 @@ const TourBooking = () => {
     for (let i = 0; i < allPassengers.length; i++) {
       const passenger = allPassengers[i];
       if (!passenger.name.trim()) {
-        alert(`Vui lòng nhập đầy đủ họ tên cho hành khách thứ ${i + 1}!`);
+        toast.warning(`Vui lòng nhập đầy đủ họ tên cho hành khách thứ ${i + 1}!`);
         return;
       }
       if (!passenger.birthDate) {
-        alert(`Vui lòng nhập ngày sinh cho hành khách thứ ${i + 1}!`);
+        toast.warning(`Vui lòng nhập ngày sinh cho hành khách thứ ${i + 1}!`);
         return;
       }
     }
 
     // 4. VALIDATE INFANT vs ADULT
     if (passengerData.infant.length > passengerData.adult.length) {
-      alert(`Số lượng em bé (${passengerData.infant.length}) không được vượt quá số người lớn (${passengerData.adult.length})!\n\nMỗi người lớn chỉ được đi kèm 1 em bé.`);
+      toast.warning(`Số lượng em bé (${passengerData.infant.length}) không được vượt quá số người lớn (${passengerData.adult.length})!\n\nMỗi người lớn chỉ được đi kèm 1 em bé.`);
       return;
     }
 
@@ -429,11 +430,11 @@ const TourBooking = () => {
   
   if (!bookingCode) {
     console.error(' No booking code in response:', response.data);
-    alert('Đặt tour thành công nhưng không nhận được mã booking.\nVui lòng kiểm tra email hoặc liên hệ CSKH: 1900-xxxx');
+    toast.error('Đặt tour thành công nhưng không nhận được mã booking.\nVui lòng kiểm tra email hoặc liên hệ CSKH: 1900-xxxx');
     return;
   }
 
-  alert(` Đặt tour thành công!\n\nMã đặt tour: ${bookingCode}\n\nVui lòng thanh toán trong vòng 24 giờ.`);
+  toast.success(` Đặt tour thành công!\n\nMã đặt tour: ${bookingCode}\n\nVui lòng thanh toán trong vòng 24 giờ.`);
 
   navigate(`/payment-booking?bookingCode=${bookingCode}`, {
     state: { bookingData: response.data }
@@ -460,7 +461,7 @@ const TourBooking = () => {
     }
   }
   
-  alert(errorMessage);
+  toast.error(errorMessage);
   
   if (errorMessage.includes('not enough seats') || errorMessage.includes('không còn đủ chỗ')) {
     window.location.reload();
