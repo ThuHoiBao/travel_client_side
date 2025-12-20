@@ -1,13 +1,9 @@
-/* src/components/InformationComponent/TransactionList/TransactionListItem/TransactionListItem.module.scss */
-
-// --- Variables ---
-$primary-color: #1890ff; // Màu xanh chính
-$danger-color: #ff4d4f; // Màu đỏ
-$success-color: #52c41a; // Màu xanh lá
+$primary-color: #1890ff; 
+$danger-color: #ff4d4f; 
+$success-color: #52c41a;
 $bg-light: #f7f7f7;
 $border-light: #e0e0e0;
 
-// --- Main Container ---
 .transactionItem {
     background-color: white;
     border-radius: 10px;
@@ -15,17 +11,15 @@ $border-light: #e0e0e0;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    border: 1px solid transparent; /* Viền trong suốt mặc định */
+    border: 1px solid transparent; 
 
-    // Hiệu ứng viền sáng hiện đại khi hover
     &:hover {
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        border-color: $primary-color; /* Viền sáng màu chủ đạo */
+        border-color: $primary-color;
         transform: translateY(-2px);
     }
 }
 
-// --- Header Section ---
 .header {
     background-color: $bg-light;
     padding: 12px 20px;
@@ -35,7 +29,6 @@ $border-light: #e0e0e0;
     border-bottom: 1px solid $border-light;
 }
 
-// --- Content Layout ---
 .content {
     display: flex;
     align-items: flex-start; 
@@ -43,7 +36,6 @@ $border-light: #e0e0e0;
     gap: 20px;
 }
 
-// --- Image ---
 .image {
     width: 200px; 
     height: 180px;
@@ -52,7 +44,6 @@ $border-light: #e0e0e0;
     flex-shrink: 0;
 }
 
-// --- Information ---
 .info {
     flex-grow: 1;
     display: flex;
@@ -81,7 +72,6 @@ $border-light: #e0e0e0;
     }
 }
 
-// --- Actions Area (Right side) ---
 .actions {
     display: flex;
     flex-direction: column;
@@ -117,20 +107,17 @@ $border-light: #e0e0e0;
     }
 }
 
-// --- Button Group (QUAN TRỌNG) ---
 .buttonGroup {
     display: flex;
     gap: 10px; 
     width: 100%;
     margin-top: 5px; 
     
-    // Đảm bảo các nút chia đều không gian nếu có 2 nút
     & > * {
         flex: 1 1 50%; 
         margin-top: 0 !important; 
     }
     
-    // Nếu chỉ có 1 nút (ví dụ: trạng thái PAID/OVERDUE_PAYMENT)
     &:only-child {
         & > * {
             width: 100%;
@@ -172,7 +159,6 @@ $border-light: #e0e0e0;
     width: 100%;
 }
 
-// --- Buttons ---
 .btnPrimary, .btnSecondary, .btnDanger, .btnDetail {
     padding: 10px 15px;
     border-radius: 8px;
@@ -226,7 +212,6 @@ $border-light: #e0e0e0;
     }
 }
 
-// --- Responsive Adjustments ---
 @media (max-width: 992px) {
     .content {
         flex-direction: column;

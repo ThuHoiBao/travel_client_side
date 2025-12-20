@@ -1,4 +1,3 @@
-// src/components/InformationComponent/TransactionList/TransactionListItem/TransactionListItem.jsx
 import React, { useState, useEffect } from 'react';
 import styles from './TransactionListItem.module.scss';
 import { FaTicketAlt, FaCalendarAlt, FaMoneyBillWave } from 'react-icons/fa'; 
@@ -6,35 +5,125 @@ import TransactionDetailModal from './TransactionDetailModal/TransactionDetailMo
 import { LuClock3, LuZap, LuEye, LuStar, LuClipboardList } from "react-icons/lu"; 
 import CancelOptionModal from './CancelOptionModal/CancelOptionModal';
 import ReviewComponent from '../ReviewComponent/ReviewComponent'; 
-import ViewReviewModal from '../ViewReviewModal/ViewReviewModal'; // ✨ IMPORT MỚI// ✨ IMPORT MỚI // Import Modal mới
+import ViewReviewModal from '../ViewReviewModal/ViewReviewModal'; 
+import { toast } from 'react-toastify';
+import axios from '../../../../utils/axiosCustomize';
 const TransactionListItem = ({ booking, refetch }) => {
     const [timeLeft, setTimeLeft] = useState('');
-    // State quản lý Modal
     const [isModalOpen, setIsModalOpen] = useState(false); 
-    // State quản lý Modal Hủy Tour
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [isViewReviewModalOpen, setIsViewReviewModalOpen] = useState(false);
-    // ✨ HÀM MỞ/ĐÓNG REVIEW MODAL
     const handleOpenReviewModal = () => setIsReviewModalOpen(true);
     const handleCloseReviewModal = () => setIsReviewModalOpen(false);
-    // Hàm mở Modal hủy
+    const [isPaymentLoading, setIsPaymentLoading] = useState(false);
+  const handlePaymentClick = async () => {
+        if (!booking || !booking.bookingCode) {
+            toast.error('Không tìm thấy thông tin booking!');
+            return;
+        }
+
+        if (booking.timeLimit) {
+            const deadline = new Date(booking.timeLimit);
+            const now = new Date();
+            if (now >= deadline) {
+                toast.error('Thời hạn thanh toán đã hết. Booking của bạn có thể đã bị hủy.');
+                return;
+            }
+        }
+
+        try {
+            setIsPaymentLoading(true);
+
+            const paymentRequest = {
+                bookingCode: booking.bookingCode,
+                amount: booking.totalPrice,
+                description: `Thanh toan ${booking.bookingCode}`,
+                returnUrl: window.location.origin + "/payment-waiting",
+                cancelUrl: window.location.origin + "/payment-cancel"
+            };
+
+            console.log('Creating PayOS payment request:', paymentRequest);
+
+            const response = await axios.post('/payment/payos/create', paymentRequest);
+
+            console.log('Payment response:', response);
+
+            let paymentUrl = null;
+            let orderCode = null;
+
+            if (response.data?.checkoutUrl) {
+                paymentUrl = response.data.checkoutUrl;
+                orderCode = response.data.transactionId;
+            } else if (response.data?.paymentUrl) {
+                paymentUrl = response.data.paymentUrl;
+                orderCode = response.data.transactionId;
+            } else if (response.paymentUrl) {
+                paymentUrl = response.paymentUrl;
+                orderCode = response.data?.transactionId;
+            } else if (response.data?.data?.checkoutUrl) {
+                paymentUrl = response.data.data.checkoutUrl;
+                orderCode = response.data.transactionId;
+            } else if (response.data?.url) {
+                paymentUrl = response.data.url;
+                orderCode = response.data.transactionId;
+            }
+
+            if (paymentUrl && orderCode) {
+                console.log('Redirecting to PayOS:', paymentUrl);
+
+                sessionStorage.setItem('pendingPaymentOrderCode', orderCode);
+                sessionStorage.setItem('pendingPaymentBookingCode', booking.bookingCode);
+
+                const paymentWindow = window.open(paymentUrl, '_blank');
+
+                if (!paymentWindow) {
+                    toast.warning('Vui lòng cho phép popup để mở trang thanh toán!');
+                }
+
+                setTimeout(() => {
+                    window.location.href = `/payment-waiting?orderCode=${orderCode}&bookingCode=${booking.bookingCode}`;
+                }, 1000);
+
+            } else {
+                throw new Error('Không tìm thấy đường dẫn thanh toán từ phản hồi server');
+            }
+
+        } catch (error) {
+            console.error('Payment error:', {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status,
+                fullError: error
+            });
+
+            let errorMessage = 'Không thể tạo thanh toán. Vui lòng thử lại sau.';
+
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.response?.data?.error) {
+                errorMessage = error.response.data.error;
+            } else if (error.message && !error.message.includes('Network Error')) {
+                errorMessage = error.message;
+            }
+
+            toast.error(errorMessage);
+        } finally {
+            setIsPaymentLoading(false);
+        }
+    };
     const handleCancelClick = () => {
         setIsCancelModalOpen(true);
     };
 
-    // Hàm đóng Modal hủy
     const handleCloseCancelModal = () => {
         setIsCancelModalOpen(false);
     };
-    // Hàm mở/đóng Modal
     const handleDetailClick = () => {
         setIsModalOpen(true);
     };
-    // ✨ HÀM MỞ/ĐÓNG XEM REVIEW MODAL
     const handleOpenViewReviewModal = () => setIsViewReviewModalOpen(true);
     const handleCloseViewReviewModal = () => setIsViewReviewModalOpen(false);
-    // --- Helper Functions ---
 
     const getStatusLabel = (status) => {
         switch (status) {
@@ -50,7 +139,6 @@ const TransactionListItem = ({ booking, refetch }) => {
         }
     };
 
-    // Hàm trả về màu nền cho Status Badge
     const getStatusStyle = (status) => {
         switch (status) {
             case 'PENDING_PAYMENT': return { backgroundColor: '#ffc107', color: 'white' };
@@ -58,7 +146,6 @@ const TransactionListItem = ({ booking, refetch }) => {
             case 'PAID': return { backgroundColor: '#52c41a', color: 'white' };
             case 'CANCELLED': 
             case 'OVERDUE_PAYMENT': return { backgroundColor: '#ff4d4f', color: 'white' };
-            // case 'PENDING_REVIEW': return { backgroundColor: '#f1513fff', color: 'white' };
             case 'REVIEWED': return { backgroundColor: '#17a2b8', color: 'white' };
             case 'PENDING_REFUND': return { backgroundColor: '#fa8c16', color: 'white' };
             default: return { backgroundColor: '#6c757d', color: 'white' };
@@ -76,7 +163,6 @@ const TransactionListItem = ({ booking, refetch }) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
     };
 
-    // --- Countdown Logic ---
 
     useEffect(() => {
         if (booking.bookingStatus !== 'PENDING_PAYMENT' || !booking.timeLimit) {
@@ -112,15 +198,12 @@ const TransactionListItem = ({ booking, refetch }) => {
     }, [booking.timeLimit, booking.bookingStatus]);
 
 
-    // --- Render Actions Area (Price, Status, Buttons) ---
-
     const renderActionArea = () => {
         
         let primaryButton = null; 
         let statusDisplay = null;
         let timeLimitDisplay = null;
         let showPlaceholder = false;
-        // Định nghĩa nút Xem chi tiết (được sử dụng lại)
         const detailButton = (
             <button
                 key="detail"
@@ -133,9 +216,23 @@ const TransactionListItem = ({ booking, refetch }) => {
 
         switch (booking.bookingStatus) {
             case 'PENDING_PAYMENT':
-                primaryButton = (
-                    <button key="pay" className={styles.btnPrimary}>
-                        <LuZap /> Thanh toán
+              primaryButton = (
+                    <button 
+                        key="pay" 
+                        className={styles.btnPrimary}
+                        onClick={handlePaymentClick}
+                        disabled={isPaymentLoading}
+                        style={{ opacity: isPaymentLoading ? 0.6 : 1 }}
+                    >
+                        {isPaymentLoading ? (
+                            <>
+                                <LuClock3 /> Đang chuyển...
+                            </>
+                        ) : (
+                            <>
+                                <LuZap /> Thanh toán
+                            </>
+                        )}
                     </button>
                 );
                 timeLimitDisplay = timeLeft && (
@@ -147,11 +244,10 @@ const TransactionListItem = ({ booking, refetch }) => {
 
             case 'PENDING_CONFIRMATION':
                 primaryButton = (
-                    // CẬP NHẬT: Thay thế hủy tour bằng việc mở Modal chọn phương thức hủy
                     <button 
                         key="cancel" 
                         className={styles.btnDanger}
-                        onClick={handleCancelClick} // Gọi hàm mở modal hủy
+                        onClick={handleCancelClick} 
                     >
                         Hủy tour
                     </button>
@@ -189,41 +285,31 @@ const TransactionListItem = ({ booking, refetch }) => {
 
             default:
                 showPlaceholder = true; 
-                // OVERDUE_PAYMENT không có primaryButton
                 break;
         }
 
-        // --- Cấu trúc lại Actions Container ---
         const placeholderButton = showPlaceholder ? <div key="placeholder" className={styles.btnPlaceholder}></div> : null;
         return (
             <div className={styles.actions}>
-                {/* 1. Status Badge */}
                 <div className={styles.statusBadge} style={getStatusStyle(booking.bookingStatus)}>
                     {getStatusLabel(booking.bookingStatus)}
                 </div>
                 
-                {/* 2. Price */}
                 <div className={styles.price}>
                      {formatPrice(booking.totalPrice)}
                 </div>
                 
-                {/* 3. Button Group (Nút Chính & Xem chi tiết) */}
-                {/* Nếu có nút hành động chính HOẶC trạng thái không phải CANCELLED/PAID/OVERDUE_PAYMENT */}
                 {
                     (primaryButton || booking.bookingStatus ) && (
                         <div className={styles.buttonGroup}>
-                            {/* Nút hành động chính (nếu có) */}
                             {primaryButton || (showPlaceholder && placeholderButton)}
-                            {/* Nút Xem chi tiết (luôn có, trừ trường hợp đặc biệt) */}
                             {detailButton}
                         </div>
                     )
                 }
                 
-                {/* 4. Time Limit (Nếu có) */}
                 {timeLimitDisplay}
                 
-                {/* 5. Cancel Reason (Nếu bị hủy) */}
                 {statusDisplay}
                 
             </div>
@@ -231,7 +317,6 @@ const TransactionListItem = ({ booking, refetch }) => {
     };
 
 
-    // --- Render Main Component ---
     return (
         <div className={styles.transactionItem}>
             <div className={styles.header}>
@@ -258,7 +343,6 @@ const TransactionListItem = ({ booking, refetch }) => {
                 
                 {renderActionArea()}
             </div>
-            {/* Modal Detail */}
             {isModalOpen && (
                 <TransactionDetailModal 
                     booking={booking} 
@@ -272,10 +356,9 @@ const TransactionListItem = ({ booking, refetch }) => {
                     booking={booking}
                     bookingID={booking.bookingID}
                     onClose={handleCloseCancelModal}
-                    onRefetch={refetch} // <--- LỖI: refetch chưa được truyền
+                    onRefetch={refetch} 
                 />
             )}
-            {/* ✨ MODAL VIẾT ĐÁNH GIÁ MỚI */}
             {isReviewModalOpen && (
                 <ReviewComponent
                     booking={booking}
@@ -283,7 +366,6 @@ const TransactionListItem = ({ booking, refetch }) => {
                     onRefetch={refetch}
                 />
             )}
-            {/* ✨ MODAL XEM ĐÁNH GIÁ MỚI */}
             {isViewReviewModalOpen && (
                 <ViewReviewModal
                     booking={booking}

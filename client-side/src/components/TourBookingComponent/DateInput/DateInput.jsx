@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import DatePicker from 'react-datepicker';
-import { IMaskInput } from 'react-imask'; // Thư viện mới
+import { IMaskInput } from 'react-imask'; 
 import { FaCalendarAlt } from 'react-icons/fa';
 import "react-datepicker/dist/react-datepicker.css";
 import { getYear, getMonth } from 'date-fns';
@@ -10,7 +10,6 @@ import styles from './DateInput.module.scss';
 
 const DateInput = ({ value, onChange, type }) => {
   
-  // Hàm kiểm tra độ tuổi (Giữ nguyên logic cũ)
   const validateAge = (date) => {
     if (!date) return true;
     
@@ -29,31 +28,28 @@ const DateInput = ({ value, onChange, type }) => {
     return true;
   };
 
-  // Custom Input sử dụng IMaskInput
   const CustomInput = forwardRef(({ value, onClick, onChange, className }, ref) => {
     return (
       <div className={styles.inputWrapper}>
         <IMaskInput
-          mask="00/00/0000" // 0 là ký tự số trong react-imask
+          mask="00/00/0000" 
           definitions={{
             '0': /[0-9]/
           }}
-          inputRef={ref} // QUAN TRỌNG: Chuyền ref vào inputRef để DatePicker định vị được
+          inputRef={ref} 
           value={value}
           
-          // DatePicker cần sự kiện onChange trả về object event giả lập
           onAccept={(value) => onChange({ target: { value } })} 
           
           onClick={onClick}
           placeholder="dd/mm/yyyy"
-          className={`${styles.inputField} ${className}`} // className từ DatePicker truyền xuống (nếu có)
+          className={`${styles.inputField} ${className}`} 
         />
         <FaCalendarAlt className={styles.icon} onClick={onClick} />
       </div>
     );
   });
 
-  // Xử lý khi chọn từ lịch (Giữ nguyên)
   const handleDateChange = (date) => {
     if (date) {
         const day = String(date.getDate()).padStart(2, '0');
@@ -74,7 +70,6 @@ const DateInput = ({ value, onChange, type }) => {
       return isNaN(date.getTime()) ? null : date;
   };
 
-  // Header tùy chỉnh của lịch (Giữ nguyên)
   const renderCustomHeader = ({
     date,
     changeYear,
@@ -108,7 +103,6 @@ const DateInput = ({ value, onChange, type }) => {
     );
   };
 
-  // Validate để hiển thị border đỏ
   const isValid = validateAge(getSelectedDate());
 
   return (
@@ -124,7 +118,6 @@ const DateInput = ({ value, onChange, type }) => {
         dropdownMode="select"
         placeholderText="dd/mm/yyyy"
         maxDate={new Date()} 
-        // Truyền style error xuống customInput nếu không hợp lệ
         className={!isValid ? styles.error : ''}
       />
       {!isValid && <span className={styles.errorMessage}>Độ tuổi không phù hợp</span>}
