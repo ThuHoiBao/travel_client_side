@@ -15,6 +15,9 @@ const DepartureList = () => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all'); // New state for date filter
+  const [customDateFrom, setCustomDateFrom] = useState(''); // New state for custom date range
+  const [customDateTo, setCustomDateTo] = useState(''); // New state for custom date range
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
@@ -38,17 +41,21 @@ const DepartureList = () => {
     bookedSlots: 0
   });
 
-   useEffect(() => {
-      loadLocations();
-    }, []);
+  useEffect(() => {
+    loadLocations();
+  }, []);
 
-     const loadLocations = async () => {
+  const loadLocations = async () => {
     try {
-      const response = await axios.get('/admin/locations/national');
+      const response = await axios.get('/admin/locations/national', {
+        params: {
+          page: 0,
+          size: 1000 
+        }
+      });
       if (response.data.content) {
         setLocations(response.data.content);
       }
-      console.log(response.data.content);
     } catch (error) {
       console.error('Error loading locations:', error);
       toast.error('Không thể tải danh sách địa điểm');
@@ -57,7 +64,62 @@ const DepartureList = () => {
 
   useEffect(() => {
     fetchDepartures();
-  }, [currentPage, statusFilter]);
+  }, [currentPage, statusFilter, dateFilter, customDateFrom, customDateTo]);
+
+  // Helper function to calculate date ranges
+  const getDateRange = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    switch (dateFilter) {
+      case 'today':
+        return {
+          from: today.toISOString().split('T')[0],
+          to: today.toISOString().split('T')[0]
+        };
+      
+      case 'thisWeek': {
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay());
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        return {
+          from: startOfWeek.toISOString().split('T')[0],
+          to: endOfWeek.toISOString().split('T')[0]
+        };
+      }
+      
+      case 'thisMonth': {
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        return {
+          from: startOfMonth.toISOString().split('T')[0],
+          to: endOfMonth.toISOString().split('T')[0]
+        };
+      }
+      
+      case 'nextMonth': {
+        const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+        const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+        return {
+          from: startOfNextMonth.toISOString().split('T')[0],
+          to: endOfNextMonth.toISOString().split('T')[0]
+        };
+      }
+      
+      case 'custom':
+        if (customDateFrom && customDateTo) {
+          return {
+            from: customDateFrom,
+            to: customDateTo
+          };
+        }
+        return null;
+      
+      default:
+        return null;
+    }
+  };
 
   const fetchDepartures = async () => {
     setLoading(true);
@@ -71,6 +133,13 @@ const DepartureList = () => {
 
       if (statusFilter !== 'all') {
         params.status = statusFilter === 'active';
+      }
+
+      // Add date range filter
+      const dateRange = getDateRange();
+      if (dateRange) {
+        params.startDate = dateRange.from;
+        params.endDate = dateRange.to;
       }
 
       const response = await axios.get('/admin/departures', { params });
@@ -160,10 +229,8 @@ const DepartureList = () => {
   };
 
   const handleEdit = async (departure) => {
-    // Fetch full departure details before opening modal
     const fullDeparture = await fetchDepartureDetail(departure.departureID);
     if (fullDeparture) {
-      console.log('Opening edit modal with data:', fullDeparture);
       setSelectedDeparture(fullDeparture);
       setShowFormModal(true);
     }
@@ -177,6 +244,17 @@ const DepartureList = () => {
   const handleCreateNew = () => {
     setSelectedDeparture(null);
     setShowFormModal(true);
+  };
+
+  const handleDateFilterChange = (value) => {
+    setDateFilter(value);
+    setCurrentPage(0);
+    
+    // Reset custom dates if not using custom filter
+    if (value !== 'custom') {
+      setCustomDateFrom('');
+      setCustomDateTo('');
+    }
   };
 
   const formatPrice = (price) => {
@@ -284,6 +362,45 @@ const DepartureList = () => {
           <option value="active">Đang hoạt động</option>
           <option value="inactive">Ngừng hoạt động</option>
         </select>
+
+        <select
+          value={dateFilter}
+          onChange={(e) => handleDateFilterChange(e.target.value)}
+          className={styles.filterSelect}
+        >
+          <option value="all">Tất cả thời gian</option>
+          <option value="today">Hôm nay</option>
+          <option value="thisWeek">Tuần này</option>
+          <option value="thisMonth">Tháng này</option>
+          <option value="nextMonth">Tháng sau</option>
+          <option value="custom">Tùy chỉnh</option>
+        </select>
+
+        {dateFilter === 'custom' && (
+          <div className={styles.dateRangeInputs}>
+            <input
+              type="date"
+              value={customDateFrom}
+              onChange={(e) => {
+                setCustomDateFrom(e.target.value);
+                setCurrentPage(0);
+              }}
+              className={styles.dateInput}
+              placeholder="Từ ngày"
+            />
+            <span className={styles.dateSeparator}>đến</span>
+            <input
+              type="date"
+              value={customDateTo}
+              onChange={(e) => {
+                setCustomDateTo(e.target.value);
+                setCurrentPage(0);
+              }}
+              className={styles.dateInput}
+              placeholder="Đến ngày"
+            />
+          </div>
+        )}
       </div>
 
       {/* Table */}
@@ -457,7 +574,6 @@ const DepartureList = () => {
           }}
           onEdit={async (departure) => {
             setShowDetailModal(false);
-            // Fetch full details before editing
             const fullDeparture = await fetchDepartureDetail(departure.departureID);
             if (fullDeparture) {
               setSelectedDeparture(fullDeparture);
