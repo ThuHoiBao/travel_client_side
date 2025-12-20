@@ -84,19 +84,12 @@ const Banner = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // VALIDATION
-        if (searchData.searchNameTour.trim() === '') {
-            setValidationError("Vui lòng nhập nơi bạn muốn đi!");
-            return;
-        }
         setValidationError('');
         setLoading(true);
         setError(null);
 
-        // 1. Tạo payload để truyền qua URL
-        const payload = {
-            searchNameTour: searchData.searchNameTour,
-        };
+        // 1. Tạo payload để truyền qua URL (không truyền searchNameTour)
+        const payload = {};
 
         if (searchData.endLocationID) {
             payload.endLocationID = searchData.endLocationID;
