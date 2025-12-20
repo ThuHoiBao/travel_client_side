@@ -39,15 +39,16 @@ $coin-color: #ffc107; // Màu vàng coin
 .logo {
     font-size: 1.2rem;
     font-weight: bold;
-    margin-right: 25px;
+    margin-right: 30px;
     color: white;
     cursor: pointer;
     text-decoration: none;
 }
 
 .logos {
+  margin-left: -20px;
   margin-top: 5px;
-  width: 65px;
+  width: 100px;
 }
 
 .navLink {

@@ -149,6 +149,7 @@ const CouponModal = ({ isOpen, onClose, onSubmit, editingCoupon }) => {
       toast.warning("Vui lòng chọn ít nhất một lịch khởi hành!");
       return;
     }
+    
     onSubmit(formData);
   };
 

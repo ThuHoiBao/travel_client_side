@@ -360,7 +360,7 @@ const TourForm = ({ tourId, onClose, onSuccess }) => {
         <div className={styles.modalHeader}>
           <div>
             <h2>{currentTourId ? 'Chỉnh sửa Tour' : 'Tạo Tour Mới'}</h2>
-            <p>{formData.tourCode || 'Chưa có mã tour'}</p>
+            <p style={{ color: '#fff' }}>{formData.tourCode || 'Chưa có mã tour'}</p>
           </div>
           <button className={styles.closeBtn} onClick={handleClose} type="button">
             <X size={24} />
