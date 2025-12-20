@@ -129,7 +129,7 @@ const Banner = () => {
                     <div className={`${styles.inputGroup} ${styles.destinationGroup}`}>
                         <FaMapMarkerAlt className={styles.icon} /> 
                         <div className={styles.inputLabels}>
-                            <label htmlFor="destination">Bạn muốn đi đâu?</label>
+                            <label htmlFor="destination">Bạn muốn đi đâu ?</label>
                             <input
                                 type="text"
                                 id="destination"
