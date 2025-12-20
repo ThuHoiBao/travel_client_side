@@ -12,9 +12,9 @@ $coin-color: #ffc107; // Màu vàng coin
     z-index: 100; 
     
     background-color: transparent;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: none;
     
-    transition: background-color 0.3s ease-in-out;
+    transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     
     padding: 10px 5%;
     display: flex;
@@ -28,6 +28,7 @@ $coin-color: #ffc107; // Màu vàng coin
 /* Trạng thái khi cuộn (Scrolled State) */
 .headerScrolled {
     background-color: $dark-blue; /* Màu xanh đậm khi cuộn */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .headerLeft {
