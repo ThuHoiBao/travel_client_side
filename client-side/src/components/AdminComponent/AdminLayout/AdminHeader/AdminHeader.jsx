@@ -90,7 +90,7 @@ const AdminHeader = () => {
     return (
         <header className={styles.adminHeader}>
             <div className={styles.leftSection}>
-               <img className={styles.logo} src='https://res.cloudinary.com/dnt8vx1at/image/upload/v1766129500/Future_Travel-removebg-preview_vkldki.png'></img>
+               <img className={styles.logo} src='https://res.cloudinary.com/dnt8vx1at/image/upload/v1766193584/FT_kpfvjq.png'></img>
             </div>
 
             <div className={styles.centerSection}>
