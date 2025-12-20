@@ -29,13 +29,10 @@ const TourBooking = () => {
   const [pointDiscount, setPointDiscount] = useState(0);
   const [pointsUsed, setPointsUsed] = useState(0);
   
-  // TODO: Thay bằng data thật từ auth context hoặc API
   const { user } = useAuth(); 
-  // Lấy params từ URL
   const tourCode = searchParams.get('tourCode');
   const departureId = searchParams.get('departureId');
 
-  // --- STATE ---
   const [loading, setLoading] = useState(true);
   const [bookingData, setBookingData] = useState(null);
   const [error, setError] = useState(null);
@@ -47,7 +44,6 @@ const TourBooking = () => {
     infant: []
   });
 
-  // State cho thông tin liên lạc
   const [contactInfo, setContactInfo] = useState({
     fullName: '',
     phone: '',
@@ -64,7 +60,6 @@ const TourBooking = () => {
   const [isAgreed, setIsAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // --- FETCH DATA FROM API ---
   useEffect(() => {
     const fetchBookingData = async () => {
       if (!tourCode || !departureId) {
@@ -82,7 +77,6 @@ const TourBooking = () => {
         const data = response.data || response;
         setBookingData(data);
        
-        // Auto apply departure coupon
         if (data.departureCoupon) {
           setAppliedDepartureCoupon({
             code: data.departureCoupon.code,
@@ -107,7 +101,6 @@ const TourBooking = () => {
     fetchBookingData();
   }, [tourCode, departureId]);
 
-  // Auto select best global coupon
   useEffect(() => {
     if (!bookingData || !bookingData.globalCoupons || appliedGlobalCoupon) return;
     
@@ -133,7 +126,6 @@ const TourBooking = () => {
     }
   }, [bookingData, passengerData, appliedGlobalCoupon]);
 
-  // Calculate remaining slots
   const maxSlots = bookingData?.availableSlots || 0;
   const currentPaxCount = 
     passengerData.adult.length + 
@@ -141,7 +133,6 @@ const TourBooking = () => {
     passengerData.toddler.length;
   const remainingSlots = maxSlots - currentPaxCount;
 
-  // --- LOGIC HÀNH KHÁCH ---
   const updatePassengerCount = (type, increment) => {
     setPassengerData(prev => {
       const currentList = prev[type];
@@ -329,7 +320,6 @@ const TourBooking = () => {
       return;
     }
 
-    // 3. VALIDATE HÀNH KHÁCH
     const allPassengers = [
       ...passengerData.adult,
       ...passengerData.child,
@@ -349,13 +339,11 @@ const TourBooking = () => {
       }
     }
 
-    // 4. VALIDATE INFANT vs ADULT
     if (passengerData.infant.length > passengerData.adult.length) {
       toast.warning(`Số lượng em bé (${passengerData.infant.length}) không được vượt quá số người lớn (${passengerData.adult.length})!\n\nMỗi người lớn chỉ được đi kèm 1 em bé.`);
       return;
     }
 
-    // 5. CHUẨN BỊ DATA ĐỂ GỬI
     const passengers = [];
 
     passengerData.adult.forEach(p => {
@@ -538,7 +526,6 @@ const TourBooking = () => {
     );
   };
 
-  // --- LOADING & ERROR STATES ---
   if (loading) {
     return (
       <div className={styles.pageContainer}>
@@ -594,7 +581,6 @@ const TourBooking = () => {
     <div className={styles.pageContainer}>
       <main className={styles.mainContent}>
        
-        {/* Stepper */}
         <div className={styles.stepperContainer}>
           <h1 className={styles.pageTitle}>ĐẶT TOUR</h1>
           <div className={styles.stepper}>
@@ -617,9 +603,7 @@ const TourBooking = () => {
 
         <div className={styles.bookingLayout}>
          
-          {/* === CỘT TRÁI === */}
           <div className={styles.leftColumn}>
-            {/* THÔNG TIN LIÊN LẠC */}
             <section className={styles.section}>
               <h2 className={styles.sectionHeader}>THÔNG TIN LIÊN LẠC</h2>
               <div className={styles.formGrid}>
@@ -662,7 +646,6 @@ const TourBooking = () => {
               </div>
             </section>
 
-            {/* SỐ LƯỢNG HÀNH KHÁCH */}
             <section className={styles.section}>
               <h2 className={styles.sectionHeader}>HÀNH KHÁCH</h2>
               <div className={styles.passengerGrid}>
@@ -706,7 +689,6 @@ const TourBooking = () => {
                 )}
               </div>
 
-              {/* Cảnh báo số chỗ còn lại */}
               {remainingSlots > 0 && remainingSlots <= 30 && (
                 <div style={{color: '#e31b23', fontWeight: 'bold', marginTop: '10px', fontSize: '14px'}}>
                   🔥 Chỉ còn {remainingSlots} chỗ cuối cùng!
@@ -720,7 +702,6 @@ const TourBooking = () => {
               )}
             </section>
 
-            {/* THÔNG TIN HÀNH KHÁCH */}
             <section className={styles.section}>
               <h2 className={styles.sectionHeader}>THÔNG TIN HÀNH KHÁCH</h2>
               {renderPassengerInputs('adult', 'Người lớn', 'Từ 12 trở lên', bookingData.adultPrice)}
@@ -729,7 +710,6 @@ const TourBooking = () => {
               {bookingData.infantPrice && renderPassengerInputs('infant', 'Em bé', 'Dưới 2 tuổi', bookingData.infantPrice)}
             </section>
 
-            {/* GHI CHÚ */}
             <section className={styles.section}>
               <h2 className={styles.sectionHeader}>GHI CHÚ</h2>
               <div className={styles.noteArea}>
@@ -742,10 +722,8 @@ const TourBooking = () => {
         </section>
       </div>
 
-      {/* === CỘT PHẢI === */}
       <div className={styles.rightColumn}>
        
-        {/* CARD 1: THÔNG TIN TOUR VÀ CHUYẾN BAY */}
         <div className={styles.summaryCard}>
           <div className={styles.tourSummary}>
             <img src={bookingData.image} alt="tour" className={styles.tourImg} />
@@ -755,7 +733,6 @@ const TourBooking = () => {
             </div>
           </div>
 
-          {/* THÔNG TIN CHUYẾN BAY */}
           {(outboundFlight || inboundFlight) && (
             <div className={styles.flightInfoContainer}>
               <div className={styles.sectionTitle}><FaPlane /> THÔNG TIN CHUYẾN BAY</div>
