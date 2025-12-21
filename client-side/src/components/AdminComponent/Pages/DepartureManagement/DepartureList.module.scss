@@ -244,17 +244,21 @@
 
     th {
       padding: 16px 24px;
-      text-align: left;
+      text-align: center;
       font-size: 12px;
       font-weight: 600;
       color: #374151;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      white-space: nowrap;
     }
+
+    
   }
 
   tbody {
     tr {
+      // white-space: n;
       border-bottom: 1px solid #f3f4f6;
       transition: background 0.2s;
 

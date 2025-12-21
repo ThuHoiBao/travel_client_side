@@ -135,7 +135,7 @@ const CouponModal = ({ isOpen, onClose, onSubmit, editingCoupon }) => {
     });
   };
 
-  const handleRemoveItem = (id) => {
+  const handleRemoveItem = (id) => {  
     setFormData(prev => ({
       ...prev,
       departureIds: prev.departureIds.filter(depId => depId !== id)

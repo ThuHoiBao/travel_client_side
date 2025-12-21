@@ -33,7 +33,6 @@ const Register = () => {
   const fetchProvinces = async () => {
     try {
       setLoading(true);
-      // Sử dụng API từ GitHub (static JSON, luôn available)
       const response = await fetch('https://raw.githubusercontent.com/kenzouno1/DiaGioiHanhChinhVN/master/data.json');
       const data = await response.json();
       
