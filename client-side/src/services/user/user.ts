@@ -1,5 +1,3 @@
-// services/user/user.ts
-
 import { api } from '../api.ts';
 import { UserRequestDTO } from '../../dto/requestDTO/UserRequestDTO.ts';
 import { UserUpdateRequestDTO } from '../../dto/requestDTO/UserUpdateRequestDTO.ts';
@@ -51,12 +49,33 @@ export const searchUsersApi = async (searchDTO: any, page: number, size: number)
     const response = await api.post(`/users/admin/search`, searchDTO, {
         params: { page, size }
     });
-    // Map content sang DTO plain object
-    const content = response.data.content.map((item: any) => UserRequestDTO.fromApiResponse(item).toPlain());
-    return { ...response.data, content };
+    const content = response.data.content.map((item: any) => {
+            const dto = UserRequestDTO.fromApiResponse(item);
+            const plain = dto.toPlain();
+            
+            return {
+                ...plain,
+                status: item.status,
+                lastActiveAt: item.lastActiveAt,
+                activityStatus: item.activityStatus
+            };
+        });
+
+        return { 
+            ...response.data, 
+            content 
+        };
 };
 
 export const lockUnlockUserApi = async (userID: number, status: boolean, reason: string) => {
     const response = await api.post(`/users/admin/update-status`, { userID, status, reason });
-    return UserRequestDTO.fromApiResponse(response.data).toPlain();
+    const dto = UserRequestDTO.fromApiResponse(response.data);
+        const plain = dto.toPlain();
+
+        return {
+            ...plain,
+            status: response.data.status,
+            lastActiveAt: response.data.lastActiveAt,
+            activityStatus: response.data.activityStatus
+        };
 };

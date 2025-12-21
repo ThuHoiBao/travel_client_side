@@ -22,10 +22,10 @@ const DepartureDetailModal = ({ departureId, onClose, onEdit }) => {
       if (response.data.success) {
         setDeparture(response.data.data);
       } else {
-        toast.error('Không thể tải chi tiết lịch khởi hành');
+        toast.error('Không thể tải chi tiết lịch khởi hành');  
         onClose();
       }
-    } catch (error) {
+    } catch (error) { 
       console.error('Error fetching departure detail:', error);
       toast.error(error.response?.data?.message || 'Không thể tải chi tiết lịch khởi hành');
       onClose();

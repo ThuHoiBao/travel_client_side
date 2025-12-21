@@ -15,16 +15,15 @@ const DepartureList = () => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [dateFilter, setDateFilter] = useState('all'); // New state for date filter
-  const [customDateFrom, setCustomDateFrom] = useState(''); // New state for custom date range
-  const [customDateTo, setCustomDateTo] = useState(''); // New state for custom date range
+  const [dateFilter, setDateFilter] = useState('all'); 
+  const [customDateFrom, setCustomDateFrom] = useState(''); 
+  const [customDateTo, setCustomDateTo] = useState(''); 
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const [pageSize] = useState(10);
   const [locations, setLocations] = useState([]);
 
-  // Modal states
   const [showFormModal, setShowFormModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedDeparture, setSelectedDeparture] = useState(null);
@@ -33,12 +32,11 @@ const DepartureList = () => {
   const [cloneLoading, setCloneLoading] = useState(false);
   const [idToClone, setIdToClone] = useState(null);
 
-  // Stats
   const [stats, setStats] = useState({
     total: 0,
     active: 0,
     totalSlots: 0,
-    bookedSlots: 0
+    totalBookings: 0
   });
 
   useEffect(() => {
@@ -155,7 +153,7 @@ const DepartureList = () => {
           total: data.length,
           active: data.filter(d => d.status).length,
           totalSlots: data.reduce((sum, d) => sum + (d.availableSlots || 0), 0),
-          bookedSlots: data.reduce((sum, d) => sum + (d.bookedSlots || 0), 0)
+          totalBookings: data.reduce((sum, d) => sum + (d.totalBookings || 0), 0)
         });
       }
     } catch (error) {
@@ -333,7 +331,7 @@ const DepartureList = () => {
           </div>
           <div className={styles.statContent}>
             <span className={styles.statLabel}>Đã đặt</span>
-            <span className={styles.statValue}>{stats.bookedSlots}</span>
+            <span className={styles.statValue}>{stats.totalBookings}</span>
           </div>
         </div>
       </div>
@@ -445,7 +443,7 @@ const DepartureList = () => {
                     <td>
                       <div className={styles.slotInfo}>
                         <span className={styles.availableSlots}>{departure.availableSlots} chỗ</span>
-                        <span className={styles.bookedSlots}>Đã đặt: {departure.bookedSlots}</span>
+                        <span className={styles.totalBookings}>Đã đặt: {departure.totalBookings}</span>
                       </div>
                     </td>
                     <td>
