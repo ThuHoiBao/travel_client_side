@@ -188,8 +188,6 @@ const Header = () => {
         setUnreadCount(0);
         setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
 
-        navigate('/information/notifications');
-
         try {
             await axios.put('/notifications/read-all');
             console.log('✅ Marked all as read');

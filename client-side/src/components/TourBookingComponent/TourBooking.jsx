@@ -5,7 +5,7 @@ import axios from '../../utils/axiosCustomize';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { toast } from 'react-toastify';
 import {
-    FaUser, FaBarcode, FaPlane, FaTag, FaTimes, FaCheckCircle, FaSpinner, FaCoins
+    FaUser, FaBarcode, FaPlane, FaTag, FaTimes, FaCheckCircle, FaSpinner, FaCoins, FaBus
 } from 'react-icons/fa';
 import DateInput from './DateInput/DateInput';
 import PointRedemption from './PointRedemption/PointRedemption';
@@ -735,7 +735,14 @@ const TourBooking = () => {
 
           {(outboundFlight || inboundFlight) && (
             <div className={styles.flightInfoContainer}>
-              <div className={styles.sectionTitle}><FaPlane /> THÔNG TIN CHUYẾN BAY</div>
+              <div className={styles.sectionTitle}>
+                {outboundFlight.vehicleType === 'PLANE' ? (
+                    <FaPlane className={styles.icon} />
+                  ) : (
+                    <FaBus className={styles.icon} />
+                )}
+                THÔNG TIN VỀ CHUYẾN ĐI
+                </div>
               <div className={styles.flightSection}>
                
                 {/* Outbound */}
@@ -759,7 +766,11 @@ const TourBooking = () => {
                       <div className={styles.dotLeft}></div>
                       <div className={styles.line}></div>
                       <div className={styles.dotRight}></div>
-                      <FaPlane className={styles.planeIcon} />
+                     {outboundFlight.vehicleType === 'PLANE' ? (
+                         <FaPlane className={styles.planeIcon} />
+                      ) : (
+                         <FaBus className={styles.planeIcon} />
+                      )}
                     </div>
                     <div className={styles.routeInfo}>
                       <span className={styles.airportCode} title={outboundFlight.startPointName}>
@@ -769,6 +780,7 @@ const TourBooking = () => {
                         {outboundFlight.endPoint}
                       </span>
                     </div>
+                       <p className={styles.flightInfo}>{outboundFlight.vehicleName}</p>
                   </div>
                 )}
 
@@ -795,7 +807,11 @@ const TourBooking = () => {
                       <div className={styles.dotLeft}></div>
                       <div className={styles.line}></div>
                       <div className={styles.dotRight}></div>
-                      <FaPlane className={styles.planeIcon} style={{transform: 'rotate(180deg)'}}/>
+                        {inboundFlight.vehicleType === 'PLANE' ? (
+                         <FaPlane className={styles.planeIcon} style={{transform: 'rotate(180deg)' ,top: '-5px'}} />
+                      ) : (
+                         <FaBus className={styles.planeIcon} style={{transform: 'rotate(180deg)', top: '-5px'}} />
+                      )}
                     </div>
                     <div className={styles.routeInfo}>
                       <span className={styles.airportCode} title={inboundFlight.startPointName}>
@@ -805,6 +821,7 @@ const TourBooking = () => {
                         {inboundFlight.endPoint}
                       </span>
                     </div>
+                       <p className={styles.flightInfo}>{inboundFlight.vehicleName}</p>
                   </div>
                 )}
               </div>

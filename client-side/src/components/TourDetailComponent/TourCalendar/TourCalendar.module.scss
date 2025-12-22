@@ -191,27 +191,26 @@
 
 /* FLIGHT INFO */
 .flightSection {
-  display: flex; /* Xếp 2 cột nằm ngang */
-  gap: 40px; /* Khoảng cách giữa 2 cột */
+  display: flex; 
+  gap: 40px; 
   padding: 10px 0;
   margin-bottom: 30px;
   border-bottom: 1px dashed #eee;
   
   @media (max-width: 768px) {
-    flex-direction: column; /* Mobile thì xếp dọc */
+    flex-direction: column; 
     gap: 30px;
   }
 }
 
 .flightColumn {
-  flex: 1; /* Mỗi cột chiếm 50% */
+  flex: 1;
   position: relative;
 
-  /* Tạo đường kẻ dọc ngăn cách giữa 2 cột */
   &:first-child::after {
     content: '';
     position: absolute;
-    right: -20px; /* Nằm chính giữa khoảng gap 40px */
+    right: -20px;
     top: 10%;
     height: 80%;
     width: 1px;
@@ -219,11 +218,10 @@
   }
 
   @media (max-width: 768px) {
-    &:first-child::after { display: none; } /* Ẩn kẻ dọc trên mobile */
+    &:first-child::after { display: none; } 
   }
 }
 
-/* Dòng 1: Ngày đi & Mã chuyến bay */
 .topRow {
   display: flex;
   justify-content: space-between;
@@ -248,7 +246,6 @@
   }
 }
 
-/* Dòng 2: Giờ bay (Nằm 2 đầu) */
 .timeRow {
   display: flex;
   justify-content: space-between;
@@ -258,7 +255,6 @@
   margin-bottom: 5px;
 }
 
-/* Dòng 3: Thanh Timeline (Line xám + 2 cục vuông) */
 .timelineBar {
   position: relative;
   height: 10px;
@@ -269,16 +265,16 @@
   .line {
     width: 100%;
     height: 4px;
-    background-color: #e0e0e0; /* Màu xám nhạt của thanh */
+    background-color: #e0e0e0; 
     border-radius: 2px;
   }
 
   .dotLeft, .dotRight {
     width: 10px;
     height: 10px;
-    background-color: #ccc; /* Màu xám đậm hơn của cục vuông */
+    background-color: #ccc; 
     position: absolute;
-    border-radius: 2px; /* Bo góc nhẹ cho giống hình */
+    border-radius: 2px; 
   }
 
   .dotLeft { left: 0; }
@@ -290,12 +286,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 5px; /* Canh lề nhẹ cho thẳng với chấm tròn */
+  padding: 0 5px; 
   position: relative;
-  margin-top: -5px; /* Kéo lên gần timeline một chút */
+  margin-top: -5px;
 
   .airlineLogo {
-    height: 20px; /* Logo nhỏ ở giữa */
+    height: 20px;
     object-fit: contain;
   }
 
@@ -303,20 +299,17 @@
     font-weight: 700;
     font-size: 14px;
     color: #333;
-    cursor: help; /* Con trỏ chuột hình dấu ? */
-    position: relative; /* Để định vị tooltip con */
+    cursor: help; 
+    position: relative;
 
-    /* --- TẠO TOOLTIP BẰNG CSS --- */
-    
-    /* 1. Phần nội dung Tooltip */
     &::after {
-      content: attr(data-tooltip); /* Lấy nội dung từ data-tooltip */
+      content: attr(data-tooltip); 
       position: absolute;
-      bottom: 100%; /* Nằm bên trên */
+      bottom: 100%; 
       left: 50%;
       transform: translateX(-50%);
-      background-color: #ebf8ff; /* Màu nền xanh nhạt giống ảnh */
-      color: #0050b3; /* Màu chữ xanh đậm */
+      background-color: #ebf8ff;
+      color: #0050b3;
       padding: 8px 12px;
       border-radius: 6px;
       border: 1px solid #91d5ff;
@@ -326,15 +319,13 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       z-index: 100;
       
-      /* Ẩn mặc định */
       opacity: 0;
       visibility: hidden;
       transition: all 0.2s ease;
       pointer-events: none;
-      margin-bottom: 10px; /* Cách xa chữ một chút */
+      margin-bottom: 10px; 
     }
 
-    /* 2. Mũi tên nhọn bên dưới Tooltip */
     &::before {
       content: '';
       position: absolute;
@@ -342,29 +333,36 @@
       left: 50%;
       transform: translateX(-50%);
       border: 6px solid transparent;
-      border-top-color: #91d5ff; /* Màu mũi tên trùng màu viền */
-      margin-bottom: -2px; /* Tinh chỉnh vị trí mũi tên */
+      border-top-color: #91d5ff;
+      margin-bottom: -2px; 
       
       opacity: 0;
       visibility: hidden;
       transition: all 0.2s ease;
     }
 
-    /* Hiệu ứng Hover: Hiện tooltip */
     &:hover::after,
     &:hover::before {
       opacity: 1;
       visibility: visible;
-      transform: translateX(-50%) translateY(-5px); /* Nảy lên nhẹ */
+      transform: translateX(-50%) translateY(-5px); 
     }
   }
+}
+
+.flightInfo { 
+  text-align: center;
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: black;
 }
 
 
 /* PRICING GRID */
 .pricingGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* 2 cột */
+  grid-template-columns: 1fr 1fr; 
   column-gap: 40px;
   row-gap: 15px;
 

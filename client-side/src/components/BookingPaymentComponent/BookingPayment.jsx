@@ -11,7 +11,8 @@ import {
   FaSpinner,
   FaChevronDown,
   FaChevronUp,
-  FaTag
+  FaTag,
+  FaBus
 } from 'react-icons/fa';
 
 const BookingPayment = () => {
@@ -457,7 +458,7 @@ const BookingPayment = () => {
                     </div>
                     <div className={styles.metaItem}>
                       <FaBarcode /> {bookingData.tourCode}
-                    </div>
+                    </div>  
                     <div className={styles.metaItem}>
                       <FaClock /> {bookingData.duration}
                     </div>
@@ -468,7 +469,14 @@ const BookingPayment = () => {
               {/* Flight Info */}
               {(bookingData.outboundTransport || bookingData.inboundTransport) && (
                 <div className={styles.flightInfoContainer}>
-                  <h4><FaPlane /> THÔNG TIN CHUYẾN BAY</h4>
+                  <h4>
+                    {bookingData.outboundTransport.vehicleType === 'PLANE' ? (
+                    <FaPlane className={styles.icon} />
+                     ) : (
+                     <FaBus className={styles.icon} />
+                   )}
+                     THÔNG TIN VỀ CHUYẾN ĐI
+                  </h4>
                   
                   <div className={styles.flightSection}>
                     {/* Outbound */}
@@ -494,7 +502,11 @@ const BookingPayment = () => {
                           <div className={styles.dotLeft}></div>
                           <div className={styles.line}></div>
                           <div className={styles.dotRight}></div>
-                          <FaPlane className={styles.planeIcon} />
+                          {bookingData.outboundTransport.vehicleType === 'PLANE' ? (
+                         <FaPlane className={styles.planeIcon} />
+                           ) : (
+                             <FaBus className={styles.planeIcon} />
+                          )}
                         </div>
                         <div className={styles.routeInfo}>
                           <span className={styles.airportCode} title={bookingData.outboundTransport.startPointName}>
@@ -504,6 +516,7 @@ const BookingPayment = () => {
                             {bookingData.outboundTransport.endPoint}
                           </span>
                         </div>
+                           <p className={styles.flightInfo}>{bookingData.outboundTransport.vehicleName}</p>
                       </div>
                     )}
 
@@ -534,7 +547,11 @@ const BookingPayment = () => {
                           <div className={styles.dotLeft}></div>
                           <div className={styles.line}></div>
                           <div className={styles.dotRight}></div>
-                          <FaPlane className={`${styles.planeIcon} ${styles.return}`} />
+                          {bookingData.inboundTransport.vehicleType === 'PLANE' ? (
+                            <FaPlane className={styles.planeIcon} />
+                              ) : (
+                                <FaBus className={styles.planeIcon} />
+                          )}
                         </div>
                         <div className={styles.routeInfo}>
                           <span className={styles.airportCode} title={bookingData.inboundTransport.startPointName}>
@@ -544,6 +561,7 @@ const BookingPayment = () => {
                             {bookingData.inboundTransport.endPoint}
                           </span>
                         </div>
+                           <p className={styles.flightInfo}>{bookingData.inboundTransport.vehicleName}</p>
                       </div>
                     )}
                   </div>

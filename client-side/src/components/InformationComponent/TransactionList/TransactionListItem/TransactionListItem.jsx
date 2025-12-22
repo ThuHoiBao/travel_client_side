@@ -17,100 +17,13 @@ const TransactionListItem = ({ booking, refetch }) => {
     const handleOpenReviewModal = () => setIsReviewModalOpen(true);
     const handleCloseReviewModal = () => setIsReviewModalOpen(false);
     const [isPaymentLoading, setIsPaymentLoading] = useState(false);
-  const handlePaymentClick = async () => {
+    const handlePaymentClick = () => {
         if (!booking || !booking.bookingCode) {
             toast.error('Không tìm thấy thông tin booking!');
             return;
         }
 
-        if (booking.timeLimit) {
-            const deadline = new Date(booking.timeLimit);
-            const now = new Date();
-            if (now >= deadline) {
-                toast.error('Thời hạn thanh toán đã hết. Booking của bạn có thể đã bị hủy.');
-                return;
-            }
-        }
-
-        try {
-            setIsPaymentLoading(true);
-
-            const paymentRequest = {
-                bookingCode: booking.bookingCode,
-                amount: booking.totalPrice,
-                description: `Thanh toan ${booking.bookingCode}`,
-                returnUrl: window.location.origin + "/payment-waiting",
-                cancelUrl: window.location.origin + "/payment-cancel"
-            };
-
-            console.log('Creating PayOS payment request:', paymentRequest);
-
-            const response = await axios.post('/payment/payos/create', paymentRequest);
-
-            console.log('Payment response:', response);
-
-            let paymentUrl = null;
-            let orderCode = null;
-
-            if (response.data?.checkoutUrl) {
-                paymentUrl = response.data.checkoutUrl;
-                orderCode = response.data.transactionId;
-            } else if (response.data?.paymentUrl) {
-                paymentUrl = response.data.paymentUrl;
-                orderCode = response.data.transactionId;
-            } else if (response.paymentUrl) {
-                paymentUrl = response.paymentUrl;
-                orderCode = response.data?.transactionId;
-            } else if (response.data?.data?.checkoutUrl) {
-                paymentUrl = response.data.data.checkoutUrl;
-                orderCode = response.data.transactionId;
-            } else if (response.data?.url) {
-                paymentUrl = response.data.url;
-                orderCode = response.data.transactionId;
-            }
-
-            if (paymentUrl && orderCode) {
-                console.log('Redirecting to PayOS:', paymentUrl);
-
-                sessionStorage.setItem('pendingPaymentOrderCode', orderCode);
-                sessionStorage.setItem('pendingPaymentBookingCode', booking.bookingCode);
-
-                const paymentWindow = window.open(paymentUrl, '_blank');
-
-                if (!paymentWindow) {
-                    toast.warning('Vui lòng cho phép popup để mở trang thanh toán!');
-                }
-
-                setTimeout(() => {
-                    window.location.href = `/payment-waiting?orderCode=${orderCode}&bookingCode=${booking.bookingCode}`;
-                }, 1000);
-
-            } else {
-                throw new Error('Không tìm thấy đường dẫn thanh toán từ phản hồi server');
-            }
-
-        } catch (error) {
-            console.error('Payment error:', {
-                message: error.message,
-                response: error.response?.data,
-                status: error.response?.status,
-                fullError: error
-            });
-
-            let errorMessage = 'Không thể tạo thanh toán. Vui lòng thử lại sau.';
-
-            if (error.response?.data?.message) {
-                errorMessage = error.response.data.message;
-            } else if (error.response?.data?.error) {
-                errorMessage = error.response.data.error;
-            } else if (error.message && !error.message.includes('Network Error')) {
-                errorMessage = error.message;
-            }
-
-            toast.error(errorMessage);
-        } finally {
-            setIsPaymentLoading(false);
-        }
+        window.location.href = `/payment-booking?bookingCode=${booking.bookingCode}`;
     };
     const handleCancelClick = () => {
         setIsCancelModalOpen(true);

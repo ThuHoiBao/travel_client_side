@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from './TourCalendar.module.scss';
-import { FaChevronLeft, FaChevronRight, FaRegCalendarAlt, FaArrowLeft, FaPlane } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaRegCalendarAlt, FaArrowLeft, FaPlane, FaBus } from 'react-icons/fa';
 
 const TourCalendar = ({departures, onDepartureSelect, selectedDepartureId}) => {
   const [currentMonth, setCurrentMonth] = useState({
@@ -177,7 +177,8 @@ const renderCalendarDays = () => {
                 <div className={styles.topRow}>
                           <span className={styles.label}>Ngày đi - {new Date(outbound.departTime).toLocaleDateString('vi-VN')}</span>
                           <div className={styles.flightCode}>
-                            <FaPlane className={styles.icon} /> {outbound.transportCode}
+                            {outbound.vehicleType === 'PLANE' ? <FaPlane className={styles.icon} /> : <FaBus className={styles.icon} />}
+                            {outbound.transportCode}
                           </div>
                         </div>
                         
@@ -209,6 +210,7 @@ const renderCalendarDays = () => {
                             {outbound.endPoint}
                         </span>
                       </div>
+                       <p className={styles.flightInfo}>{outbound.vehicleName}</p>
               </>
             ) : <div className={styles.noInfo}>Đang cập nhập chuyến đi</div>
           }
@@ -222,8 +224,10 @@ const renderCalendarDays = () => {
                   <div className={styles.topRow}>
                     <span className={styles.label}>Ngày về - {new Date(inbound.departTime).toLocaleDateString('vi-VN')}</span> 
                     <div className={styles.flightCode}>
-                      <FaPlane className={styles.icon} /> {inbound.transportCode}
+                      {inbound.vehicleType === 'PLANE' ? <FaPlane className={styles.icon} /> : <FaBus className={styles.icon} />} 
+                      {inbound.transportCode}
                     </div>
+                   
                   </div>
 
                   <div className={styles.timeRow}>
@@ -253,7 +257,8 @@ const renderCalendarDays = () => {
                         >
                             {inbound.endPoint}
                         </span>
-                      </div>
+                    </div>
+                     <p className={styles.flightInfo}>{inbound.vehicleName}</p>
               </>
             ) : <><div className={styles.noInfo}>Đang cập nhập chuyến về</div></>
           }
