@@ -4,28 +4,37 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './RefundInfoModal.module.scss';
 import { requestRefundApi } from '../../../../../services/booking/booking.ts'; 
-import { FaMoneyCheckAlt, FaChevronDown, FaTimes } from 'react-icons/fa'; // Import thêm icon
-// Giả định BANK_LIST được import từ 1 file riêng hoặc được định nghĩa ở đây
+import { FaMoneyCheckAlt, FaTimes, FaChevronDown, FaCheckCircle } from 'react-icons/fa';
+
 const BANK_LIST = [
-    { code: 'AGR', name: 'Ngân hàng Agribank', icon: 'AGRIBANK' },
-    { code: 'VTB', name: 'Ngân hàng VietinBank', icon: 'VietinBank' },
-    { code: 'BIDV', name: 'Ngân hàng BIDV', icon: 'BIDV' },
-    { code: 'ACB', name: 'Ngân hàng ACB', icon: 'ACB' },
-    { code: 'TCB', name: 'Ngân hàng Techcombank', icon: 'TECHCOMBANK' },
-    { code: 'VPB', name: 'Ngân hàng VPBank', icon: 'VPBank' },
-    { code: 'HDB', name: 'Ngân hàng HDBank', icon: 'HDBank' },
-    { code: 'LPB', name: 'Ngân hàng LienVietPostBank', icon: 'LienVietPostBank' },
-    { code: 'SHB', name: 'Ngân hàng SHB', icon: 'SHB' },
-    { code: 'TPB', name: 'Ngân hàng TPBank', icon: 'TPBank' },
-    { code: 'SEAB', name: 'Ngân hàng SeaBank', icon: 'SeaBank' },
-    { code: 'MB', name: 'Ngân hàng MB', icon: 'MB' },
-    { code: 'MSB', name: 'Ngân hàng MSB', icon: 'MSB' },
-    { code: 'VIB', name: 'Ngân hàng VIB', icon: 'VIB' },
-    { code: 'NCB', name: 'Ngân hàng NCB', icon: 'NCB' },
-    //...
+    { code: 'VCB', name: 'Vietcombank', shortName: 'VCB', bin: '970436', color: '#0c8e57' },
+    { code: 'VTB', name: 'VietinBank', shortName: 'VTB', bin: '970415', color: '#003da5' },
+    { code: 'BIDV', name: 'BIDV', shortName: 'BIDV', bin: '970418', color: '#a1272f' },
+    { code: 'AGR', name: 'Agribank', shortName: 'AGR', bin: '970405', color: '#0066b2' },
+    { code: 'ACB', name: 'ACB', shortName: 'ACB', bin: '970416', color: '#00a7d0' },
+    { code: 'TCB', name: 'Techcombank', shortName: 'TCB', bin: '970407', color: '#e91c23' },
+    { code: 'VPB', name: 'VPBank', shortName: 'VPB', bin: '970432', color: '#1e5c96' },
+    { code: 'HDB', name: 'HDBank', shortName: 'HDB', bin: '970437', color: '#f4a920' },
+    { code: 'LPB', name: 'LienVietPostBank', shortName: 'LPB', bin: '970449', color: '#e84e1f' },
+    { code: 'SHB', name: 'SHB', shortName: 'SHB', bin: '970443', color: '#ff6b35' },
+    { code: 'TPB', name: 'TPBank', shortName: 'TPB', bin: '970423', color: '#6f31a8' },
+    { code: 'SEAB', name: 'SeaBank', shortName: 'SEAB', bin: '970440', color: '#ff9500' },
+    { code: 'MB', name: 'MB Bank', shortName: 'MB', bin: '970422', color: '#e30613' },
+    { code: 'MSB', name: 'MSB', shortName: 'MSB', bin: '970426', color: '#c41e3a' },
+    { code: 'VIB', name: 'VIB', shortName: 'VIB', bin: '970441', color: '#ffc20e' },
+    { code: 'NCB', name: 'NCB', shortName: 'NCB', bin: '970419', color: '#00308e' },
+    { code: 'SAC', name: 'Sacombank', shortName: 'SAC', bin: '970403', color: '#1e6dd2' },
+    { code: 'EXIM', name: 'Eximbank', shortName: 'EXIM', bin: '970431', color: '#007ac3' },
 ];
 
-// Component Modal chọn Ngân hàng
+const getBankLogo = (bank) => (bank.bin ? `https://api.vietqr.io/img/${bank.bin}.png` : '');
+
+const handleLogoError = (event) => {
+    const fallbackEl = event.currentTarget.nextElementSibling;
+    if (fallbackEl) fallbackEl.style.display = 'flex';
+    event.currentTarget.style.display = 'none';
+};
+
 const BankSelectionModal = ({ onSelect, onClose }) => {
     const handleBankClick = (bankCode) => {
         onSelect(bankCode);
@@ -34,17 +43,37 @@ const BankSelectionModal = ({ onSelect, onClose }) => {
 
     const bankSelectionJSX = (
         <div className={styles.bankSelectOverlay} onClick={onClose}>
-            <div className={styles.bankSelectContent} onClick={e => e.stopPropagation()}>
+            <div className={styles.bankSelectContent} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.bankSelectHeader}>
                     <h4>Chọn Ngân hàng hưởng thụ</h4>
                     <FaTimes className={styles.closeIcon} onClick={onClose} />
                 </div>
-                <div className={styles.bankList}>
-                    {BANK_LIST.map(bank => (
-                        <div key={bank.code} className={styles.bankItem} onClick={() => handleBankClick(bank.code)}>
-                            {/* Thay thế icon bằng logo thực tế nếu có */}
-                            <span className={styles.bankIconPlaceholder}>{bank.icon.substring(0, 2)}</span> 
-                            <span className={styles.bankName}>{bank.name}</span>
+                <div className={styles.bankGrid}>
+                    {BANK_LIST.map((bank) => (
+                        <div
+                            key={bank.code}
+                            className={styles.bankCard}
+                            onClick={() => handleBankClick(bank.code)}
+                        >
+                            <div className={styles.bankEmblem}>
+                                <img
+                                    src={getBankLogo(bank)}
+                                    alt={bank.name}
+                                    className={styles.bankLogo}
+                                    loading="lazy"
+                                    onError={handleLogoError}
+                                />
+                                <div
+                                    className={styles.logoFallback}
+                                    style={{ backgroundColor: bank.color }}
+                                >
+                                    {bank.shortName}
+                                </div>
+                            </div>
+                            <div className={styles.bankInfo}>
+                                <span className={styles.bankName}>{bank.name}</span>
+                                <span className={styles.bankCode}>BIN: {bank.bin}</span>
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -70,7 +99,6 @@ const RefundInfoModal = ({ bookingID, booking, onClose, onBack, onRefetch }) => 
     const [showBankModal, setShowBankModal] = useState(false); // State quản lý modal chọn Bank
 
     const selectedBank = BANK_LIST.find(b => b.code === formData.bank);
-    const selectedBankName = selectedBank ? selectedBank.name : formData.bank;
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -109,79 +137,127 @@ const RefundInfoModal = ({ bookingID, booking, onClose, onBack, onRefetch }) => 
         }
     };
 
-    // --- JSX cho Modal Thông báo Thành công/Lỗi ---
-    if (successMessage) {
-        // ... (JSX thông báo thành công giữ nguyên)
-         const successModalJSX = (
-            <div className={styles.modalOverlay} onClick={onClose}>
-                <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
-                    <h3 className={styles.successTitle}>Thông báo</h3>
-                    <p className={styles.successMessage}>{successMessage}</p>
-                    <button 
-                        className={styles.btnPrimary} 
-                        onClick={handleCloseAndReload} // Tải lại trang khi nhấn Đóng
+        // --- JSX cho Modal Thông báo Thành công ---
+        if (successMessage) {
+            const successModalJSX = (
+                <div className={styles.modalOverlay} onClick={onClose}>
+                    <div
+                        className={`${styles.modalContent} ${styles.successContent}`}
+                        onClick={(e) => e.stopPropagation()}
                     >
-                        Đóng
-                    </button>
+                        <div className={styles.successIcon}>
+                            <FaCheckCircle />
+                        </div>
+                        <h3 className={styles.successTitle}>Thành công!</h3>
+                        <p className={styles.successMessage}>{successMessage}</p>
+                        <div className={styles.successActions}>
+                            <button 
+                                className={styles.successButton} 
+                                onClick={handleCloseAndReload}
+                            >
+                                Đóng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+            return createPortal(successModalJSX, document.body); 
+        }
+
+        // --- JSX cho Modal Nhập thông tin Hoàn tiền ---
+        const refundInfoModalJSX = (
+            <div className={styles.modalOverlay} onClick={onClose}>
+                {showBankModal && (
+                    <BankSelectionModal 
+                        onSelect={handleBankSelect} 
+                        onClose={() => setShowBankModal(false)}
+                    />
+                )}
+
+                <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                    <div className={styles.headerSection}>
+                        <div className={styles.icon}>
+                            <FaMoneyCheckAlt />
+                        </div>
+                        <h3 className={styles.title}>Thông Tin Hoàn Tiền Ngân Hàng</h3>
+                        <p className={styles.description}>Điền thông tin tài khoản để nhận tiền hoàn trả</p>
+                    </div>
+
+                    <div className={styles.formSection}>
+                        <div className={styles.formGroup}>
+                            <label htmlFor="accountName">Tên chủ tài khoản *</label>
+                            <input 
+                                type="text" 
+                                id="accountName" 
+                                name="accountName" 
+                                value={formData.accountName} 
+                                onChange={handleChange} 
+                                placeholder="Nhập tên chủ tài khoản"
+                                required 
+                            />
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label htmlFor="accountNumber">Số tài khoản *</label>
+                            <input 
+                                type="text" 
+                                id="accountNumber" 
+                                name="accountNumber" 
+                                value={formData.accountNumber} 
+                                onChange={handleChange} 
+                                placeholder="Nhập số tài khoản"
+                                required 
+                            />
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label>Ngân hàng hưởng thụ *</label>
+                            <div className={styles.bankSelectTrigger} onClick={() => setShowBankModal(true)}>
+                                {selectedBank ? (
+                                    <div className={styles.selectedBankInfo}>
+                                        <div className={styles.bankEmblem}>
+                                            <img
+                                                src={getBankLogo(selectedBank)}
+                                                alt={selectedBank.name}
+                                                className={styles.bankLogo}
+                                                onError={handleLogoError}
+                                            />
+                                            <div
+                                                className={styles.logoFallback}
+                                                style={{ backgroundColor: selectedBank.color }}
+                                            >
+                                                {selectedBank.shortName}
+                                            </div>
+                                        </div>
+                                        <div className={styles.selectedBankText}>
+                                            <span className={styles.bankName}>{selectedBank.name}</span>
+                                            <span className={styles.bankCode}>BIN: {selectedBank.bin}</span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <span className={styles.placeholder}>Chọn ngân hàng...</span>
+                                )}
+                                <FaChevronDown />
+                            </div>
+                            <input type="hidden" name="bank" value={formData.bank} /> 
+                        </div>
+
+                        {error && <div className={styles.error}>{error}</div>}
+                    </div>
+
+                    <div className={styles.buttonGroup}>
+                        <button className={styles.btnSecondary} onClick={onBack} disabled={isProcessing}>Hủy</button>
+                        <button 
+                            className={styles.btnPrimary} 
+                            onClick={handleConfirmRefund} 
+                            disabled={isProcessing}
+                        >
+                            {isProcessing ? 'Đang xử lý...' : 'Xác nhận'}
+                        </button>
+                    </div>
                 </div>
             </div>
         );
-        return createPortal(successModalJSX, document.body); 
-    }
-
-    // --- JSX cho Modal Nhập thông tin Hoàn tiền ---
-    const refundInfoModalJSX = (
-        <div className={styles.modalOverlay} onClick={onClose}>
-            {/* ✅ Hiển thị BankSelectionModal nếu showBankModal là true */}
-            {showBankModal && (
-                <BankSelectionModal 
-                    onSelect={handleBankSelect} 
-                    onClose={() => setShowBankModal(false)}
-                />
-            )}
-
-            <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
-                <FaMoneyCheckAlt className={styles.icon} />
-                <h3 className={styles.title}>Thông Tin Hoàn Tiền Ngân Hàng</h3>
-                <p className={styles.description}>Vui lòng điền thông tin tài khoản để nhận tiền hoàn trả.</p>
-
-                <div className={styles.formGroup}>
-                    <label htmlFor="accountName">Tên chủ tài khoản *</label>
-                    <input type="text" id="accountName" name="accountName" value={formData.accountName} onChange={handleChange} required />
-                </div>
-                <div className={styles.formGroup}>
-                    <label htmlFor="accountNumber">Số tài khoản *</label>
-                    <input type="text" id="accountNumber" name="accountNumber" value={formData.accountNumber} onChange={handleChange} required />
-                </div>
-                
-                {/* ✅ THAY THẾ INPUT BẰNG CUSTOM SELECT */}
-                <div className={styles.formGroup}>
-                    <label htmlFor="bank">Ngân hàng hưởng thụ *</label>
-                    <div className={styles.bankSelectTrigger} onClick={() => setShowBankModal(true)}>
-                        <span className={formData.bank ? '' : styles.placeholder}>
-                            {formData.bank ? selectedBankName : 'Chọn ngân hàng...'}
-                        </span>
-                        <FaChevronDown />
-                    </div>
-                    {/* Input ẩn để giữ trường 'bank' trong form data */}
-                    <input type="hidden" name="bank" value={formData.bank} /> 
-                </div>
-
-                {error && <p className={styles.error}>{error}</p>}
-
-                <div className={styles.buttonGroup}>
-                    <button className={styles.btnSecondary} onClick={onBack} disabled={isProcessing}>Quay lại</button>
-                    <button 
-                        className={styles.btnPrimary} 
-                        onClick={handleConfirmRefund} 
-                        disabled={isProcessing}
-                    >
-                        {isProcessing ? 'Đang gửi...' : 'Xác nhận'}
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
     
     return createPortal(refundInfoModalJSX, document.body); 
 };

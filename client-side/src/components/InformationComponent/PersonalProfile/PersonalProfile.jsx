@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import styles from './PersonalProfile.module.scss';
-import { UserUpdateRequestDTO } from '../../../dto/requestDTO/UserUpdateRequestDTO.ts';
 import { updateUserApi } from '../../../services/user/user.ts';
 import { useAuth } from '../../../context/AuthContext.jsx';
+import { FaUser, FaPhone, FaBirthdayCake, FaEnvelope } from 'react-icons/fa';
 
-const PersonalProfile = () => {
+const PersonalProfile = ({ isSidebarVersion = false }) => {
     const { user, updateUser } = useAuth();
     
     const userData = user?.data || user;
@@ -22,6 +22,16 @@ const PersonalProfile = () => {
     
     const email = userData?.email || '';
     const userID = userData?.userId || userData?.id;
+    
+    // Calculate points (use coinBalance from user data)
+    const loyaltyPoints = useMemo(() => {
+        return userData?.coinBalance || 0;
+    }, [userData?.coinBalance]);
+
+    // Format number with thousand separators
+    const formatNumber = (num) => {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    };
     
     const parsedDate = useMemo(() => {
         const dateOfBirth = userData?.dateOfBirth || '';
@@ -48,9 +58,11 @@ const PersonalProfile = () => {
     
     useEffect(() => {
         if (userData) {
+            console.log('PersonalProfile userData:', userData);
+            console.log('Phone value:', userData.phone, userData.phoneNumber, userData.phone_number);
             setFormData({
-                fullName: userData.fullName || '',
-                phone: userData.phone || '',
+                fullName: userData.fullName || userData.fullname || '',
+                phone: userData.phone || userData.phoneNumber || userData.phone_number || '',
                 day: parsedDate.day,
                 month: parsedDate.month,
                 year: parsedDate.year
@@ -117,7 +129,7 @@ const PersonalProfile = () => {
                 formDataPayload.append('dateOfBirth', dateOfBirth);
             }
 
-            const response = await updateUserApi(userID, formDataPayload);
+            await updateUserApi(userID, formDataPayload);
 
             updateUser({
                 fullName: formData.fullName,
@@ -158,14 +170,45 @@ const PersonalProfile = () => {
 
     return (
         <div className={styles.personalProfile}>
-            {/* Header
-            <div className={styles.pageHeader}>
-                <h1 className={styles.pageTitle}>Hồ Sơ Cá Nhân</h1>
-                <p className={styles.pageSubtitle}>Quản lý thông tin cá nhân để bảo mật tài khoản</p>
-            </div>
-             */}
-            {/* Success/Error Messages */}
-            {message.text && (
+            {!isSidebarVersion && (
+                <>
+                    {/* Profile Header - chỉ hiển thị khi không phải sidebar */}
+                    <div className={styles.profileHeader}>
+                        <div className={styles.cover}>
+                            <div className={styles.coverDecor} />
+                        </div>
+                        <div className={styles.headerContent}>
+                            <div className={styles.avatarWrap}>
+                                <img
+                                    src={userData?.avatar || 'https://images.unsplash.com/photo-1544723795-3fb6469f0f34?q=80&w=200&h=200&fit=crop&auto=format&dpr=2'}
+                                    alt={userData?.fullName || 'User avatar'}
+                                    className={styles.avatar}
+                                />
+                            </div>
+                            <div className={styles.identity}>
+                                <h1 className={styles.displayName}>{userData?.fullName || 'Người dùng'}</h1>
+                                <p className={styles.subtitle}>Khách hàng • Future Travel</p>
+                            </div>
+                            <div className={styles.headerActions}>
+                                <button className={styles.editBtn} onClick={() => {}}>
+                                    Chỉnh sửa hồ sơ
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Success/Error Messages */}
+                    {message.text && (
+                        <div className={message.type === 'success' ? styles.successMessage : styles.errorMessage}>
+                            {message.text}
+                        </div>
+                    )}
+                </>
+            )}
+
+            {/* Personal Stats Section - Thống kê cá nhân */}
+
+            {isSidebarVersion && message.text && (
                 <div className={message.type === 'success' ? styles.successMessage : styles.errorMessage}>
                     {message.text}
                 </div>
@@ -173,10 +216,25 @@ const PersonalProfile = () => {
             
             {/* Thông tin cá nhân */}
             <div className={styles.section}>
-                <h2 className={styles.sectionTitle}>Thông tin cá nhân</h2>
+                <h2 className={styles.sectionTitle}>
+                    <FaUser /> Thông tin cá nhân
+                </h2>
+
+                {/* Loyalty Points Display - Right after title */}
+                <div className={styles.loyaltySection}>
+                    <div className={styles.loyaltyCard}>
+                        <div className={styles.loyaltyContent}>
+                            <span className={styles.loyaltyIcon}>⭐</span>
+                            <span className={styles.loyaltyLabel}>Điểm tích lũy</span>
+                            <span className={styles.loyaltyValue}>{formatNumber(loyaltyPoints)}</span>
+                        </div>
+                    </div>
+                </div>
                 
                 <div className={styles.formGroup}>
-                    <label className={styles.label}>Họ và tên</label>
+                    <label className={styles.label}>
+                        <FaUser /> Họ và tên
+                    </label>
                     <input
                         type="text"
                         className={styles.input}
@@ -184,13 +242,13 @@ const PersonalProfile = () => {
                         onChange={(e) => handleInputChange('fullName', e.target.value)}
                         placeholder="Nhập họ và tên"
                     />
-                    <p className={styles.helperText}>
-                        Tên hiển thị trên hồ sơ và trong các giao dịch
-                    </p>
+
                 </div>
                 
                 <div className={styles.formGroup}>
-                    <label className={styles.label}>Số điện thoại</label>
+                    <label className={styles.label}>
+                        <FaPhone /> Số điện thoại
+                    </label>
                     <input
                         type="text"
                         className={`${styles.input} ${phoneError ? styles.inputError : ''}`}
@@ -205,7 +263,9 @@ const PersonalProfile = () => {
                 </div>
                 
                 <div className={styles.formGroup}>
-                    <label className={styles.label}>Ngày sinh</label>
+                    <label className={styles.label}>
+                        <FaBirthdayCake /> Ngày sinh
+                    </label>
                     <div className={styles.dateInputs}>
                         <select 
                             className={styles.dateSelect} 
@@ -240,7 +300,9 @@ const PersonalProfile = () => {
                     </div>
                 </div>
                 <div className={styles.formGroup}>
-                        <label className={styles.label}>Email</label>
+                        <label className={styles.label}>
+                            <FaEnvelope /> Email
+                        </label>
                         <input
                             type="email"
                             className={`${styles.input} ${styles.inputReadOnly}`}

@@ -2,20 +2,23 @@
 
 .transactionList {
     width: 100%;
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
 }
 
-// Header cố định - TĂNG Z-INDEX VÀ PADDING
+// Header cố định - tone trắng hiện đại
 .pageHeader {
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 22px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #eef1f6;
     position: sticky;
-    top: -30px; 
+    top: -30px;
     background: #ffffff;
-    z-index: 999;
-    padding-top: 15px; 
-    margin-top: -30px; 
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); 
+    z-index: 5;
+    padding-top: 12px;
+    margin-top: -30px;
+    box-shadow: 0 6px 18px rgba(17, 24, 39, 0.06);
     
     &::before {
         content: '';
@@ -86,16 +89,14 @@
     pointer-events: none;
 }
 
-// Status Tabs - Cố định dưới header
+// Status Tabs - Pill style, cố định dưới header
 .statusTabs {
-
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
     gap: 8px;
     padding-bottom: 2px;
     
-    // Custom scrollbar
     &::-webkit-scrollbar {
         height: 4px;
     }
@@ -110,20 +111,20 @@
 
 .tab {
     flex-shrink: 0;
-    background: white;
-    border: 1px solid #e0e0e0;
-    padding: 8px 16px;
-    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid #e7ecf3;
+    padding: 8px 14px;
+    border-radius: 999px;
     font-size: 13px;
     cursor: pointer;
-    color: #666;
-    font-weight: 500;
+    color: #6b7280;
+    font-weight: 700;
     transition: all 0.2s ease;
     white-space: nowrap;
 
     &:hover {
-        border-color: #1890ff;
-        color: #1890ff;
+        border-color: #cbd5e1;
+        color: #111827;
     }
     
     &:focus {
@@ -132,9 +133,9 @@
 
     &.active {
         background: #1890ff;
-        color: white;
+        color: #ffffff;
         border-color: #1890ff;
-        font-weight: 600;
+        box-shadow: 0 6px 16px rgba(24, 144, 255, 0.2);
     }
 }
 

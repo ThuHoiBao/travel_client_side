@@ -141,14 +141,49 @@ const TransactionListItem = ({ booking, refetch }) => {
 
     const getStatusStyle = (status) => {
         switch (status) {
-            case 'PENDING_PAYMENT': return { backgroundColor: '#ffc107', color: 'white' };
-            case 'PENDING_CONFIRMATION': return { backgroundColor: '#007bff', color: 'white' };
-            case 'PAID': return { backgroundColor: '#52c41a', color: 'white' };
+            case 'PENDING_PAYMENT': 
+                return { 
+                    backgroundColor: '#fff4e6',
+                    color: '#d46b08',
+                    border: '1px solid #ffd591'
+                };
+            case 'PENDING_CONFIRMATION': 
+                return { 
+                    backgroundColor: '#e6f7ff',
+                    color: '#096dd9',
+                    border: '1px solid #91d5ff'
+                };
+            case 'PAID': 
+                return { 
+                    backgroundColor: '#d4f4dd',
+                    color: '#237804',
+                    border: '1px solid #95de64'
+                };
             case 'CANCELLED': 
-            case 'OVERDUE_PAYMENT': return { backgroundColor: '#ff4d4f', color: 'white' };
-            case 'REVIEWED': return { backgroundColor: '#17a2b8', color: 'white' };
-            case 'PENDING_REFUND': return { backgroundColor: '#fa8c16', color: 'white' };
-            default: return { backgroundColor: '#6c757d', color: 'white' };
+            case 'OVERDUE_PAYMENT': 
+                return { 
+                    backgroundColor: '#fff1f0',
+                    color: '#cf1322',
+                    border: '1px solid #ffa39e'
+                };
+            case 'REVIEWED': 
+                return { 
+                    backgroundColor: '#e6fffb',
+                    color: '#08979c',
+                    border: '1px solid #87e8de'
+                };
+            case 'PENDING_REFUND': 
+                return { 
+                    backgroundColor: '#fff7e6',
+                    color: '#d46b08',
+                    border: '1px solid #ffc069'
+                };
+            default: 
+                return { 
+                    backgroundColor: '#f5f5f5',
+                    color: '#595959',
+                    border: '1px solid #d9d9d9'
+                };
         }
     };
 

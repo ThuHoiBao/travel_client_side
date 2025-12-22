@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './ReviewComponent.module.scss';
-import { FaTimes, FaStar, FaUpload, FaTimesCircle, FaGrinStars, FaSmile, FaMeh, FaFrown, FaGrimace, FaSadTear } from 'react-icons/fa';
+import { FaTimes, FaStar, FaUpload } from 'react-icons/fa';
 import { submitReviewApi } from '../../../../services/review/review.ts'; // Import API
 
 const MIN_COMMENT_LENGTH = 10;
@@ -18,37 +18,22 @@ const ReviewComponent = ({ booking, onClose, onRefetch }) => {
     const [finalModal, setFinalModal] = useState(null); // { success: boolean, points: number }
     
     // --- Helpers ---
-const getEmotionIcon = (rating) => {
-    switch (rating) {
-        case 5:
-            return {
-                icon: <FaGrinStars className={styles.emotionIcon} style={{ color: '#52c41a' }} />,
-                label: "Tuyệt vời"
-            };
-        case 4:
-            return {
-                icon: <FaSmile className={styles.emotionIcon} style={{ color: '#87d068' }} />,
-                label: "Hài lòng"
-            };
-        case 3:
-            return {
-                icon: <FaMeh className={styles.emotionIcon} style={{ color: '#ffc107' }} />,
-                label: "Bình thường"
-            };
-        case 2:
-            return {
-                icon: <FaFrown className={styles.emotionIcon} style={{ color: '#ff4d4f' }} />,
-                label: "Không hài lòng"
-            };
-        case 1:
-            return {
-                icon: <FaGrimace className={styles.emotionIcon} style={{ color: '#f00' }} />,
-                label: "Tệ"
-            };
-        default:
-            return { icon: null, label: "" };
-    }
-};
+    const getEmotionIcon = (value) => {
+        switch (value) {
+            case 5:
+                return { emoji: '😍', label: 'Tuyệt vời', color: '#52c41a' };
+            case 4:
+                return { emoji: '😊', label: 'Hài lòng', color: '#87d068' };
+            case 3:
+                return { emoji: '😐', label: 'Bình thường', color: '#ffc107' };
+            case 2:
+                return { emoji: '😟', label: 'Không hài lòng', color: '#ff9800' };
+            case 1:
+                return { emoji: '😢', label: 'Rất tệ', color: '#ff4d4f' };
+            default:
+                return { emoji: null, label: '', color: '' };
+        }
+    };
     
     const getCoinPoints = (commentLength, imageCount) => {
         if (commentLength < MIN_COMMENT_LENGTH) return 0;
@@ -143,117 +128,125 @@ const getEmotionIcon = (rating) => {
         return createPortal(finalModalJSX, document.body);
     }
 
-const emotionData = getEmotionIcon(rating); // ✨ LẤY DATA CẢM XÚC
+    const emotionData = getEmotionIcon(rating);
+
     // --- Render Review Component ---
     const reviewModalJSX = (
         <div className={styles.modalOverlay} onClick={onClose}>
-            <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <button className={styles.closeButton} onClick={onClose} disabled={isSubmitting}>
                     <FaTimes />
                 </button>
-                
-                <h2 className={styles.modalTitle}>Viết đánh giá</h2>
-                
-                {/* 1. Thông tin Tour */}
-                <div className={styles.tourInfo}>
-                    <img src={booking.image || 'placeholder.png'} alt={booking.tourName} className={styles.tourImage} />
-                    <div className={styles.tourDetails}>
-                        <h4>{booking.tourName}</h4>
-                        <p>Mã Booking: {booking.bookingCode}</p>
+
+                {/* Header cố định */}
+                <div className={styles.modalHeader}>
+                    <div className={styles.headerIcon}>✍️</div>
+                    <div className={styles.headerText}>
+                        <h2 className={styles.modalTitle}>Viết đánh giá</h2>
+                        <p className={styles.modalSubtitle}>Chia sẻ trải nghiệm của bạn cùng mọi người</p>
                     </div>
                 </div>
-                
-                {/* 2. Hướng dẫn nhận điểm */}
-                <div className={styles.coinGuide}>
-                    <details>
-                        <summary className={styles.guideSummary}>
-                            Xem Hướng dẫn đánh giá chuẩn để nhận đến 10 điểm !
-                        </summary>
-                        <div className={styles.guideDetail}>
-                            <p>⭐ Điều kiện nhận điểm thưởng :</p>
-                            <ul>
-                                <li> 5 điểm: Đánh giá trên 10 ký tự không kèm ảnh.</li>
-                                <li> 7 điểm: Đánh giá trên 10 ký tự kèm 1 ảnh.</li>
-                                <li> 10 điểm: Đánh giá trên 10 ký tự kèm nhiều hơn 1 ảnh (từ 2 ảnh trở lên).</li>
-                                <li> Nếu đánh giá dưới 10 ký tự hoặc không đạt điều kiện trên, bạn sẽ không nhận được điểm.</li>
-                            </ul>
-                            {/* <p className={styles.currentPoints}>
-                                **Điểm thưởng hiện tại:** <span className={styles.pointValue}>{currentPoints} điểm</span>
-                            </p> */}
+
+                <div className={styles.mainContent}>
+                    {/* 1. Thông tin Tour */}
+                    <div className={styles.tourInfo}>
+                        <img src={booking.image || 'placeholder.png'} alt={booking.tourName} className={styles.tourImage} />
+                        <div className={styles.tourDetails}>
+                            <h4>{booking.tourName}</h4>
+                            <p>Mã Booking: {booking.bookingCode}</p>
                         </div>
-                    </details>
-                </div>
-
-                {/* 3. Rating */}
-                <div className={styles.ratingSection}>
-                    <p className={styles.ratingLabel}>Đánh giá Tour *</p>
-                    <div className={styles.starContainer}>
-                        {[1, 2, 3, 4, 5].map((star) => (
-                            <FaStar
-                                key={star}
-                                className={styles.star}
-                                color={star <= rating ? "#ffc107" : "#e4e5e9"}
-                                onClick={() => setRating(star)}
-                            />
-                        ))}
-                       {/* ✨ HIỂN THỊ ICON VÀ LABEL */}
-                        {emotionData.icon && (
-                            <div className={styles.emotionDisplay}>
-                                {emotionData.icon}
-                                <span className={styles.emotionLabel}>{emotionData.label}</span>
-                            </div>
-                        )}
                     </div>
-                </div>
+                    
+                    {/* 2. Hướng dẫn nhận điểm */}
+                    <div className={styles.coinGuide}>
+                        <details>
+                            <summary className={styles.guideSummary}>
+                                Xem Hướng dẫn đánh giá chuẩn để nhận đến 10 điểm !
+                            </summary>
+                            <div className={styles.guideDetail}>
+                                <p>⭐ Điều kiện nhận điểm thưởng :</p>
+                                <ul>
+                                    <li> 5 điểm: Đánh giá trên 10 ký tự không kèm ảnh.</li>
+                                    <li> 7 điểm: Đánh giá trên 10 ký tự kèm 1 ảnh.</li>
+                                    <li> 10 điểm: Đánh giá trên 10 ký tự kèm nhiều hơn 1 ảnh (từ 2 ảnh trở lên).</li>
+                                    <li> Nếu đánh giá dưới 10 ký tự hoặc không đạt điều kiện trên, bạn sẽ không nhận được điểm.</li>
+                                </ul>
+                            </div>
+                        </details>
+                    </div>
 
-                {/* 4. Comment */}
-                <div className={styles.commentSection}>
-                    <textarea
-                        placeholder="Viết cảm nhận của bạn về chuyến đi..."
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        rows={4}
-                    />
-                    <p className={styles.charCount}>
-                        {comment.length} / {MIN_COMMENT_LENGTH} ký tự (Tối thiểu cho điểm)
-                    </p>
-                </div>
-
-                {/* 5. Image Upload */}
-                <div className={styles.imageSection}>
-                    <div className={styles.imageList}>
-                        {/* Nút Thêm Ảnh */}
-                        {images.length < MAX_IMAGES && (
-                            <label className={styles.addImageButton}>
-                                <FaUpload /> Thêm ảnh ({images.length}/{MAX_IMAGES})
-                                <input
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    onChange={handleImageChange}
-                                    style={{ display: 'none' }}
-                                    disabled={images.length >= MAX_IMAGES || isSubmitting}
+                    {/* 3. Rating + Emotion */}
+                    <div className={styles.ratingSection}>
+                        <p className={styles.ratingLabel}>Đánh giá Tour *</p>
+                        <div className={styles.starContainer}>
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <FaStar
+                                    key={star}
+                                    className={styles.star}
+                                    color={star <= rating ? '#ffc107' : '#e4e5e9'}
+                                    onClick={() => setRating(star)}
                                 />
-                            </label>
-                        )}
-                        
-                        {/* Ảnh đã chọn */}
-                        {previewUrls.map((url, index) => (
-                            <div key={index} className={styles.imagePreview}>
-                                <img src={url} alt={`Review ${index + 1}`} />
-                                <button onClick={() => handleRemoveImage(index)} className={styles.removeImage}>
-                                    <FaTimesCircle />
-                                </button>
+                            ))}
+                        </div>
+                        {emotionData.emoji && (
+                            <div className={styles.emotionDisplay}>
+                                <span className={styles.emotionEmoji} style={{ color: emotionData.color }}>
+                                    {emotionData.emoji}
+                                </span>
+                                <span className={styles.emotionLabel} style={{ color: emotionData.color }}>
+                                    {emotionData.label}
+                                </span>
                             </div>
-                        ))}
+                        )}
                     </div>
-                    <p className={styles.imageHelper}>Cảm ơn bạn đã chia sẻ cảm nhận về chuyến đi! Những cảm nhận của bạn sẽ giúp chúng tôi và mọi người hiểu rõ hơn về chuyến đi !!</p>
+
+                    {/* 4. Comment */}
+                    <div className={styles.commentSection}>
+                        <textarea
+                            placeholder="Viết cảm nhận của bạn về chuyến đi..."
+                            value={comment}
+                            onChange={(e) => setComment(e.target.value)}
+                            rows={4}
+                        />
+                        <p className={styles.charCount}>
+                            {comment.length} / {MIN_COMMENT_LENGTH} ký tự (Tối thiểu cho điểm)
+                        </p>
+                    </div>
+
+                    {/* 5. Image Upload */}
+                    <div className={styles.imageSection}>
+                        <div className={styles.imageList}>
+                            {images.length < MAX_IMAGES && (
+                                <label className={styles.addImageButton}>
+                                    <FaUpload /> Thêm ảnh ({images.length}/{MAX_IMAGES})
+                                    <input
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={handleImageChange}
+                                        style={{ display: 'none' }}
+                                        disabled={images.length >= MAX_IMAGES || isSubmitting}
+                                    />
+                                </label>
+                            )}
+                            
+                            {previewUrls.map((url, index) => (
+                                <div key={index} className={styles.imagePreview}>
+                                    <img src={url} alt={`Review ${index + 1}`} />
+                                    <button onClick={() => handleRemoveImage(index)} className={styles.removeImage}>
+                                        ✕
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                        <p className={styles.imageHelper}>Cảm ơn bạn đã chia sẻ cảm nhận về chuyến đi! Những cảm nhận của bạn sẽ giúp chúng tôi và mọi người hiểu rõ hơn về chuyến đi !!</p>
+                    </div>
+
+                    {submitError && <p className={styles.error}>{submitError}</p>}
                 </div>
-                
-                {submitError && <p className={styles.error}>{submitError}</p>}
-                
-                {/* 6. Action Buttons */}
-                <div className={styles.buttonGroup}>
+
+                {/* Footer cố định */}
+                <div className={styles.stickyFooter}>
                     <button 
                         className={styles.btnCancel} 
                         onClick={onClose} 
@@ -269,7 +262,6 @@ const emotionData = getEmotionIcon(rating); // ✨ LẤY DATA CẢM XÚC
                         {isSubmitting ? 'Đang gửi...' : 'Gửi đánh giá'}
                     </button>
                 </div>
-                
             </div>
         </div>
     );
