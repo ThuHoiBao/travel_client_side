@@ -121,7 +121,7 @@ const InformationComponent = () => {
                     </div>
                     <div className={styles.nameSection}>
                         <h1 className={styles.userName}>{userData?.fullName || 'Khách hàng'}</h1>
-                        <p className={styles.userRole}>Thành viên Future Travel • Người yêu du lịch</p>
+                        <p className={styles.userRole}>Thành viên Future Travel</p>
                     </div>
                 </div>
 

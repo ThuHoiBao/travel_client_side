@@ -93,7 +93,7 @@ const Login = () => {
       if (userRole === 'ADMIN') {
         navigate('/admin/dashboard', { replace: true });
       } else {
-        navigate(from, { replace: true });
+        window.location.replace('/');
       }
       
     } catch (error) {
@@ -156,7 +156,7 @@ const Login = () => {
       if (userRole === 'ADMIN') {
         navigate('/admin/dashboard', { replace: true });
       } else {
-        navigate(from, { replace: true });
+        window.location.replace('/');
       }
       
     } catch (error) {

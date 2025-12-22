@@ -352,12 +352,12 @@ export const CancelWithRefundModal = ({ booking, onClose, onSuccess }) => {
                             bookingCode={booking.bookingCode}
                         />
 
-                        <div className={styles.refundInfo}>
+                        {/* <div className={styles.refundInfo}>
                             <h4>Thông tin hoàn tiền</h4>
                             <p className={styles.refundAmount}>
                                 <strong>Số tiền hoàn:</strong> {formatPrice(totalRefund)}
                             </p>
-                        </div>
+                        </div> */}
 
                         <div className={styles.reasonSection}>
                             <h4>Chọn lý do hủy chuyến đi <span className={styles.required}>*</span></h4>

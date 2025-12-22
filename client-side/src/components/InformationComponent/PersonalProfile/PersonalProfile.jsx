@@ -2,7 +2,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import styles from './PersonalProfile.module.scss';
 import { updateUserApi } from '../../../services/user/user.ts';
 import { useAuth } from '../../../context/AuthContext.jsx';
-import { FaUser, FaPhone, FaBirthdayCake, FaEnvelope } from 'react-icons/fa';
+import { FaUser, FaPhone, FaBirthdayCake, FaEnvelope, FaCoins } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 
 const PersonalProfile = ({ isSidebarVersion = false }) => {
     const { user, updateUser } = useAuth();
@@ -17,7 +18,7 @@ const PersonalProfile = ({ isSidebarVersion = false }) => {
         year: ''
     });
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState({ type: '', text: '' });
+    
     const [phoneError, setPhoneError] = useState('');
     
     const email = userData?.email || '';
@@ -97,13 +98,11 @@ const PersonalProfile = ({ isSidebarVersion = false }) => {
                 [field]: value
             }));
         }
-        setMessage({ type: '', text: '' });
     };
     
     const handleSave = async () => {
         try {
             setLoading(true);
-            setMessage({ type: '', text: '' });
 
             if (formData.phone && formData.phone.length !== 10) {
                 setPhoneError('Số điện thoại phải có đúng 10 chữ số');
@@ -138,11 +137,7 @@ const PersonalProfile = ({ isSidebarVersion = false }) => {
                     ? `${formData.year}-${formData.month.padStart(2, '0')}-${formData.day.padStart(2, '0')}`
                     : userData?.dateOfBirth
             });
-
-            setMessage({
-                type: 'success',
-                text: 'Cập nhật thông tin thành công!'
-            });
+            toast.success('Cập nhật thông tin thành công!');
 
         } catch (error) {
             console.error('Error updating user:', error);
@@ -150,11 +145,7 @@ const PersonalProfile = ({ isSidebarVersion = false }) => {
             const errorMessage = error.response?.data?.message 
                 || error.response?.data?.error
                 || 'Có lỗi xảy ra khi cập nhật thông tin.';
-            
-            setMessage({
-                type: 'error',
-                text: errorMessage
-            });
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -197,38 +188,21 @@ const PersonalProfile = ({ isSidebarVersion = false }) => {
                         </div>
                     </div>
 
-                    {/* Success/Error Messages */}
-                    {message.text && (
-                        <div className={message.type === 'success' ? styles.successMessage : styles.errorMessage}>
-                            {message.text}
-                        </div>
-                    )}
+                    {/* Success/Error Messages replaced by toast notifications */}
                 </>
             )}
 
             {/* Personal Stats Section - Thống kê cá nhân */}
 
-            {isSidebarVersion && message.text && (
-                <div className={message.type === 'success' ? styles.successMessage : styles.errorMessage}>
-                    {message.text}
-                </div>
-            )}
+            {/* Sidebar message replaced by toast notifications */}
             
             {/* Thông tin cá nhân */}
             <div className={styles.section}>
                 <h2 className={styles.sectionTitle}>
                     <FaUser /> Thông tin cá nhân
                 </h2>
-
-                {/* Loyalty Points Display - Right after title */}
-                <div className={styles.loyaltySection}>
-                    <div className={styles.loyaltyCard}>
-                        <div className={styles.loyaltyContent}>
-                            <span className={styles.loyaltyIcon}>⭐</span>
-                            <span className={styles.loyaltyLabel}>Điểm tích lũy</span>
-                            <span className={styles.loyaltyValue}>{formatNumber(loyaltyPoints)}</span>
-                        </div>
-                    </div>
+                <div className={styles.loyaltyPoints}>
+                    <FaCoins /> {formatNumber(loyaltyPoints)} điểm
                 </div>
                 
                 <div className={styles.formGroup}>

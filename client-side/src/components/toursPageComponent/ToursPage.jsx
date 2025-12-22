@@ -1,13 +1,14 @@
 // src/components/ToursPageComponent/ToursPage.jsx (CẬP NHẬT)
 
 import React, { useEffect, useState, useMemo,useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { searchToursApi } from '../../services/tours/tours.ts';
 import { useLocations } from '../../hook/useLocations.ts';
 import FilterAndSearchInput from './FilterAndSearchInput/FilterAndSearchInput.jsx'; 
 import TourComponent from './TourComponent/TourComponent.jsx'; 
 import styles from './ToursPage.module.scss'; 
 import { useAuth } from '../../context/AuthContext.jsx';
+import { FaMapSigns, FaHome } from 'react-icons/fa';
 // Định nghĩa các Tùy chọn Sắp xếp
 const SORT_OPTIONS = [
     { value: 'ALL', label: 'Tất cả' },
@@ -16,6 +17,7 @@ const SORT_OPTIONS = [
     { value: 'DEPARTURE_NEAR', label: 'Ngày khởi hành gần nhất' },
 ];
 const ToursPage = () => {
+    const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const { endLocations, loading: locationsLoading } = useLocations(); 
     const [tours, setTours] = useState([]);
@@ -98,76 +100,96 @@ const isSpecificDestinationSelected = currentEndPointInfo && currentEndPointInfo
         setIsSortDropdownOpen(false);
     }, []);
     return (
-        <div className={styles.toursPageLayout}>
-            {/* Cột Trái: Bộ Lọc */}
-            <div className={styles.filterColumn}>
-                <FilterAndSearchInput /> 
-            </div>
-
-            {/* Cột Phải: Thông tin Điểm đến và Kết Quả */}
-            <div className={styles.resultsColumn}>
-                
-                {/* KHỐI THÔNG TIN ĐIỂM ĐẾN (Logic CẬP NHẬT) */}
-                <div className={styles.destinationHeader}>
-                    {isSpecificDestinationSelected ? (
-                        <>
-                            {/* Hiển thị thông tin điểm đến cụ thể */}
-                            <h2>Du Lịch {currentEndPointInfo.name}</h2>
-                            <p>{currentEndPointInfo.description || 'Khám phá điểm đến hấp dẫn này.'}</p>
-                        </>
-                    ) : (
-                        <>
-                            {/* Hiển thị thông điệp chung khi chọn 'Tất cả' */}
-                            <h2>Du lịch cùng Future Travel</h2>
-                            <p>Hãy tận hưởng trải nghiệm du lịch chuyên nghiệp, mang lại cho bạn những khoảnh khắc tuyệt vời và nâng tầm cuộc sống. Chúng tôi cam kết mang đến những chuyến đi đáng nhớ, giúp bạn khám phá thế giới theo cách hoàn hảo nhất.</p>
-                        </>
-                    )}
+        <>
+            <div className={styles.pageHero}>
+                <div className={styles.heroIconWrap}>
+                    <FaMapSigns />
                 </div>
-                
-                {/* ✨ HEADER KẾT QUẢ VÀ SẮP XẾP MỚI ✨ */}
-                <div className={styles.resultHeader}> 
-                <h3 className={styles.tourCount}>Tìm thấy <span className={styles.tourCountValue}>{tours.length}</span>chương trình tour cho bạn.</h3>                    
-                    {/* DROP DOWN SẮP XẾP */}
-                    <div className={styles.sortContainer}>
-                        <span className={styles.sortLabel}>Sắp xếp theo:</span>
-                        <div 
-                            className={styles.sortDropdown}
-                            onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-                        >
-                            <span className={styles.sortSelected}>{currentSort.label}</span>
-                            <i className={`fas fa-chevron-${isSortDropdownOpen ? 'up' : 'down'}`}></i>
-                            
-                            {isSortDropdownOpen && (
-                                <div className={styles.sortOptionsList}>
-                                    {SORT_OPTIONS.map(option => (
-                                        <div 
-                                            key={option.value}
-                                            className={`${styles.sortOption} ${currentSort.value === option.value ? styles.activeSort : ''}`}
-                                            onClick={() => handleSortSelect(option)}
-                                        >
-                                            {option.label}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                <div className={styles.heroTextBlock}>
+                    <p className={styles.heroEyebrow}>Tours</p>
+                    <h1 className={styles.heroTitle}>Khám phá tour phù hợp</h1>
+                    <p className={styles.heroSub}>
+                        Sắp xếp, lọc và chọn hành trình yêu thích với thông tin chuyến đi.
+                    </p>
+                    <div className={styles.heroBreadcrumb}>
+                        <span className={styles.crumb} onClick={() => navigate('/')} style={{cursor: 'pointer'}}><FaHome /> Trang chủ</span>
+                        <span className={styles.crumbDivider}>/</span>
+                        <span className={styles.crumbActive}>Danh sách tour</span>
                     </div>
                 </div>
-                
-                {loading || locationsLoading && <p>Đang tải dữ liệu...</p>}
-                {error && <p className={styles.errorMessage}>Lỗi: {error}</p>}
-                
-                {/* SỬ DỤNG DANH SÁCH TOUR ĐÃ SẮP XẾP */}
-               {!loading && !error && (
-                <TourComponent 
-                    tours={sortedTours} 
-                    currentUserId={currentUserId} // TRUYỀN ID XUỐNG
-                />
-            )}
-                {/* Xóa logic hiển thị 'Không tìm thấy' cũ vì đã được xử lý trong TourComponent */}
-                
             </div>
-        </div>
+
+            <div className={styles.toursPageLayout}>
+                {/* Cột Trái: Bộ Lọc */}
+                <div className={styles.filterColumn}>
+                    <FilterAndSearchInput /> 
+                </div>
+
+                {/* Cột Phải: Thông tin Điểm đến và Kết Quả */}
+                <div className={styles.resultsColumn}>
+                    
+                    {/* KHỐI THÔNG TIN ĐIỂM ĐẾN (Logic CẬP NHẬT) */}
+                    <div className={styles.destinationHeader}>
+                        {isSpecificDestinationSelected ? (
+                            <>
+                                {/* Hiển thị thông tin điểm đến cụ thể */}
+                                <h2>Du Lịch {currentEndPointInfo.name}</h2>
+                                <p>{currentEndPointInfo.description || 'Khám phá điểm đến hấp dẫn này.'}</p>
+                            </>
+                        ) : (
+                            <>
+                                {/* Hiển thị thông điệp chung khi chọn 'Tất cả' */}
+                                <h2>Du lịch cùng Future Travel</h2>
+                                <p>Hãy tận hưởng trải nghiệm du lịch chuyên nghiệp, mang lại cho bạn những khoảnh khắc tuyệt vời và nâng tầm cuộc sống. Chúng tôi cam kết mang đến những chuyến đi đáng nhớ, giúp bạn khám phá thế giới theo cách hoàn hảo nhất.</p>
+                            </>
+                        )}
+                    </div>
+                    
+                    {/* ✨ HEADER KẾT QUẢ VÀ SẮP XẾP MỚI ✨ */}
+                    <div className={styles.resultHeader}> 
+                    <h3 className={styles.tourCount}>Tìm thấy <span className={styles.tourCountValue}>{tours.length}</span>chương trình tour cho bạn.</h3>                    
+                        {/* DROP DOWN SẮP XẾP */}
+                        <div className={styles.sortContainer}>
+                            <span className={styles.sortLabel}>Sắp xếp theo:</span>
+                            <div 
+                                className={styles.sortDropdown}
+                                onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+                            >
+                                <span className={styles.sortSelected}>{currentSort.label}</span>
+                                <i className={`fas fa-chevron-${isSortDropdownOpen ? 'up' : 'down'}`}></i>
+                                
+                                {isSortDropdownOpen && (
+                                    <div className={styles.sortOptionsList}>
+                                        {SORT_OPTIONS.map(option => (
+                                            <div 
+                                                key={option.value}
+                                                className={`${styles.sortOption} ${currentSort.value === option.value ? styles.activeSort : ''}`}
+                                                onClick={() => handleSortSelect(option)}
+                                            >
+                                                {option.label}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {loading || locationsLoading && <p>Đang tải dữ liệu...</p>}
+                    {error && <p className={styles.errorMessage}>Lỗi: {error}</p>}
+                    
+                    {/* SỬ DỤNG DANH SÁCH TOUR ĐÃ SẮP XẾP */}
+                   {!loading && !error && (
+                    <TourComponent 
+                        tours={sortedTours} 
+                        currentUserId={currentUserId} // TRUYỀN ID XUỐNG
+                    />
+                )}
+                    {/* Xóa logic hiển thị 'Không tìm thấy' cũ vì đã được xử lý trong TourComponent */}
+                    
+                </div>
+            </div>
+        </>
     );
 };
 
