@@ -1,64 +1,72 @@
-// src/hook/useWebSocket.ts
-import { useEffect, useRef, useCallback } from 'react';
-import { Client } from '@stomp/stompjs';
+import { useEffect, useRef, useCallback, use } from 'react';
 import SockJS from 'sockjs-client';
+import { Client } from '@stomp/stompjs';
 
-interface WebSocketHookProps {
+interface UseWebSocketProps {
+    topic: string | string[]; 
     onMessage: (message: any) => void;
-    topic: string; // e.g., "/topic/admin/bookings" or "/topic/user/4/bookings"
     enabled?: boolean;
 }
 
-const useWebSocket = ({ onMessage, topic, enabled = true }: WebSocketHookProps) => {
+const useWebSocket = ({ topic, onMessage, enabled = true }: UseWebSocketProps) => {
     const stompClientRef = useRef<Client | null>(null);
+    const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    useEffect(() => {
+    const connect = useCallback(() => {
         if (!enabled) return;
 
-        // Tạo WebSocket connection
         const socket = new SockJS('http://localhost:8080/ws');
-        const stompClient = new Client({
-            webSocketFactory: () => socket as any,
-            debug: (str) => {
-                console.log('[STOMP Debug]:', str);
-            },
+        const client = new Client({
+            webSocketFactory: () => socket,
             reconnectDelay: 5000,
             heartbeatIncoming: 4000,
             heartbeatOutgoing: 4000,
+            
+            onConnect: () => {
+                console.log('WebSocket Connected');
+                
+                const topics = Array.isArray(topic) ? topic : [topic];
+                
+                topics.forEach(t => {
+                    client.subscribe(t, (message) => {
+                        try {
+                            const data = JSON.parse(message.body);
+                            console.log(`Received from ${t}:`, data);
+                            onMessage(data);
+                        } catch (error) {
+                            console.error('Error parsing message:', error);
+                        }
+                    });
+                });
+            },
+            
+            onStompError: (frame) => {
+                console.error('STOMP error:', frame);
+            },
+            
+            onDisconnect: () => {
+                console.log('WebSocket Disconnected');
+            }
         });
 
-        stompClient.onConnect = () => {
-            console.log('✅ WebSocket Connected. Subscribing to:', topic);
-            
-            // Subscribe to topic
-            stompClient.subscribe(topic, (message) => {
-                try {
-                    const data = JSON.parse(message.body);
-                    console.log('📩 Received WebSocket message:', data);
-                    onMessage(data);
-                } catch (error) {
-                    console.error('Error parsing WebSocket message:', error);
-                }
-            });
-        };
+        client.activate();
+        stompClientRef.current = client;
+    }, [topic, onMessage, enabled]);
 
-        stompClient.onStompError = (frame) => {
-            console.error('❌ STOMP Error:', frame);
-        };
+    useEffect(() => {
+        connect();
 
-        stompClient.activate();
-        stompClientRef.current = stompClient;
-
-        // Cleanup on unmount
         return () => {
             if (stompClientRef.current) {
-                console.log('🔌 Disconnecting WebSocket...');
                 stompClientRef.current.deactivate();
             }
+            if (reconnectTimeoutRef.current) {
+                clearTimeout(reconnectTimeoutRef.current);
+            }
         };
-    }, [topic, enabled, onMessage]);
+    }, [connect]);
 
-    return null;
+    return { client: stompClientRef.current };
 };
 
 export default useWebSocket;

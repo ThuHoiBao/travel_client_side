@@ -54,6 +54,9 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     font-weight: 700;
     color: $text-dark;
     margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
 
   p {
@@ -73,6 +76,10 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
       transform: translateY(-1px);
     }
   }
+
+    svg {
+      color: #3b82f6;
+    }
 }
 
 // Stats Grid

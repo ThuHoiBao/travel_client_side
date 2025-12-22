@@ -35,6 +35,9 @@ $row-stripe: #f8fafc; // Màu cho hàng chẵn
     color: $text-main;
     margin: 0 0 4px 0;
     letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
 
   p {
@@ -67,6 +70,9 @@ $row-stripe: #f8fafc; // Màu cho hàng chẵn
       transform: translateY(0);
     }
   }
+    svg {
+      color: #3b82f6;
+    }
 }
 
 // Toolbar
