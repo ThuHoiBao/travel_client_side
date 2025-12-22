@@ -495,7 +495,7 @@
             left: 50%;
             transform: translateX(-50%);
             color: #1890ff;
-            font-size: 16px;
+            font-size: 20px;
             background: white;
             padding: 0 4px;
 
@@ -770,4 +770,12 @@
       color: #444;
     }
   }
+}
+
+.flightInfo { 
+  text-align: center;
+  margin-top: 0px;
+  font-size: 12px;
+  font-weight: 500;
+  color: black;
 }
