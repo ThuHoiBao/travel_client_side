@@ -34,8 +34,17 @@ const UsersPage = () => {
         email: initialEmail || null
     });
 
-    const { users, loading, totalPages, totalElements, refetch } = useAdminUsers(activeSearch, currentPage, pageSize);
+    const {users, loading, totalPages, totalElements, refetch, updateUserInList } = useAdminUsers(activeSearch, currentPage, pageSize);
 
+    useWebSocket({
+        topic: '/topic/user-activity',
+        onMessage: (userData) => {
+            console.log('User activity update:', userData);
+            updateUserInList(userData);
+        },
+        enabled: true
+    });
+    
     useWebSocket({
         topic: '/topic/admin/users',
         onMessage: () => refetch(),

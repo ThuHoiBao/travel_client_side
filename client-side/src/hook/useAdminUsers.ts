@@ -1,4 +1,3 @@
-// src/hook/useAdminUsers.ts
 import { useState, useEffect, useCallback } from 'react';
 import { searchUsersApi } from '../services/user/user.ts';
 
@@ -10,6 +9,25 @@ const useAdminUsers = (searchDTO: any, page: number, size: number) => {
     const [refetchTrigger, setRefetchTrigger] = useState(0);
 
     const refetch = useCallback(() => setRefetchTrigger(prev => prev + 1), []);
+    const updateUserInList = useCallback((updatedUser: any) => {
+        setUsers(prevUsers => {
+            const index = prevUsers.findIndex(u => u.userID === updatedUser.userID);
+            
+            if (index !== -1) {
+                const newUsers = [...prevUsers];
+                newUsers[index] = {
+                    ...newUsers[index],
+                    ...updatedUser,
+                    status: updatedUser.status,
+                    lastActiveAt: updatedUser.lastActiveAt,
+                    activityStatus: updatedUser.activityStatus
+                };
+                return newUsers;
+            }
+            
+            return prevUsers;
+        });
+    }, []);
 
     useEffect(() => {
         const fetch = async () => {
@@ -28,6 +46,6 @@ const useAdminUsers = (searchDTO: any, page: number, size: number) => {
         fetch();
     }, [searchDTO, page, size, refetchTrigger]);
 
-    return { users, loading, totalPages, totalElements, refetch };
+    return { users, loading, totalPages, totalElements, refetch, updateUserInList };
 };
 export default useAdminUsers;

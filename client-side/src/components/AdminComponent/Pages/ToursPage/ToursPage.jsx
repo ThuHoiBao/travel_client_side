@@ -125,7 +125,7 @@ const TourList = () => {
       {/* Header */}
       <div className={styles.header}>
         <div>
-          <h1>Quản lý Tours</h1>
+          <h1> <MapPin size={32} />Quản lý Tours</h1>
           <p>Quản lý tất cả các tour du lịch</p>
         </div>
         <button className={styles.btnPrimary} onClick={handleCreateNew}>

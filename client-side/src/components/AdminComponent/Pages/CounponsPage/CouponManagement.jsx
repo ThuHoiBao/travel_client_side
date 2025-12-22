@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Search, Plus, Edit2, Trash2, Calendar, Tag, TrendingUp, Users, RotateCcw, Bell } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, Calendar, Tag, TrendingUp, Users, RotateCcw, Bell, TicketPercent  } from 'lucide-react';
 import axios from '../../../../utils/axiosCustomize'; 
 import { toast } from 'react-toastify'; 
 import styles from './CouponManagement.module.scss';
@@ -192,7 +192,8 @@ const CouponManagement = () => {
         {/* Header */}
         <div className={styles.header}>
           <div>
-            <h1>Quản lý Coupon & Thông báo</h1>
+          
+            <h1><TicketPercent size={32} /> Quản lý Coupon & Thông báo</h1>
             <p>Tạo và quản lý mã giảm giá, gửi thông báo tự động đến khách hàng</p>
           </div>
           <button onClick={handleCreate} className={styles.btnCreate}>
