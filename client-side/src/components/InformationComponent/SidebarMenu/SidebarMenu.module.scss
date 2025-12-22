@@ -1,53 +1,53 @@
 // SidebarMenu.module.scss - Thiết kế tối giản, hiện đại, màu trắng chủ đạo
 
 .sidebar {
-    width: 280px;
+    width: 100%;
     background: #ffffff;
     border-radius: 16px;
     padding: 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    border: 1px solid #f0f0f0;
+    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.06);
+    border: 1px solid #eef1f6;
     height: fit-content;
     position: sticky;
     top: 100px;
     align-self: flex-start;
     max-height: calc(100vh - 120px);
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
 
     &:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 14px 28px rgba(17, 24, 39, 0.08);
     }
 }
 
 // Profile Section - Tối giản
 .profileSection {
     text-align: center;
-    padding: 30px 20px 25px;
-    background: #fafafa;
-    border-bottom: 1px solid #f0f0f0;
+    padding: 28px 20px 24px;
+    background: linear-gradient(180deg, #fbfcff 0%, #f7f9fc 100%);
+    border-bottom: 1px solid #eef1f6;
     position: relative;
 }
 
 .avatar {
-    width: 90px;
-    height: 90px;
+    width: 92px;
+    height: 92px;
     border-radius: 50%;
-    margin: 0 auto 15px;
+    margin: 0 auto 14px;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 3px solid #f0f0f0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 3px solid #ffffff;
+    box-shadow: 0 8px 18px rgba(17, 24, 39, 0.08);
     position: relative;
 
     &:hover {
-        transform: scale(1.05);
-        border-color: #1890ff;
-        box-shadow: 0 4px 16px rgba(24, 144, 255, 0.2);
+        transform: translateY(-2px);
+        border-color: #e7ecf3;
+        box-shadow: 0 12px 24px rgba(24, 144, 255, 0.16);
     }
 
     &:active {
@@ -67,27 +67,22 @@
 
 .userName {
     font-size: 18px;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin: 0 0 5px 0;
+    font-weight: 700;
+    color: #16181d;
+    margin: 0 0 6px 0;
     letter-spacing: -0.2px;
 }
 
 .memberBadge {
-    background: #1890ff;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
+    background: #ffffff;
+    color: #374151;
+    padding: 8px 14px;
+    border-radius: 999px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     display: inline-block;
-    cursor: default;
-    transition: all 0.3s ease;
+    border: 1px solid #e7ecf3;
     letter-spacing: 0.2px;
-    
-    &:hover {
-        background: #40a9ff;
-    }
 }
 
 // Menu List - Clean & Minimal
@@ -103,52 +98,51 @@
     align-items: center;
     padding: 12px 16px;
     margin-bottom: 4px;
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: #666;
+    color: #6b7280;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     position: relative;
-    
+
     &:hover {
-        background-color: #f7f7f7;
-        color: #1a1a1a;
+        background-color: #f8fafc;
+        color: #111827;
         transform: translateX(2px);
     }
-    
+
     &.menuItemActive {
-        background: #e6f7ff;
+        background: #eef6ff;
         color: #1890ff;
-        font-weight: 600;
-        
+        font-weight: 700;
+
         .menuIcon {
             color: #1890ff;
         }
     }
-    
-    // Coin Display
+
     &.coinDisplay {
         cursor: default;
-        background: #fff7e6;
-        border: 1px solid #ffd591;
+        background: #fffaf0;
+        border: 1px solid #ffe3a3;
         padding: 12px 16px;
         margin-top: 0;
         margin-bottom: 12px;
-        
+
         &:hover {
-            background: #fff7e6;
+            background: #fffaf0;
             transform: none;
         }
-        
+
         .menuIcon {
-            color: #faad14;
+            color: #f59e0b;
             font-size: 18px;
         }
-        
+
         span {
-            font-weight: 700;
-            color: #d46b08;
+            font-weight: 800;
+            color: #b45309;
             font-size: 15px;
         }
     }
@@ -157,15 +151,15 @@
 .menuIcon {
     margin-right: 12px;
     font-size: 16px;
-    color: #999;
+    color: #a1a1aa;
     transition: all 0.2s ease;
-    
+
     .menuItemActive & {
         color: #1890ff;
     }
 
     .menuItem:hover & {
-        color: #1a1a1a;
+        color: #111827;
     }
 }
 

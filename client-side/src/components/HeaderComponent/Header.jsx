@@ -143,6 +143,7 @@ const Header = () => {
 
     const currentPath = location.pathname;
     const isHomePage = currentPath === '/';
+    const isInformationPage = currentPath.startsWith('/information');
 
     const userId = user?.id || user?.userID;
 
@@ -304,13 +305,16 @@ const Header = () => {
     }, [isAuthenticated]);
 
     useEffect(() => {
+        // Transparent on top for Home and Information pages, turn blue on scroll
+        const isTransparentRoute = isHomePage || isInformationPage;
+
         const handleScroll = () => {
-            if (isHomePage) {
+            if (isTransparentRoute) {
                 setScrolled(window.scrollY > 2);
             }
         };
 
-        if (isHomePage) {
+        if (isTransparentRoute) {
             window.addEventListener('scroll', handleScroll);
             handleScroll();
         } else {
@@ -318,7 +322,7 @@ const Header = () => {
         }
 
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [isHomePage]);
+    }, [isHomePage, isInformationPage]);
 
     const getNavLinkClass = (path) => {
         if (path === '/') return currentPath === '/' ? styles.navLinkActive : styles.navLink;

@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import SidebarMenu from './SidebarMenu/SidebarMenu';
 import PersonalProfile from './PersonalProfile/PersonalProfile';
 import TransactionList from './TransactionList/TransactionList';
 import FavoriteTours from './FavoriteTours/FavoriteTours';
 import styles from './InformationComponent.module.scss';
 import AvatarUploadModal from './AvatarUploadModal/AvatarUploadModal';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { FiUser, FiHome, FiChevronRight } from 'react-icons/fi';
+import coverImg from '../../assets/images/nuidoi.jpg';
 
 const InformationComponent = () => {
     const navigate = useNavigate();
@@ -15,59 +14,27 @@ const InformationComponent = () => {
     const { tab } = useParams();
     const { user, updateUser, loading, isAuthenticated } = useAuth(); 
     
-    // Redirect nếu chưa đăng nhập
     useEffect(() => {
         if (!loading && !isAuthenticated) {
             navigate('/login');
         }
     }, [loading, isAuthenticated, navigate]);
     
-    // Xác định tab đang active
     const getActiveTab = () => {
         if (tab) return tab;
         const path = location.pathname;
         if (path.includes('/transaction')) return 'transaction';
-        if (path.includes('/notifications')) return 'notifications';
         if (path.includes('/favorites')) return 'favorites';
-        return 'profile';
+        return 'transaction';
     };
     
     const [activeTab, setActiveTab] = useState(getActiveTab());
     const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
     
-    // Lấy tên tab hiện tại để hiển thị
-    const getTabTitle = () => {
-        switch (activeTab) {
-            case 'profile':
-                return 'Hồ Sơ Cá Nhân';
-            case 'transaction':
-                return 'Danh Sách Giao Dịch';
-            case 'favorites':
-                return 'Tour Yêu Thích';
-            default:
-                return 'Thông Tin Tài Khoản';
-        }
-    };
-
-    const getTabDescription = () => {
-        switch (activeTab) {
-            case 'profile':
-                return 'Quản lý thông tin cá nhân';
-            case 'transaction':
-                return 'Theo dõi lịch sử giao dịch';
-            case 'favorites':
-                return 'Danh sách các tour du lịch yêu thích';
-            default:
-                return 'Quản lý tài khoản của bạn';
-        }
-    };
-    
-    // Callback khi cập nhật avatar thành công
     const handleAvatarUpdateSuccess = (updatedUserPlainObject) => {
         updateUser(updatedUserPlainObject);
     };
     
-    // Cập nhật active tab khi URL thay đổi
     useEffect(() => {
         const newTab = getActiveTab();
         if (newTab !== activeTab) {
@@ -75,27 +42,22 @@ const InformationComponent = () => {
         }
     }, [location.pathname, tab]);
     
-    // Xử lý click menu
     const handleMenuClick = (tab) => {
         setActiveTab(tab);
         navigate(`/information/${tab}`);
     };
     
-    // Render nội dung theo tab
     const renderContent = () => {
         switch (activeTab) {
-            case 'profile':
-                return <PersonalProfile />;
             case 'transaction':
                 return <TransactionList user={user} />;
             case 'favorites':
                 return <FavoriteTours user={user}/>;
             default:
-                return <PersonalProfile />;
+                return <TransactionList user={user} />;
         }
     };
     
-    // Loading state
     if (loading) {
         return (
             <div className={styles.informationWrapper}>
@@ -107,7 +69,6 @@ const InformationComponent = () => {
         );
     }
     
-    // Error state - không có user
     if (!user) {
         return (
             <div className={styles.informationWrapper}>
@@ -121,50 +82,80 @@ const InformationComponent = () => {
         );
     }
     
-    // Main render
+    const userData = user?.data || user;
+    
     return (
         <div className={styles.informationWrapper}>
-            {/* Page Header - Banner trên cùng */}
-            <div className={styles.pageHeader}>
-                <div className={styles.headerContainer}>
-                    <div className={styles.headerContent}>
-                        <div className={styles.headerIcon}>
-                            <FiUser />
-                        </div>
-                        <div className={styles.headerText}>
-                            <h1>{getTabTitle()}</h1>
-                            <p>{getTabDescription()}</p>
+            {/* Premium Cover & Profile Header */}
+            <div className={styles.profileHero}>
+                <div className={styles.coverSection}>
+                    <div className={styles.coverImage}>
+                        <img 
+                            src={coverImg}
+                            alt="cover" 
+                            className={styles.cover}
+                            loading="eager"
+                            decoding="async"
+                            onError={(e) => {
+                                import('../../assets/images/nuidoi.jpg').then(mod => {
+                                    e.currentTarget.src = mod.default || mod;
+                                }).catch(() => {});
+                            }}
+                        />
+                    </div>
+                </div>
+
+                {/* Profile Info Overlay */}
+                <div className={styles.profileInfoContainer}>
+                    <div className={styles.avatarSection}>
+                        <div className={styles.avatarWrapper} onClick={() => setIsAvatarModalOpen(true)}>
+                            <img 
+                                src={userData?.avatar || 'https://th.bing.com/th/id/OIP.KMh7jiRqiGInQryreHc-UwHaHa?w=180&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3'}
+                                alt={userData?.fullName || 'User'}
+                                className={styles.avatar}
+                            />
+                            <div className={styles.editAvatarBtn}>
+                                <i className="fas fa-camera"></i>
+                            </div>
                         </div>
                     </div>
+                    <div className={styles.nameSection}>
+                        <h1 className={styles.userName}>{userData?.fullName || 'Khách hàng'}</h1>
+                        <p className={styles.userRole}>Thành viên Future Travel • Người yêu du lịch</p>
+                    </div>
+                </div>
 
-                    {/* Breadcrumb */}
-                    <div className={styles.breadcrumb}>
-                        <a href="/">
-                            <FiHome /> Trang chủ
-                        </a>
-                        <FiChevronRight />
-                        <span>Tài khoản</span>
-                        <FiChevronRight />
-                        <span>{getTabTitle()}</span>
+                {/* Facebook-style Navigation Tabs */}
+                <div className={styles.profileTabs}>
+                    <div className={styles.tabsContainer}>
+                        <button
+                            className={`${styles.profileTab} ${activeTab === 'transaction' ? styles.profileTabActive : ''}`}
+                            onClick={() => handleMenuClick('transaction')}
+                        >
+                            <i className="fas fa-list-alt"></i>
+                            <span>Danh sách giao dịch</span>
+                        </button>
+                        <button
+                            className={`${styles.profileTab} ${activeTab === 'favorites' ? styles.profileTabActive : ''}`}
+                            onClick={() => handleMenuClick('favorites')}
+                        >
+                            <i className="fas fa-heart"></i>
+                            <span>Tour yêu thích</span>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            {/* Container chính */}
+            {/* Main 2-Column Layout */}
             <div className={styles.container}>
-                {/* Sidebar - Cố định bên trái */}
-                <div className={styles.sidebarWrapper}>
-                    <SidebarMenu 
-                        user={user}
-                        activeTab={activeTab}
-                        onMenuClick={handleMenuClick}
-                        onAvatarClick={() => setIsAvatarModalOpen(true)}
-                    />
-                </div>
-                
-                {/* Content Area - Có thể cuộn */}
+                {/* Main Content */}
                 <div className={styles.contentArea}>
                     {renderContent()}
+                </div>
+
+                {/* Right Sidebar - Personal Profile Form */}
+                <div className={styles.rightSidebar}>
+                    <PersonalProfile isSidebarVersion={true} />
                 </div>
             </div>
             

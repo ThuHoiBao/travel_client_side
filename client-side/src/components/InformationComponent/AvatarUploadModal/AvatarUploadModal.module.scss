@@ -6,7 +6,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(17, 24, 39, 0.55);
+    backdrop-filter: blur(2px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -14,46 +15,50 @@
 }
 
 .modalContent {
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    width: 90%;
-    max-width: 400px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: saturate(1.2) blur(8px);
+    padding: 28px;
+    border-radius: 16px;
+    box-shadow: 0 16px 36px rgba(17, 24, 39, 0.18), inset 0 1px 0 rgba(255,255,255,0.6);
+    width: 92%;
+    max-width: 420px;
     position: relative;
     text-align: center;
+    border: 1px solid #eef1f6;
 }
 
 .closeIcon {
     position: absolute;
-    top: 15px;
-    right: 15px;
+    top: 14px;
+    right: 14px;
     font-size: 18px;
-    color: #999;
+    color: #9aa2b1;
     cursor: pointer;
+    transition: color 0.2s ease;
     &:hover {
-        color: #333;
+        color: #111827;
     }
 }
 
 .modalTitle {
-    font-size: 1.2em;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #16181d;
+    margin-bottom: 18px;
 }
 
 .avatarPreviewContainer {
-    width: 150px;
-    height: 150px;
+    width: 160px;
+    height: 160px;
     border-radius: 50%;
-    margin: 0 auto 20px;
+    margin: 0 auto 18px;
     overflow: hidden;
-    border: 3px solid #1890ff;
+    border: 6px solid #ffffff;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+    box-shadow: 0 10px 22px rgba(17, 24, 39, 0.1);
 }
 
 .avatarPreview {
@@ -68,11 +73,11 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.85);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-weight: bold;
+    font-weight: 700;
     color: #1890ff;
 }
 
@@ -98,23 +103,25 @@
 }
 
 .selectButton {
-    background-color: #f0f0f0;
-    color: #333;
-    border: 1px solid #ccc;
+    background-color: #ffffff;
+    color: #374151;
+    border: 1px solid #e7ecf3;
     &:hover:not(:disabled) {
-        background-color: #e0e0e0;
+        border-color: #cbd5e1;
+        transform: translateY(-1px);
     }
 }
 
 .updateButton {
-    background-color: #1890ff;
+    background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
     color: white;
     border: none;
     &:hover:not(:disabled) {
-        background-color: #096dd9;
+        filter: brightness(1.05);
+        transform: translateY(-1px);
     }
     &:disabled {
-        background-color: #a0cfff;
+        background: #a0cfff;
         cursor: not-allowed;
     }
 }

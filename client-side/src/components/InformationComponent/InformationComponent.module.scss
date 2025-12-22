@@ -1,119 +1,244 @@
-// InformationComponent.module.scss - Layout với header đẹp
+// Modern 2-Column Profile Layout with Facebook-style Tabs
 
 .informationWrapper {
     min-height: 100vh;
-    background: #fafafa;
+    background: linear-gradient(to bottom, #f8f9fc 0%, #f3f5fa 100%);
     padding: 0;
-    padding-top: 50px; // Khoảng cách cho navbar
-    margin-top: 0;
 }
 
-// Page Header - Banner trên cùng
-.pageHeader {
-    background: white;
-    border-bottom: 1px solid #f0f0f0;
-    padding: 30px 0;
-    margin-bottom: 10px;
+// ============ PROFILE HERO SECTION ============
+.profileHero {
+    background: #ffffff;
+    border-bottom: 1px solid #e7ecf3;
+    position: relative;
 }
 
-.headerContainer {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 20px;
+.coverSection {
+    width: 100%;
+    height: clamp(340px, 40vh, 480px); /* responsive height for better fit */
+    overflow: hidden;
+    position: relative;
 }
 
-.headerContent {
-    display: flex;
-    align-items: center;
-    gap: 20px;
+.coverImage {
+    width: 100%;
+    height: clamp(340px, 40vh, 480px);
 }
 
-.headerIcon {
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 24px;
-    flex-shrink: 0;
+.cover {
+    width: 100%;
+    height: clamp(340px, 40vh, 480px);
+    object-fit: cover;
 }
 
-.headerText {
-    h1 {
-        font-size: 24px;
-        font-weight: 600;
-        color: #1a1a1a;
-        margin: 0 0 5px 0;
-        letter-spacing: -0.5px;
-    }
-
-    p {
-        font-size: 14px;
-        color: #999;
-        margin: 0;
-    }
+.editCoverBtn {
+    position: absolute;
+    bottom: 16px;
+.coverBg {
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain; /* show full image within fixed area */
 }
 
-// Breadcrumb
-.breadcrumb {
+    right: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    object-fit: cover; /* fill area while maintaining aspect ratio */
+    object-position: center 30%; /* keep focal region slightly higher */
+    image-rendering: -webkit-optimize-contrast; /* improve downscale sharpness in Chrome */
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    cursor: pointer;
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 13px;
-    color: #999;
-    margin-top: 15px;
-    
-    a {
-        color: #666;
-        text-decoration: none;
-        transition: color 0.2s;
-        
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    z-index: 1;
+
+    i {
+        font-size: 16px;
+    }
+
+    &:hover {
+        background: rgba(245, 245, 245, 0.95);
+        transform: scale(1.02);
+    }
+}
+
+.coverFallback {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+// Profile Info Container (Overlay)
+.profileInfoContainer {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    align-items: flex-end; /* căn đáy để tên nằm ngang với avatar */
+    transform: translateY(-32px); /* giảm top để sát ảnh bìa hơn */
+    position: relative;
+    z-index: 2;
+}
+
+.avatarSection {
+    display: flex;
+    align-items: flex-end;
+}
+
+.avatarWrapper {
+    position: relative;
+    width: 160px; /* tăng 20px kích thước avatar */
+    height: 160px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: -48px; /* chồng lên ảnh bìa ~1/2 (kết hợp dịch -32px của container) */
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #ffffff; /* viền trắng nhỏ lại */
+    box-shadow: 0 12px 28px rgba(17, 24, 39, 0.12);
+    transition: all 0.3s ease;
+
+    &:hover {
+        filter: brightness(0.97);
+    }
+}
+
+.editAvatarBtn {
+    display: none; /* ẩn hình tròn xanh trên avatar */
+}
+
+.nameSection {
+    padding-bottom: 6px;
+    grid-column: 2; /* nằm bên phải avatar */
+    grid-row: 1;
+}
+
+.userName {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+    color: #111827;
+    letter-spacing: -0.5px;
+}
+
+.userRole {
+    margin: 6px 0 0 0;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.coinDisplayRight {
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #fff7e6 0%, #ffe8cc 100%);
+    border: 1px solid #ffe3a3;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #b45309;
+    font-weight: 800;
+    font-size: 15px;
+    box-shadow: 0 2px 8px rgba(180, 83, 9, 0.15);
+
+    i {
+        color: #f59e0b;
+        font-size: 18px;
+    }
+}
+
+// ============ FACEBOOK-STYLE TABS ============
+.profileTabs {
+    border-top: 1px solid #e7ecf3;
+    background: #ffffff;
+    margin-top: -6px; /* kéo tabs lên gần hơn */
+}
+
+.tabsContainer {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    gap: 4px;
+}
+
+.profileTab {
+    padding: 16px 20px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #65676b;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+
+    i {
+        font-size: 16px;
+    }
+
+    &:hover {
+        background: rgba(0, 0, 0, 0.03);
+        border-radius: 8px 8px 0 0;
+    }
+
+    &.profileTabActive {
+        color: #1890ff;
+        border-bottom-color: #1890ff;
+
         &:hover {
-            color: #1890ff;
+            background: rgba(24, 144, 255, 0.05);
         }
     }
-    
-    span {
-        color: #bdbdbd;
-    }
 }
 
-// Container chính
+// ============ MAIN 2-COLUMN CONTAINER ============
 .container {
-    max-width: 1280px;
+    max-width: 1400px;
     margin: 0 auto;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 320px;
     gap: 24px;
-    padding: 0 20px 40px;
-    align-items: flex-start;
+    padding: 20px 24px 40px;
+    align-items: start;
 }
 
-// Sidebar wrapper
 .sidebarWrapper {
-    flex-shrink: 0;
-    width: 280px;
+    position: sticky;
+    top: 80px;
 }
 
-// Content area
 .contentArea {
-    flex: 1;
-    background: white;
-    border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-    border: 1px solid #f0f0f0;
-    min-height: 500px;
-
-    // Cho phép cuộn
-    max-height: calc(100vh - 200px);
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 10px 28px rgba(17, 24, 39, 0.06);
+    border: 1px solid #eef1f6;
+    min-height: 800px;
+    max-height: calc(100vh - 180px);
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 
-    // Custom scrollbar
     &::-webkit-scrollbar {
-        width: 6px;
+        width: 8px;
     }
 
     &::-webkit-scrollbar-track {
@@ -121,69 +246,91 @@
     }
 
     &::-webkit-scrollbar-thumb {
-        background: #e0e0e0;
-        border-radius: 4px;
+        background: #d1d5db;
+        border-radius: 6px;
 
         &:hover {
-            background: #bdbdbd;
+            background: #9ca3af;
         }
     }
 }
 
-// Loading và Error states
+.rightSidebar {
+    position: sticky;
+    top: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: calc(180vh - 100px);
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 6px;
+
+        &:hover {
+            background: #9ca3af;
+        }
+    }
+}
+
+// ============ LOADING & ERROR STATES ============
 .loadingContainer,
 .errorContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 400px;
+    min-height: 600px;
     gap: 16px;
     padding: 40px;
 }
 
-.loadingContainer {
-    .spinner {
-        width: 40px;
-        height: 40px;
-        border: 3px solid #f0f0f0;
-        border-top: 3px solid #1890ff;
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-    }
-    
-    p {
-        color: #666;
-        font-size: 14px;
-        font-weight: 500;
-    }
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid #f0f0f0;
+    border-top: 3px solid #1890ff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.loadingContainer p {
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .errorContainer {
     p {
-        color: #ff4d4f;
+        color: #e25353;
         font-size: 16px;
-        font-weight: 600;
+        font-weight: 700;
         text-align: center;
     }
-    
+
     button {
         padding: 10px 24px;
-        background: #1890ff;
+        background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
         color: white;
         border: none;
-        border-radius: 8px;
+        border-radius: 10px;
         cursor: pointer;
         font-size: 14px;
-        font-weight: 600;
+        font-weight: 700;
         transition: all 0.2s ease;
-        
-        &:hover {
-            background: #40a9ff;
-        }
 
-        &:active {
-            transform: scale(0.98);
+        &:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
         }
     }
 }
@@ -193,69 +340,147 @@
     100% { transform: rotate(360deg); }
 }
 
-// Responsive Design
+// ============ RESPONSIVE ============
 @media (max-width: 1024px) {
     .container {
-        gap: 20px;
-        padding: 0 15px 30px;
+        grid-template-columns: 1fr;
+        padding: 16px 16px 32px;
     }
 
-    .sidebarWrapper {
-        width: 260px;
+    .rightSidebar {
+        position: static;
+        top: auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
     }
 
-    .contentArea {
-        padding: 25px;
+    .navContainer {
+        flex-wrap: wrap;
+    }
+
+    .coinDisplay {
+        order: -1;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .profileInfoContainer {
+        grid-template-columns: auto 1fr;
+        padding: 0 16px;
+
+        .actionButtons {
+            grid-column: 1 / -1;
+            justify-content: flex-start;
+        }
     }
 }
 
 @media (max-width: 768px) {
-    .informationWrapper {
-        padding-top: 60px;
+    .coverSection {
+        height: clamp(160px, 28vh, 260px);
     }
 
-    .pageHeader {
-        padding: 20px 0;
-        margin-bottom: 20px;
+    .avatarWrapper {
+        width: 100px;
+        height: 100px;
     }
 
-    .headerContent {
-        gap: 15px;
+    .userName {
+        font-size: 24px;
     }
 
-    .headerIcon {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
+    .profileInfoContainer {
+        gap: 14px;
+        transform: translateY(-40px);
+        grid-template-columns: auto 1fr;
     }
 
-    .headerText h1 {
-        font-size: 20px;
+    .coinDisplayRight {
+        grid-column: 2;
+        justify-self: end;
+        margin-top: 12px;
     }
 
-    .container {
-        flex-direction: column;
-        gap: 20px;
+    .tabsContainer {
+        gap: 2px;
     }
 
-    .sidebarWrapper {
-        width: 100%;
+    .profileTab {
+        padding: 14px 16px;
+        font-size: 14px;
+
+        span {
+            display: none;
+        }
+
+        i {
+            font-size: 18px;
+        }
     }
 
     .contentArea {
         padding: 20px;
+        min-height: 400px;
         max-height: none;
         overflow-y: visible;
     }
 }
 
 @media (max-width: 480px) {
-    .contentArea {
-        padding: 16px;
-        border-radius: 10px;
+    .coverSection {
+        height: clamp(140px, 24vh, 200px);
     }
 
-    .headerText h1 {
-        font-size: 18px;
+    .avatarWrapper {
+        width: 80px;
+        height: 80px;
+    }
+
+    .userName {
+        font-size: 20px;
+    }
+
+    .editProfileBtn {
+        padding: 8px 14px;
+        font-size: 12px;
+    }
+
+    .profileInfoContainer {
+        grid-template-columns: auto 1fr;
+        padding: 0 12px;
+        gap: 12px;
+    }
+
+    .coinDisplayRight {
+        grid-column: 1 / -1;
+        justify-self: center;
+        margin-top: 8px;
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+
+    .tabsContainer {
+        justify-content: space-around;
+        padding: 0 12px;
+    }
+
+    .profileTab {
+        padding: 12px 10px;
+        flex: 1;
+        justify-content: center;
+
+        span {
+            display: none;
+        }
+
+        i {
+            font-size: 20px;
+        }
+    }
+
+    .contentArea {
+        padding: 16px;
+        border-radius: 12px;
     }
 }
