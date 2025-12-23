@@ -29,6 +29,47 @@ const BANK_LIST = [
 
 const getBankLogo = (bank) => (bank.logo || '');
 
+// Helper: resolve a bank from code, shortName, or full name (case-insensitive)
+const resolveBank = (value) => {
+    if (!value) return null;
+    const v = String(value).trim();
+    if (!v) return null;
+    const upper = v.toUpperCase();
+    return (
+        BANK_LIST.find(b => b.code.toUpperCase() === upper) ||
+        BANK_LIST.find(b => (b.shortName || '').toUpperCase() === upper) ||
+        BANK_LIST.find(b => (b.name || '').toUpperCase() === upper)
+    ) || null;
+};
+
+// Helper: map to standardized VietQR bank display name (uppercase)
+const getVietQRBankName = (bankOrCode) => {
+    if (!bankOrCode) return '';
+    const bank = typeof bankOrCode === 'string' ? resolveBank(bankOrCode) : bankOrCode;
+    const code = (bank?.code || '').toUpperCase();
+    const mapping = {
+        VCB: 'VIETCOMBANK',
+        VTB: 'VIETINBANK',
+        BIDV: 'BIDV',
+        AGR: 'AGRIBANK',
+        ACB: 'ACB',
+        TCB: 'TECHCOMBANK',
+        VPB: 'VPBANK',
+        HDB: 'HDBANK',
+        LPB: 'LIENVIETPOSTBANK',
+        SHB: 'SHB',
+        TPB: 'TPBANK',
+        SEAB: 'SEABANK',
+        MB: 'MBBANK',
+        MSB: 'MSB',
+        VIB: 'VIB',
+        NCB: 'NCB',
+        SAC: 'SACOMBANK',
+        EXIM: 'EXIMBANK',
+    };
+    return mapping[code] || (bank?.name || '').toUpperCase();
+};
+
 const handleLogoError = (event) => {
     const fallbackEl = event.currentTarget.nextElementSibling;
     if (fallbackEl) fallbackEl.style.display = 'flex';
@@ -87,18 +128,21 @@ const BankSelectionModal = ({ onSelect, onClose }) => {
 
 // ✅ Thêm 'booking' vào props
 const RefundInfoModal = ({ bookingID, booking, onClose, onBack, onRefetch }) => {
-    // ✅ Khởi tạo state với dữ liệu sẵn có từ booking
+    // ✅ Chuẩn hoá giá trị ngân hàng từ booking (chấp nhận code, shortName, hoặc name)
+    const initialResolvedBank = resolveBank(booking?.bank);
+    // ✅ Khởi tạo state với dữ liệu sẵn có từ booking (ưu tiên lưu code chuẩn)
     const [formData, setFormData] = useState({
         accountName: booking.accountName || '',
         accountNumber: booking.accountNumber || '',
-        bank: booking.bank || '', // Mã bank (ví dụ: 'ACB', 'VTB')
+        bank: initialResolvedBank ? initialResolvedBank.code : (booking.bank || ''),
     });
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
     const [showBankModal, setShowBankModal] = useState(false); // State quản lý modal chọn Bank
 
-    const selectedBank = BANK_LIST.find(b => b.code === formData.bank);
+    // ✅ Tìm ngân hàng theo mã/shortName/name để hiển thị
+    const selectedBank = resolveBank(formData.bank);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -124,7 +168,14 @@ const RefundInfoModal = ({ bookingID, booking, onClose, onBack, onRefetch }) => 
 
         setIsProcessing(true);
         try {
-            await requestRefundApi(bookingID, formData);
+            // Gửi tên ngân hàng đầy đủ tới backend để phù hợp với cột bank_name
+            const payload = {
+                accountName: formData.accountName,
+                accountNumber: formData.accountNumber,
+                // Gửi tên ngân hàng chuẩn VietQR (uppercase)
+                bank: getVietQRBankName(selectedBank || formData.bank),
+            };
+            await requestRefundApi(bookingID, payload);
             
             setSuccessMessage("Cảm ơn bạn! Yêu cầu hoàn tiền qua Ngân hàng của bạn đã thành công. Vui lòng đợi chúng tôi xử lí hoàn tiền lại.");
             
