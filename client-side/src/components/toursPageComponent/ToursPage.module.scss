@@ -6,8 +6,91 @@
     padding: 20px;
     max-width: 1200px;
     margin: 0 auto;
-    /* Đã có margin-top để tránh Header cố định */
-    margin-top: 100px;  
+    /* Giảm khoảng cách với top, vẫn giữ đệm nhỏ cho header cố định */
+    margin-top: 20px;  
+}
+
+.pageHero {
+    width: 100%;
+    margin: 50px 0 20px 0;
+    padding: 22px 26px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    background: linear-gradient(120deg, #e9f3ff 0%, #f7fbff 50%, #ffffff 100%);
+    border-radius: 0;
+    box-shadow: 0 16px 40px -24px rgba(0, 76, 140, 0.4);
+    border: 1px solid rgba(31, 106, 175, 0.08);
+    border-left: none;
+    border-right: none;
+    margin-bottom: -20px;
+}
+
+.heroIconWrap {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(150deg, #2f6ac5, #1e4f9f);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.4rem;
+    box-shadow: 0 12px 24px -16px rgba(47, 106, 197, 0.8);
+}
+
+.heroTextBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.heroEyebrow {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1f6aaf;
+    letter-spacing: 0.02em;
+}
+
+.heroTitle {
+    margin: 0;
+    font-size: 1.6rem;
+    color: #0f1f3a;
+    font-weight: 700;
+}
+
+.heroSub {
+    margin: 0;
+    color: #4b5563;
+    line-height: 1.5;
+    max-width: 780px;
+}
+
+.heroBreadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 0.95rem;
+    color: #4b5563;
+}
+
+.crumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #1f6aaf;
+    font-weight: 600;
+}
+
+.crumbDivider {
+    color: #94a3b8;
+}
+
+.crumbActive {
+    color: #0f172a;
+    font-weight: 700;
 }
 
 .filterColumn {

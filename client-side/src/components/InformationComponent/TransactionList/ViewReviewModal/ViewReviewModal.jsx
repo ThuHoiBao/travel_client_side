@@ -8,32 +8,32 @@ import {
 } from 'react-icons/fa';
 import { getReviewByBookingIdApi } from '../../../../services/review/review.ts';
 
-// --- HÀM CHUYỂN ĐỔI RATING SANG ICON CẢM XÚC (Giữ nguyên) ---
+// --- HÀM CHUYỂN ĐỔI RATING SANG ICON CẢM XÚC MESSENGER STYLE ---
 const getEmotionIcon = (rating, styles) => {
     switch (rating) {
         case 5:
             return {
-                icon: <FaGrinStars className={styles.emotionIcon} style={{ color: '#52c41a' }} />,
+                icon: <div className={styles.emotionIcon} style={{ color: '#e74c3c' }}>🥰</div>,
                 label: "Tuyệt vời"
             };
         case 4:
             return {
-                icon: <FaSmile className={styles.emotionIcon} style={{ color: '#87d068' }} />,
+                icon: <div className={styles.emotionIcon} style={{ color: '#e91e63' }}>😍</div>,
                 label: "Hài lòng"
             };
         case 3:
             return {
-                icon: <FaMeh className={styles.emotionIcon} style={{ color: '#ffc107' }} />,
+                icon: <div className={styles.emotionIcon} style={{ color: '#f39c12' }}>😆</div>,
                 label: "Bình thường"
             };
         case 2:
             return {
-                icon: <FaFrown className={styles.emotionIcon} style={{ color: '#ff4d4f' }} />,
+                icon: <div className={styles.emotionIcon} style={{ color: '#95a5a6' }}>😢</div>,
                 label: "Không hài lòng"
             };
         case 1:
             return {
-                icon: <FaGrimace className={styles.emotionIcon} style={{ color: '#f00' }} />,
+                icon: <div className={styles.emotionIcon} style={{ color: '#e67e22' }}>😠</div>,
                 label: "Tệ"
             };
         default:
@@ -139,69 +139,82 @@ const ViewReviewModal = ({ booking, onClose, formatPrice, formatDate }) => {
 
     const modalJSX = (
         <div className={styles.modalOverlay} onClick={onClose}>
-            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                <button className={styles.closeButton} onClick={onClose}><FaTimes /></button>
-
-                <h2 className={styles.modalTitle}>Cảm nhận về chuyến đi</h2>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}> 
                 
-                {/* 1. Tour Info */}
-                <div className={styles.tourSummary}>
-                    <img src={booking.image || 'placeholder.png'} alt={booking.tourName} className={styles.tourImage} />
-                    <div className={styles.tourDetails}>
-                        <h4>{booking.tourName}</h4>
-                        <p>Mã Booking: {booking.bookingCode}</p>
-                        <p>Mã Tour: {booking.tourCode}</p>
-                    </div>
+                {/* FIXED HEADER */}
+                <div className={styles.modalHeader}>
+                    <h2 className={styles.modalTitle}>Xem Đánh Giá</h2>
+                    <button className={styles.closeButton} onClick={onClose}><FaTimes /></button>
                 </div>
-                
-                {/* 2. Review Section (Tích hợp Gallery) */}
-                {reviewData && (
-                    <div className={styles.reviewSection}>
-                        
-                        {/* 💡 TIÊU ĐỀ PHẦN ĐÁNH GIÁ */}
-                        <h3 className={styles.reviewHeader}>
-                            Cảm nhận về chuyến đi
-                        </h3>
-                        
-                        {/* 💡 COMMENT (Nằm trên) */}
-                        <p className={styles.comment}>{reviewData.comment || 'Không có bình luận.'}</p>
-                        
-                        {/* 💡 IMAGE GALLERY (Tích hợp vào đây) */}
-                        {reviewData.imageUrls && reviewData.imageUrls.length > 0 && (
-                            <div className={styles.gallerySection}>
-                                <h3>Ảnh đã đính kèm ({reviewData.imageUrls.length})</h3>
-                                <div className={styles.imageGrid}>
-                                    {reviewData.imageUrls.map((url, index) => (
-                                        <img
-                                            key={index}
-                                            src={url}
-                                            alt={`Ảnh ${index + 1}`}
-                                            onClick={() => openLightbox(url, index)} 
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                        
-                        {/* 💡 RATING & EMOTION (Nằm dưới) */}
-                        <div className={styles.ratingFooter}>
-                            
-                            {/* SAO VÀ ĐIỂM SỐ GỐC */}
-                            <div className={styles.smallRating}>
-                                <div className={styles.stars}>{renderStars(reviewData.rating)}</div>
-                                <span className={styles.ratingValue}>
-                                    {reviewData.rating}<span>/5</span>
-                                </span>
-                            </div>
 
-                            {/* ICON CẢM XÚC LỚN + LABEL */}
-                            <div className={styles.emotionContainer}>
-                                {emotion.icon}
-                                <span className={styles.emotionLabel}>{emotion.label}</span>
-                            </div>
+                {/* SCROLLABLE BODY */}
+                <div className={styles.modalBody}>
+                    {/* 1. Tour Info */}
+                    <div className={styles.tourSummary}>
+                        <img src={booking.image || 'placeholder.png'} alt={booking.tourName} className={styles.tourImage} />
+                        <div className={styles.tourDetails}>
+                            <h4>{booking.tourName}</h4>
+                            <p>Mã Booking: {booking.bookingCode}</p>
+                            <p>Mã Tour: {booking.tourCode}</p>
                         </div>
                     </div>
-                )}
+                    
+                    {/* 2. Review Section (Tích hợp Gallery) */}
+                    {reviewData && (
+                        <div className={styles.reviewSection}>
+                            
+                            {/* 💡 TIÊU ĐỀ PHẦN ĐÁNH GIÁ */}
+                            <h3 className={styles.reviewHeader}>
+                                Cảm nhận về chuyến đi
+                            </h3>
+                            
+                            {/* 💡 COMMENT (Nằm trên) */}
+                            <p className={styles.comment}>{reviewData.comment || 'Không có bình luận.'}</p>
+                            
+                            {/* 💡 IMAGE GALLERY (Tích hợp vào đây) */}
+                            {reviewData.imageUrls && reviewData.imageUrls.length > 0 && (
+                                <div className={styles.gallerySection}>
+                                    <h3>Ảnh đã đính kèm ({reviewData.imageUrls.length})</h3>
+                                    <div className={styles.imageGrid}>
+                                        {reviewData.imageUrls.map((url, index) => (
+                                            <img
+                                                key={index}
+                                                src={url}
+                                                alt={`Ảnh ${index + 1}`}
+                                                onClick={() => openLightbox(url, index)} 
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {/* 💡 RATING & EMOTION (Nằm dưới) */}
+                            <div className={styles.ratingFooter}>
+                                
+                                {/* SAO VÀ ĐIỂM SỐ GỐC */}
+                                <div className={styles.smallRating}>
+                                    <div className={styles.stars}>{renderStars(reviewData.rating)}</div>
+                                    <span className={styles.ratingValue}>
+                                        {reviewData.rating}<span>/5</span>
+                                    </span>
+                                </div>
+
+                                {/* ICON CẢM XÚC LỚN + LABEL */}
+                                <div className={styles.emotionContainer}>
+                                    {emotion.icon}
+                                    <span className={styles.emotionLabel}>{emotion.label}</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* FIXED FOOTER
+                <div className={styles.modalFooter}>
+                    <button className={styles.closeBtn} onClick={onClose}>
+                        <FaTimes /> Đóng
+                    </button>
+                </div> */}
 
                 {lightboxJSX}
             </div>

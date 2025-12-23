@@ -30,7 +30,7 @@
 .loyaltyCard {
     background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
     border: 2px solid #91d5ff;
-    border-radius: 15px;
+    border-radius: 5px;
     padding: 2px 3px;
     margin-bottom: 10px;
     transition: all 0.3s ease;
@@ -124,7 +124,7 @@
 
 .sectionTitle {
     margin: 0;
-    padding: 24px 24px 18px 24px;
+    padding: 24px 24px 12px 24px;
     font-size: 18px;
     font-weight: 800;
     color: #111827;
@@ -139,6 +139,16 @@
         color: #111827;
         font-size: 20px;
     }
+}
+
+.loyaltyPoints {
+    padding: 0 24px 18px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #f59e0b;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 /* Form styling */
