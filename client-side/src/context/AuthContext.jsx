@@ -10,6 +10,16 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         checkAuth();
+         const handleUnauthorized = () => {
+            console.log('🚪 Unauthorized event - logging out');
+            logout();
+        };
+
+        window.addEventListener('unauthorized', handleUnauthorized);
+
+        return () => {
+            window.removeEventListener('unauthorized', handleUnauthorized);
+        };
     }, []);
 
     const fetchProfile = async () => {
@@ -25,6 +35,9 @@ export const AuthProvider = ({ children }) => {
             console.error("Lỗi cập nhật thông tin user:", error);
             setUser(null);
             setIsAuthenticated(false);
+             if (error.response?.status === 401) {
+                logout();
+            }
         }
     };
 
