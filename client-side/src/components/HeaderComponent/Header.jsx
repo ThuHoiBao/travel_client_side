@@ -3,12 +3,16 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styles from './Header.module.scss';
 import { FaPhoneAlt, FaCoins, FaEdit, FaListAlt, FaBell, FaInfoCircle, FaSignOutAlt } from 'react-icons/fa';
 import { IoIosAirplane } from "react-icons/io";
+import { IoHomeOutline } from "react-icons/io5";
+import { FaSuitcaseRolling } from "react-icons/fa";
+import { MdForum, MdOutlineAttractions } from "react-icons/md";
 import { GiShipBow } from "react-icons/gi";
 import { useAuth } from '../../context/AuthContext';
 import axios from '../../utils/axiosCustomize';
 import websocketService from '../../services/websocket';
 
 const NotificationDropdown = ({ styles, onClose, notifications, onMarkAsRead, onViewAll }) => {
+    const navigate = useNavigate(); 
     const dropdownRef = useRef(null);
 
     useEffect(() => {
@@ -45,8 +49,74 @@ const NotificationDropdown = ({ styles, onClose, notifications, onMarkAsRead, on
             case 'BOOKING_CONFIRMED':
             case 'BOOKING_CANCELLED': return '✈️';
             case 'PAYMENT_SUCCESS': return '💳';
+            case 'NEW_COMMENT': return '💬';
+            case 'COMMENT_REPLY': return '↩️';
+            case 'COMMENT_LIKE': return '❤️';   
+            case 'POST_LIKE': return '👍';
             default: return '📢';
         }
+    };
+
+    const handleNotificationClick = (notification) => { 
+        console.log('Notification clicked:', notification); 
+        //Mask as read
+        onMarkAsRead(notification.notificationID);
+        
+        //Parse metadata
+        let metadata;
+        try {
+            metadata = typeof notification.metadata === 'string' ? JSON.parse(notification.metadata) : notification.metadata;
+        } catch(error) {
+            console.error('Error parsing metadata:', error);
+            metadata = {};  
+        }
+
+        console.log('Parsed metadata:', metadata);
+
+        onClose();
+        switch(notification.type) {
+            case 'NEW_COMMENT':
+            case 'COMMENT_REPLY':
+            case 'COMMENT_LIKE':
+            case 'POST_LIKE':
+            console.log('Navigating to post:', metadata.postId);
+                if(metadata.postId) {
+                    navigate(`/post/${metadata.postId}`);
+                    if(metadata.commentId){
+                        setTimeout(() => {
+                        const commentElement = document.getElementById(`comment-${metadata.commentId}`);
+                            if (commentElement) {
+                                commentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                commentElement.classList.add('highlight-comment');
+                                setTimeout(() => commentElement.classList.remove('highlight-comment'), 2000);
+                            }
+                        }, 500);    
+                    }
+                }
+                break;
+            case 'BOOKING_CONFIRMED':
+            case 'BOOKING_CANCELLED':
+                if (metadata.bookingId) {
+                    navigate(`/booking/${metadata.bookingId}`);
+                }
+                break;
+            
+            case 'NEW_COUPON':
+            case 'COUPON_UPDATED':
+                if (metadata.couponId) {
+                    navigate(`/tour/${metadata.departure.tourCode}`);
+                }
+                break;
+            
+            case 'PAYMENT_SUCCESS':
+                if (metadata.orderId) {
+                    navigate(`/orders/${metadata.orderId}`);
+                }
+                break;
+            default:
+                console.log('Unknown notification type:', notification.type);
+        }            
+       
     };
 
     return (
@@ -65,7 +135,8 @@ const NotificationDropdown = ({ styles, onClose, notifications, onMarkAsRead, on
                         <div
                             key={notification.notificationID}
                             className={`${styles.notificationItem} ${!notification.isRead ? styles.unread : ''}`}
-                            onClick={() => onMarkAsRead(notification.notificationID)}
+                            onClick={() => handleNotificationClick(notification)}
+                            style={{ cursor: 'pointer' }}
                         >
                             <div className={styles.notificationIcon}>
                                 {getNotificationIcon(notification.type)}
@@ -375,11 +446,12 @@ const Header = () => {
         <div className={headerClasses}>
             <div className={styles.headerLeft}>
                 <Link className={styles.logo} to="/"><img className={styles.logos} src='https://res.cloudinary.com/dnt8vx1at/image/upload/v1766193584/FT_kpfvjq.png'/></Link>
-                <Link to="/" className={getNavLinkClass('/')}>Trang chủ</Link>
-                <Link to="/tours" className={getNavLinkClass('/tours')}>Tours</Link>
+                <Link to="/" className={getNavLinkClass('/')}><IoHomeOutline/> Trang chủ</Link>
+                <Link to="/tours" className={getNavLinkClass('/tours')}><FaSuitcaseRolling /> Tours</Link>
                 <Link to="/flights" className={getNavLinkClass('/flights')}><IoIosAirplane /> Vé máy bay</Link>
-                <Link to="/entertainment" className={getNavLinkClass('/entertainment')}>Vui chơi giải trí</Link>
+                <Link to="/entertainment" className={getNavLinkClass('/entertainment')}> <MdOutlineAttractions />Vui chơi giải trí</Link>
                 <Link to="/trains" className={getNavLinkClass('/trains')}><GiShipBow /> Vé tàu</Link>
+                 <Link to="/forum" className={getNavLinkClass('/forum')}><MdForum /> Diễn đàn</Link>
             </div>
 
             <div className={styles.headerRight}>

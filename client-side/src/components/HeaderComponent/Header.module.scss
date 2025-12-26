@@ -641,3 +641,23 @@ $coin-color: #ffc107; // Màu vàng coin
     margin: 0 10px;
   }
 }
+
+
+// Animation highlight cho comment khi scroll tới
+:global(.highlight-comment) {
+    animation: highlightFade 2s ease-in-out;
+    background-color: rgba(255, 215, 0, 0.3);
+    border-radius: 8px;
+}
+
+
+:global {
+  @keyframes highlightFade {
+    0% {
+      background-color: rgba(255, 215, 0, 0.5);
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+}

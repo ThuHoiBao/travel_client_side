@@ -1,5 +1,3 @@
-// src/App.tsx (Cập nhật cuối cùng)
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './components/homPageComponent/HomePage'; 
 import MainLayout from './components/LayoutComponent/MainLayout'; 
@@ -20,14 +18,8 @@ import CouponManagement from './components/AdminComponent/Pages/CounponsPage/Cou
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ScrollToTop from './utils/ScrollToTop';
-// // Các trang giả định
-// const HotelPage = () => <div>Trang Khách sạn</div>; 
-// const FlightsPage = () => <div>Trang Vé máy bay</div>; 
-// const EntertainmentPage = () => <div>Trang Vui chơi giải trí</div>;
-// const TrainsPage = () => <div>Trang Vé tàu</div>;
-// const LoginPage = () => <div>Trang Đăng nhập</div>; 
-// const AdminPage = () => <div>Trang Quản trị</div>; 
-
+import ForumPage from './components/forum/ForumPage';
+import PostDetailPage from './components/forum/PostDetail/PostDetailPage';
 function App() {
   return (
     <Router>
@@ -35,26 +27,16 @@ function App() {
       <Routes>
 
         
-        {/* LAYOUT CHÍNH: Bọc tất cả các trang cần Header và Footer */}
         <Route element={<MainLayout />}>
                 
              
-            {/* Trang Chủ (Landing page) */}
             <Route path="/" element={<HomePage />} /> 
             
-            {/* Trang Tours (Sẽ nhận params từ Banner) */}
             <Route path="/tours" element={<ToursPage />} /> 
             
-            {/* Trang Information */}
             <Route path="/information" element={<InformationComponent />} />
             <Route path="/information/:tab" element={<InformationComponent />} />
             
-            {/* Các trang khác
-            <Route path="/hotel" element={<HotelPage />} />
-            <Route path="/flights" element={<FlightsPage />} />
-            <Route path="/entertainment" element={<EntertainmentPage />} />
-            <Route path="/trains" element={<TrainsPage />} /> */}
-
             <Route 
               path="/tour-detail" 
               element={<TourDetail />} 
@@ -72,6 +54,10 @@ function App() {
               path="/payment-booking" 
               element={<BookingPayment />}
           />
+
+          <Route path="/forum" element={<ForumPage />} />
+          <Route path="/post/:postId" element={<PostDetailPage />} />
+
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-failed" element={<PaymentFailed />} />
