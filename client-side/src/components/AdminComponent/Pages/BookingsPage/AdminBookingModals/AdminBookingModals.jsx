@@ -426,7 +426,7 @@ export const ProcessRefundModal = ({ booking, onClose, onSuccess }) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
     };
 
-    const totalRefund = booking.totalPrice + (booking.paidByCoin || 0);
+    const totalRefund = booking.refundAmount || 0;
 
     // Auto-check
     useEffect(() => {

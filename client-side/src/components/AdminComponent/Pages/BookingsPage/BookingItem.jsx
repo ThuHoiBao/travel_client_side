@@ -1,5 +1,6 @@
 // src/components/AdminComponent/Pages/BookingsPage/BookingItem.jsx
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import styles from './BookingItem.module.scss';
 import { FaEye, FaStar, FaDollarSign, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import TransactionDetailModal from '../../../InformationComponent/TransactionList/TransactionListItem/TransactionDetailModal/TransactionDetailModal';
@@ -33,6 +34,29 @@ const BookingItem = ({ booking, formatPrice, formatDate, refetch }) => {
 
     const statusInfo = statusMap[booking.bookingStatus] || { label: booking.bookingStatus, class: 'statusDefault' };
 
+    // Guard: tour đã khởi hành?
+    const hasDeparted = React.useMemo(() => {
+        if (!booking?.departureDate) return false;
+        const departureTime = new Date(booking.departureDate).getTime();
+        return departureTime < Date.now();
+    }, [booking?.departureDate]);
+
+    const handleAdminConfirm = () => {
+        if (hasDeparted) {
+            toast.warn('Tour đã khởi hành, không thể xác nhận.');
+            return;
+        }
+        setIsConfirmModalOpen(true);
+    };
+
+    const handleAdminCancelWithRefund = () => {
+        if (hasDeparted) {
+            toast.warn('Tour đã khởi hành, không thể hủy.');
+            return;
+        }
+        setIsCancelWithRefundModalOpen(true);
+    };
+
     // Render các nút action dựa trên trạng thái
     const renderActionButtons = () => {
         const status = booking.bookingStatus;
@@ -53,14 +77,14 @@ const BookingItem = ({ booking, formatPrice, formatDate, refetch }) => {
                     <>
                         <button 
                             className={`${styles.actionBtn} ${styles.btnSuccess}`}
-                            onClick={() => setIsConfirmModalOpen(true)}
+                            onClick={handleAdminConfirm}
                             title="Xác nhận booking"
                         >
                             <FaCheckCircle />
                         </button>
                         <button 
                             className={`${styles.actionBtn} ${styles.btnDanger}`}
-                            onClick={() => setIsCancelWithRefundModalOpen(true)}
+                            onClick={handleAdminCancelWithRefund}
                             title="Hủy chuyến đi"
                         >
                             <FaTimesCircle />
@@ -83,7 +107,7 @@ const BookingItem = ({ booking, formatPrice, formatDate, refetch }) => {
                 {status === 'PAID' && (
                     <button 
                         className={`${styles.actionBtn} ${styles.btnDanger}`}
-                        onClick={() => setIsCancelWithRefundModalOpen(true)}
+                        onClick={handleAdminCancelWithRefund}
                         title="Hủy chuyến đi"
                     >
                         <FaTimesCircle />

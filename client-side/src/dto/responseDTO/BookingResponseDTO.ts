@@ -40,6 +40,7 @@ export class BookingResponseDTO {
     private _refundBank: string = "";
     private _refundAccountNumber: string = "";
     private _refundAccountName: string = "";
+    private _refundAmount: number = 0;
 
     // Getters
     get bookingID() { return this._bookingID; }
@@ -80,6 +81,7 @@ export class BookingResponseDTO {
     get refundBank() { return this._refundBank; }
     get refundAccountNumber() { return this._refundAccountNumber; }
     get refundAccountName() { return this._refundAccountName; }
+    get refundAmount() { return this._refundAmount; }
     /**
      * Phương thức ánh xạ từ API Response
      * @param data Dữ liệu raw từ API
@@ -124,6 +126,7 @@ export class BookingResponseDTO {
         dto._refundBank = data.refundBank || "";
         dto._refundAccountNumber = data.refundAccountNumber || "";
         dto._refundAccountName = data.refundAccountName || "";
+        dto._refundAmount = data.refundAmount || 0;
         // Map danh sách hành khách
         dto._passengers = (data.passengers || []).map((p: any) => BookingPassengerResponseDTO.fromApiResponse(p));
         return dto;
@@ -165,6 +168,7 @@ export class BookingResponseDTO {
             refundBank: this.refundBank,
             refundAccountNumber: this.refundAccountNumber,
             refundAccountName: this.refundAccountName,
+            refundAmount: this.refundAmount,
             passengers: this.passengers.map(p => p.toPlain())
         };
     }

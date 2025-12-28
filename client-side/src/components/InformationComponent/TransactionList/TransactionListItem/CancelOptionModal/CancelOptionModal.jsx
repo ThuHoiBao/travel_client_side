@@ -14,6 +14,8 @@ import RefundInfoModal from '../RefundInfoModal/RefundInfoModal';
 const CancelOptionModal = ({ booking,bookingID, onClose, onRefetch }) => {
     // State quản lý các modal con
     const [activeSubModal, setActiveSubModal] = useState(null); // 'confirm_coin', 'refund_bank'
+    const [agreedPolicy, setAgreedPolicy] = useState(false);
+    const [showPolicyModal, setShowPolicyModal] = useState(false);
 
     // Nếu đang ở modal con, hiển thị modal con đó
     if (activeSubModal === 'confirm_coin') {
@@ -62,6 +64,7 @@ const CancelOptionModal = ({ booking,bookingID, onClose, onRefetch }) => {
                         <button
                             className={styles.btnPrimary}
                             onClick={() => setActiveSubModal('confirm_coin')}
+                            disabled={!agreedPolicy}
                         >
                             Áp dụng
                         </button>
@@ -76,10 +79,24 @@ const CancelOptionModal = ({ booking,bookingID, onClose, onRefetch }) => {
                         <button
                             className={styles.btnSecondary}
                             onClick={() => setActiveSubModal('refund_bank')}
+                            disabled={!agreedPolicy}
                         >
                             Áp dụng
                         </button>
                     </div>
+                </div>
+
+                <div className={styles.policyRow}>
+                    <label className={styles.policyLabel}>
+                        <input
+                            type="checkbox"
+                            checked={agreedPolicy}
+                            onChange={(e) => setAgreedPolicy(e.target.checked)}
+                        />
+                        <span>
+                            Đồng ý với các <span className={styles.policyLink} onClick={() => setShowPolicyModal(true)}>chính sách hủy tour</span>
+                        </span>
+                    </label>
                 </div>
 
                 <button className={styles.btnClose} onClick={onClose}>Đóng</button>
@@ -87,8 +104,47 @@ const CancelOptionModal = ({ booking,bookingID, onClose, onRefetch }) => {
         </div>
     );
 
+    const policyModal = showPolicyModal ? (
+        <div className={styles.policyModalOverlay} onClick={() => setShowPolicyModal(false)}>
+            <div className={styles.policyModal} onClick={(e) => e.stopPropagation()}>
+                <div className={styles.policyHeader}>
+                    <div className={styles.policyTitle}>Chính sách hủy tour</div>
+                    <button
+                        type="button"
+                        className={styles.policyClose}
+                        aria-label="Đóng"
+                        onClick={() => setShowPolicyModal(false)}
+                    >
+                        ✕
+                    </button>
+                </div>
+
+                <div className={styles.policyBody}>
+                    <p>Future Travel áp dụng phí hủy theo từng mốc thời gian trước ngày khởi hành:</p>
+                    <ul>
+                        <li><strong>Sau khi đăng ký:</strong> Phí hủy 10% giá vé du lịch.</li>
+                        <li><strong>Trước 15 ngày:</strong> Phí hủy 50% giá vé du lịch.</li>
+                        <li><strong>Trước 05 ngày:</strong> Phí hủy 70% giá vé du lịch.</li>
+                        <li><strong>Trước 02 ngày:</strong> Phí hủy 90% giá vé du lịch.</li>
+                    </ul>
+                    <div className={styles.policyNote}>Phí hủy được tính trên tổng giá vé đã thanh toán. Vui lòng cân nhắc trước khi xác nhận.</div>
+                </div>
+
+                <div className={styles.policyFooter}>
+                    <button className={styles.btnPrimary} onClick={() => setShowPolicyModal(false)}>Đã hiểu</button>
+                </div>
+            </div>
+        </div>
+    ) : null;
+
     // ✅ RENDER BẰNG PORTAL: Đẩy toàn bộ Modal ra ngoài DOM body
-    return createPortal(modalContent, document.body);
+    return createPortal(
+        <>
+            {modalContent}
+            {policyModal}
+        </>,
+        document.body
+    );
 };
 
 

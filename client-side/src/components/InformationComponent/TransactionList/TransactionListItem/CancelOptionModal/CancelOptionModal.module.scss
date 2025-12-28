@@ -120,6 +120,12 @@ $border-light: #e0e0e0;
     &:hover { background-color: darken($secondary-color, 10%); }
 }
 
+.btnPrimary:disabled,
+.btnSecondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .btnClose {
     background: rgb(224, 26, 26);
     color: #ffffff;
@@ -133,4 +139,122 @@ $border-light: #e0e0e0;
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-50px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+.policyRow {
+    display: flex;
+    justify-content: flex-start;
+    margin: 10px 0 5px;
+}
+
+.policyLabel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #333;
+
+    input {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.policyLink {
+    color: $primary-color;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+        color: darken($primary-color, 10%);
+    }
+}
+
+.policyModalOverlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2100;
+}
+
+.policyModal {
+    background: #fff;
+    padding: 18px 20px 16px;
+    border-radius: 12px;
+    width: 92%;
+    max-width: 560px;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.18);
+    border: 1px solid #e7eaf1;
+}
+
+.policyHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eef1f5;
+}
+
+.policyTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.policyClose {
+    background: #f5f7fb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    color: #6b7280;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: #e0e7ff;
+        color: #1d4ed8;
+        border-color: #c7d2fe;
+    }
+}
+
+.policyBody {
+    padding: 14px 2px 12px;
+    color: #374151;
+    text-align: left;
+
+    p {
+        margin: 0 0 10px;
+        font-weight: 600;
+    }
+
+    ul {
+        padding-left: 18px;
+        margin: 0 0 10px;
+        color: #4b5563;
+        li { margin-bottom: 6px; }
+    }
+}
+
+.policyNote {
+    margin-top: 6px;
+    padding: 10px 12px;
+    background: #f9fafb;
+    border: 1px dashed #d1d5db;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #374151;
+}
+
+.policyFooter {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 10px;
+    border-top: 1px solid #eef1f5;
 }
