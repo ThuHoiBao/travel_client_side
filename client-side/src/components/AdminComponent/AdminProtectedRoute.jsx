@@ -9,7 +9,7 @@ const AdminProtectedRoute = () => {
     console.log('No admin credentials found, redirecting to admin login');
     return <Navigate to="/admin/login" replace />;
   }
-
+ 
   try {
     const adminUser = JSON.parse(adminUserStr);
     const userRole = adminUser.role;
