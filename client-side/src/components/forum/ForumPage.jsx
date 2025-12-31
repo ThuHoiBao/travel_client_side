@@ -104,7 +104,8 @@ const ForumPage = () => {
           totalPosts: stats.totalPosts || 0,
           totalComments: stats.totalComments || 0,
           totalLikesReceived: stats.totalLikesReceived || 0,
-          reputationPoints: stats.reputationPoints || 0
+          reputationPoints: stats.reputationPoints || 0,
+          totalFollowers: stats.totalFollowers || 0
         }
       });
     } catch (error) {

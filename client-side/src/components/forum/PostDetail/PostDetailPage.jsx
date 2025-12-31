@@ -10,7 +10,7 @@ import {
   Calendar,
   ArrowLeft,
   Send,
-  CornerDownRight // IMPORT ICON MỚI
+  CornerDownRight
 } from 'lucide-react';
 import Avatar from '../../../components/shared/Avatar/Avatar';
 import Badge from '../../../components/shared/Badge/Badge';
@@ -31,7 +31,6 @@ const PostDetailPage = () => {
   const [commentContent, setCommentContent] = useState('');
   const [commentLoading, setCommentLoading] = useState(false);
 
-  // Quản lý trạng thái mở rộng reply
   const [expandedCommentIds, setExpandedCommentIds] = useState(new Set());
 
   useEffect(() => {
@@ -44,6 +43,7 @@ const PostDetailPage = () => {
       const res = await axios.get(`/forum/posts/${postId}`);
       const postData = res.data.data;
       setPost(postData);
+      
       setLiked(postData.isLikedByCurrentUser || false);
       setLikeCount(postData.likeCount || 0);
     } catch (err) {
@@ -72,7 +72,13 @@ const PostDetailPage = () => {
         parentCommentId: null
       };
       const res = await axios.post(`/forum/posts/${postId}/comments`, payload);
-      setPost(res.data.data);
+      const updatedPost = res.data.data;
+      setPost(updatedPost);
+      
+      // FIX: Cập nhật lại liked status sau khi có data mới
+      setLiked(updatedPost.isLikedByCurrentUser || false);
+      setLikeCount(updatedPost.likeCount || 0);
+      
       setCommentContent('');
     } catch (err) {
       alert('Không thể gửi bình luận');
@@ -140,7 +146,14 @@ const PostDetailPage = () => {
         };
         const res = await axios.post(`/forum/posts/${postId}/comments`, payload);
         ensureExpanded(comment.commentId);
-        setPost(res.data.data);
+        
+        const updatedPost = res.data.data;
+        setPost(updatedPost);
+        
+        // FIX: Cập nhật lại liked status
+        setLiked(updatedPost.isLikedByCurrentUser || false);
+        setLikeCount(updatedPost.likeCount || 0);
+        
         setReplyText('');
         setShowReplyForm(false); 
       } catch (err) {
@@ -167,7 +180,6 @@ const PostDetailPage = () => {
     return (
       <div className={isReply ? styles.replyItem : styles.commentItem} id={`comment-${comment.commentId}`}>
         
-        {/* AVATAR: Resize nhỏ nếu là reply */}
         <div className={styles.commentAvatar}>
           <Avatar 
             src={comment.author?.avatarUrl} 
@@ -177,13 +189,11 @@ const PostDetailPage = () => {
         </div>
 
         <div className={styles.commentBody}>
-          {/* BUBBLE CHAT */}
           <div className={styles.commentBubble}>
             <span className={styles.commentAuthor}>{comment.author?.fullName}</span>
             <p>{comment.content}</p>
           </div>
 
-          {/* ACTIONS: Like, Reply, Date */}
           <div className={styles.commentActions}>
             <span className={styles.commentDate}>
               {format(new Date(comment.createdAt), 'dd/MM/yyyy', { locale: vi })}
@@ -198,7 +208,6 @@ const PostDetailPage = () => {
             <button onClick={handleReplyClick}>Phản hồi</button>
           </div>
 
-          {/* FORM REPLY */}
           {showReplyForm && (
             <div className={styles.replyForm}>
               <Avatar src={comment.author?.avatarUrl} size="xs" alt="You" />
@@ -221,7 +230,6 @@ const PostDetailPage = () => {
             </div>
           )}
 
-          {/* NÚT XEM REPLY KIỂU FACEBOOK */}
           {!isReply && hasReplies && (
             <button 
               className={styles.fbViewRepliesBtn}
@@ -234,7 +242,6 @@ const PostDetailPage = () => {
             </button>
           )}
 
-          {/* LIST REPLIES */}
           {!isReply && hasReplies && isExpanded && (
             <div className={styles.repliesContainer}>
               {allReplies.map((reply) => (
@@ -322,7 +329,6 @@ const PostDetailPage = () => {
           <div className={styles.commentsSection}>
             <h3>Bình luận ({commentCount || 0})</h3>
 
-            {/* Avatar user hiện tại + input */}
             <div className={styles.commentForm}>
             <Avatar src={author?.avatarUrl} size="lg" alt={author?.fullName} />
                <textarea

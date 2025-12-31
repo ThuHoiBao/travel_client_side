@@ -53,6 +53,8 @@ const NotificationDropdown = ({ styles, onClose, notifications, onMarkAsRead, on
             case 'COMMENT_REPLY': return '↩️';
             case 'COMMENT_LIKE': return '❤️';   
             case 'POST_LIKE': return '👍';
+            case 'NEW_FOLLOWER': return '👤';
+            case 'NEW_POST_FROM_FOLLOWING': return '📝';
             default: return '📢';
         }
     };
@@ -65,20 +67,23 @@ const NotificationDropdown = ({ styles, onClose, notifications, onMarkAsRead, on
         //Parse metadata
         let metadata;
         try {
-            metadata = typeof notification.metadata === 'string' ? JSON.parse(notification.metadata) : notification.metadata;
+            metadata = typeof notification.metadata === 'string' 
+            ? JSON.parse(notification.metadata) 
+            : notification.metadata;
         } catch(error) {
             console.error('Error parsing metadata:', error);
             metadata = {};  
         }
 
         console.log('Parsed metadata:', metadata);
-
         onClose();
+
         switch(notification.type) {
             case 'NEW_COMMENT':
             case 'COMMENT_REPLY':
             case 'COMMENT_LIKE':
             case 'POST_LIKE':
+            case 'NEW_POST_FROM_FOLLOWING':
             console.log('Navigating to post:', metadata.postId);
                 if(metadata.postId) {
                     navigate(`/post/${metadata.postId}`);
@@ -94,6 +99,10 @@ const NotificationDropdown = ({ styles, onClose, notifications, onMarkAsRead, on
                     }
                 }
                 break;
+            case 'NEW_FOLLOWER':
+                if (metadata.followerId) {
+                    navigate(`/forum/user/${metadata.followerId}`);
+                }
             case 'BOOKING_CONFIRMED':
             case 'BOOKING_CANCELLED':
                 if (metadata.bookingId) {

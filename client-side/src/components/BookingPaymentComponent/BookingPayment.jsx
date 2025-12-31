@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from '../../utils/axiosCustomize';
 import styles from './BookingPayment.module.scss';
+import { toast } from 'react-toastify';
 import { 
   FaCheckCircle, 
   FaClock, 
@@ -12,7 +13,9 @@ import {
   FaChevronDown,
   FaChevronUp,
   FaTag,
-  FaBus
+  FaBus,
+  FaTimes,
+  FaExclamationTriangle
 } from 'react-icons/fa';
 
 const BookingPayment = () => {
@@ -28,6 +31,7 @@ const BookingPayment = () => {
   const [paymentProcessing, setPaymentProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('PAYOS');
 
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   useEffect(() => {
     const fetchBookingData = async () => {
       if (!bookingCode) {
@@ -137,12 +141,12 @@ const BookingPayment = () => {
   const handlePayment = async () => {
     // Validate booking data
     if (!bookingData) {
-      alert('Không tìm thấy thông tin booking');
+      toast.error('Không tìm thấy thông tin booking');
       return;
     }
 
     if (bookingData.remainingAmount <= 0) {
-      alert('Booking đã được thanh toán đầy đủ');
+      toast.info('Booking đã được thanh toán đầy đủ');
       return;
     }
 
@@ -151,19 +155,16 @@ const BookingPayment = () => {
       const deadline = new Date(bookingData.paymentDeadline);
       const now = new Date();
       if (now >= deadline) {
-        alert('Thời hạn thanh toán đã hết. Booking của bạn có thể đã bị hủy.');
+        toast.error('Thời hạn thanh toán đã hết. Booking của bạn có thể đã bị hủy.');
         return;
       }
     }
 
-    // Confirm with user
-    const confirmPayment = window.confirm(
-      `Bạn có chắc muốn thanh toán ${formatCurrency(bookingData.remainingAmount)} cho booking ${bookingData.bookingCode}?`
-    );
-    
-    if (!confirmPayment) {
-      return;
-    }
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmPayment = async () => {
+  setShowConfirmModal(false);
 
    try {
       setPaymentProcessing(true);
@@ -253,7 +254,7 @@ const BookingPayment = () => {
     } finally {
       setPaymentProcessing(false);
     }
-  };
+  }
 
   if (loading) {
     return (
@@ -660,6 +661,45 @@ const BookingPayment = () => {
           </div>
         </div>
       </main>
+
+      {showConfirmModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowConfirmModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <FaExclamationTriangle className={styles.modalIcon} />
+              <h3>Xác nhận thanh toán</h3>
+              <button className={styles.closeBtn} onClick={() => setShowConfirmModal(false)}>
+                <FaTimes />
+              </button>
+            </div>
+            
+            <div className={styles.modalBody}>
+              <p>Bạn đang thực hiện thanh toán cho booking <strong>{bookingData.bookingCode}</strong>.</p>
+              <div className={styles.modalAmount}>
+                <span>Số tiền:</span>
+                <span className={styles.amountValue}>{formatCurrency(bookingData.remainingAmount)}</span>
+              </div>
+              <p className={styles.modalNote}>Phương thức: <strong>{paymentMethod === 'VNPAY' ? 'VNPAY' : 'VietQR (PayOS)'}</strong></p>
+              <p>Bạn có chắc chắn muốn tiếp tục?</p>
+            </div>
+
+            <div className={styles.modalFooter}>
+              <button 
+                className={styles.btnCancel} 
+                onClick={() => setShowConfirmModal(false)}
+              >
+                Hủy bỏ
+              </button>
+              <button 
+                className={styles.btnConfirm} 
+                onClick={handleConfirmPayment}
+              >
+                Xác nhận thanh toán
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

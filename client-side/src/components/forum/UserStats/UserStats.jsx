@@ -50,9 +50,9 @@ const UserStats = ({ user = null, onCreatePostClick }) => {
           <div className={styles.statLabel}>Bài viết</div>
         </div>
         <div className={styles.statItem}>
-          <MessageSquare size={24} className={styles.statIcon} />
-          <div className={styles.statValue}>{stats.totalComments || 0}</div>
-          <div className={styles.statLabel}>Bình luận</div>
+           <UserPlus size={24} className={styles.statIcon} />
+          <div className={styles.statValue}>{stats.totalFollowers || 0}</div>
+          <div className={styles.statLabel}>Theo dõi</div>
         </div>
         <div className={styles.statItem}>
           <Heart size={24} className={styles.statIcon} />
