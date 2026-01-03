@@ -10,6 +10,7 @@ import UserStats from '../../components/forum/UserStats/UserStats';
 import styles from './ForumPage.module.scss';
 import axios from '../../utils/axiosCustomize';
 import { useAuth } from '../../context/AuthContext.jsx';
+import UserPostsManagement from './UserPostsManagement/UserPostsManagement.jsx';
 
 // Component con để tách riêng phần header tĩnh
 const ForumHeader = React.memo(({ onSearchChange, onSortChange, filters }) => {
