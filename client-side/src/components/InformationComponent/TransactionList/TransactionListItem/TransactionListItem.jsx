@@ -25,7 +25,18 @@ const TransactionListItem = ({ booking, refetch }) => {
 
         window.location.href = `/payment-booking?bookingCode=${booking.bookingCode}`;
     };
+    const hasDeparted = React.useMemo(() => {
+        if (!booking?.departureDate) return false;
+        const departureTime = new Date(booking.departureDate).getTime();
+        const now = Date.now();
+        return departureTime < now;
+    }, [booking?.departureDate]);
+
     const handleCancelClick = () => {
+        if (hasDeparted) {
+            toast.warn('Tour đã khởi hành, không thể hủy.');
+            return;
+        }
         setIsCancelModalOpen(true);
     };
 
@@ -149,9 +160,9 @@ const TransactionListItem = ({ booking, refetch }) => {
     const renderActionArea = () => {
         
         let primaryButton = null; 
+        const secondaryButtons = [];
         let statusDisplay = null;
         let timeLimitDisplay = null;
-        let showPlaceholder = false;
         const detailButton = (
             <button
                 key="detail"
@@ -202,11 +213,20 @@ const TransactionListItem = ({ booking, refetch }) => {
                 );
                 break;
                 
-            case 'PAID':
+            case 'PAID': 
                 primaryButton = (
                     <button key="review" className={styles.btnPrimary}
                     onClick={handleOpenReviewModal}>
                         <LuStar /> Đánh giá
+                    </button>
+                );
+                secondaryButtons.push(
+                    <button 
+                        key="cancel-paid" 
+                        className={styles.btnDanger}
+                        onClick={handleCancelClick}
+                    >
+                        Hủy tour
                     </button>
                 );
                 break;
@@ -220,23 +240,20 @@ const TransactionListItem = ({ booking, refetch }) => {
                 );
                 break;
 
-           case 'CANCELLED': {
+            case 'CANCELLED': {
                 statusDisplay = booking.cancelReason && booking.cancelReason.trim() ? (
                     <div className={styles.cancelReason}>
                         <strong>Lý do hủy:</strong> {booking.cancelReason}
                     </div>
                 ) : null;
-
-                showPlaceholder = true;
                 break;
             }
 
             default:
-                showPlaceholder = true; 
                 break;
         }
 
-        const placeholderButton = showPlaceholder ? <div key="placeholder" className={styles.btnPlaceholder}></div> : null;
+        const actionButtons = [primaryButton, ...secondaryButtons].filter(Boolean);
         return (
             <div className={styles.actions}>
                 <div className={styles.statusBadge} style={getStatusStyle(booking.bookingStatus)}>
@@ -247,14 +264,10 @@ const TransactionListItem = ({ booking, refetch }) => {
                      {formatPrice(booking.totalPrice)}
                 </div>
                 
-                {
-                    (primaryButton || booking.bookingStatus ) && (
-                        <div className={styles.buttonGroup}>
-                            {primaryButton || (showPlaceholder && placeholderButton)}
-                            {detailButton}
-                        </div>
-                    )
-                }
+                <div className={styles.buttonGroup}>
+                    {actionButtons}
+                    {detailButton}
+                </div>
                 
                 {timeLimitDisplay}
                 
