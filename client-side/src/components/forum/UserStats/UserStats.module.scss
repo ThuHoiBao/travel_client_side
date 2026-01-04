@@ -121,3 +121,41 @@
 .userActions {
   margin-top: 8px;
 }
+
+.managePostsBtn {
+  margin-left: 70px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 16px;
+  border-radius: 10px;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  color: #fff;
+  background: linear-gradient(135deg, #ff9a3c 0%, #ff6a00 100%);
+
+  border: none;
+  cursor: pointer;
+
+  box-shadow: 0 6px 16px rgba(255, 122, 0, 0.35);
+  transition: all 0.25s ease;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(255, 122, 0, 0.45);
+    filter: brightness(1.05);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(255, 122, 0, 0.35);
+  }
+}

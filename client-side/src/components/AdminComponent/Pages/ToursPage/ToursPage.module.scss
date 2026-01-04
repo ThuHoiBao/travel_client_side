@@ -1,7 +1,4 @@
-/* ToursPage.module.scss */
-
-// Variables for consistent theming
-$primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+$primary-gradient: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
 $primary-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.39);
 $bg-color: #f3f4f6;
 $card-bg: #ffffff;
@@ -9,7 +6,7 @@ $text-main: #1f2937;
 $text-secondary: #6b7280;
 $border-color: #e5e7eb;
 $row-hover: #f9fafb;
-$row-stripe: #f8fafc; // Màu cho hàng chẵn
+$row-stripe: #f8fafc; 
 
 .container {
   padding: 24px;

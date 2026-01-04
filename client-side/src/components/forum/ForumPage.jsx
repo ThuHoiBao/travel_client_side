@@ -83,9 +83,10 @@ const ForumPage = () => {
     searchQuery: ''
   });
 
-  
-  const openCreateModal = () => setIsCreateModalOpen(true);
-  const closeCreateModal = () => setIsCreateModalOpen(false);
+  const handleManagerPostClick = () => {
+    navigate('/forum/my-posts');
+  }
+
 
   useEffect(() => {
     if (authUser) {
@@ -243,7 +244,7 @@ const ForumPage = () => {
 
   const rightSidebarContent = useMemo(() => (
     <>
-      <UserStats user={currentUser} onCreatePostClick={openCreateModal} />
+      <UserStats user={currentUser} onManagePostsClick={handleManagerPostClick} />
       <TrendingPosts posts={trendingPosts} onPostClick={handlePostClick} />
     </>
   ), [currentUser, trendingPosts]);
@@ -273,18 +274,6 @@ const ForumPage = () => {
           </div>
         </div>
       </ForumLayout>
-
-      <CreatePost
-        isOpen={isCreateModalOpen}
-        onClose={closeCreateModal}
-        categories={categories}
-        tags={tags}
-        onSubmit={() => {
-          closeCreateModal();
-          fetchPosts();
-        }}
-        currentUser={currentUser}
-      />
     </div>
   );
 };

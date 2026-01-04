@@ -38,7 +38,7 @@
 
 @keyframes slideUp {
   from {
-    transform: translateY(20px);
+    transform: translateY(20px);  
     opacity: 0;
   }
   to {
@@ -49,7 +49,7 @@
 
 .header {
   padding: 24px 32px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #185a9d, #185a9d);
   color: white;
   border-radius: 16px 16px 0 0;
 
@@ -77,25 +77,6 @@
     gap: 8px;
   }
 
-  .btnHeaderEdit {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
-    color: white;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: translateY(-1px);
-    }
-  }
 
   .btnCloseIcon {
     display: flex;
@@ -131,7 +112,7 @@
     font-weight: 600;
 
     &.active {
-      background: rgba(16, 185, 129, 0.2);
+      background: rgba(0, 251, 33, 0.8);
       color: #d1fae5;
       border: 1px solid rgba(16, 185, 129, 0.3);
     }
@@ -604,26 +585,6 @@
       transform: translateY(-1px);
     }
   }
-
-  .btnEdit {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    border-radius: 8px;
-    color: white;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-    }
-  }
 }
 
 .loadingBox {
@@ -654,6 +615,27 @@
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
+
+.btnEdit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(214, 75, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(12, 0, 245, 0.8);
+    transform: translateY(-1px);
+  }
+}
+
 
 @keyframes spin {
   to {

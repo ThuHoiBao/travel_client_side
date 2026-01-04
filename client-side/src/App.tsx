@@ -20,6 +20,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import ScrollToTop from './utils/ScrollToTop';
 import ForumPage from './components/forum/ForumPage';
 import PostDetailPage from './components/forum/PostDetail/PostDetailPage';
+import ProtectedRoute from './components/ProtectedRoute';
+import UserPostsManagement from './components/forum/UserPostsManagement/UserPostsManagement';
 function App() {
   return (
     <Router>
@@ -57,7 +59,14 @@ function App() {
 
           <Route path="/forum" element={<ForumPage />} />
           <Route path="/post/:postId" element={<PostDetailPage />} />
-
+         <Route 
+            path="/forum/my-posts" 
+            element={
+              <ProtectedRoute>
+                <UserPostsManagement />
+              </ProtectedRoute>
+          } 
+        />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-failed" element={<PaymentFailed />} />
