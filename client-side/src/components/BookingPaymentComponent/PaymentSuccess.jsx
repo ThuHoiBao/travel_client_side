@@ -1,24 +1,23 @@
 // PaymentSuccess.jsx
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { FaCheckCircle, FaDownload, FaEnvelope } from 'react-icons/fa';
-import styles from './PaymentResult.module.scss';
+import { FaCheckCircle, FaDownload, FaEnvelope, FaHome } from 'react-icons/fa';
 import Confetti from 'react-confetti';
+import styles from './PaymentResult.module.scss';
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const bookingCode = searchParams.get('bookingCode');
+
   const [showConfetti, setShowConfetti] = useState(true);
   const [countdown, setCountdown] = useState(10);
 
   useEffect(() => {
-    // Hide confetti after 5 seconds
     const confettiTimer = setTimeout(() => {
       setShowConfetti(false);
     }, 5000);
 
-    // Auto redirect countdown
     const countdownInterval = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -39,51 +38,60 @@ const PaymentSuccess = () => {
   return (
     <div className={styles.container}>
       {showConfetti && <Confetti />}
-      
-      <div className={styles.resultCard}>
-        <FaCheckCircle className={styles.iconSuccess} />
+
+      <div className={styles.card}>
+        <div className={styles.iconWrapper}>
+          <FaCheckCircle />
+        </div>
+
         <h1>Thanh toán thành công!</h1>
-        <p>Cảm ơn bạn đã đặt tour. Đơn hàng của bạn đã được xác nhận.</p>
-        
-        <div className={styles.bookingCode}>{bookingCode}</div>
+        <p className={styles.subtitle}>
+          Cảm ơn bạn đã đặt tour. Chuyến đi của bạn đã sẵn sàng ✈️
+        </p>
+
+        <div className={styles.bookingCode}>
+          Mã booking: <strong>{bookingCode}</strong>
+        </div>
 
         <div className={styles.infoList}>
           <div className={styles.infoItem}>
-            <span className={styles.label}>Trạng thái:</span>
-            <span className={styles.value} style={{ color: '#52c41a' }}>
-              ✓ Đã thanh toán
-            </span>
+            <span>Trạng thái</span>
+            <strong className={styles.success}>Đã thanh toán</strong>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.label}>Phương thức:</span>
-            <span className={styles.value}>VNPay</span>
+            <span>Phương thức</span>
+            <strong>VNPay</strong>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.label}>Thời gian:</span>
-            <span className={styles.value}>
-              {new Date().toLocaleString('vi-VN')}
-            </span>
+            <span>Thời gian</span>
+            <strong>{new Date().toLocaleString('vi-VN')}</strong>
           </div>
         </div>
 
-        <p style={{ marginTop: '20px', fontSize: '14px' }}>
-          <FaEnvelope style={{ marginRight: '5px' }} />
-          Chúng tôi đã gửi xác nhận đến email của bạn
-        </p>
+        <div className={styles.notice}>
+          <FaEnvelope />
+          <span>Email xác nhận đã được gửi đến bạn</span>
+        </div>
 
         <div className={styles.actions}>
-          <button onClick={() => navigate(`/payment-booking?bookingCode=${bookingCode}`)}>
-            <FaDownload style={{ marginRight: '8px' }} />
+          <button
+            className={styles.primaryBtn}
+            onClick={() =>
+              navigate(`/payment-booking?bookingCode=${bookingCode}`)
+            }
+          >
+            <FaDownload />
             Xem chi tiết
           </button>
-          <button onClick={() => navigate('/')}>
-            Về trang chủ
+
+          <button className={styles.secondaryBtn} onClick={() => navigate('/')}>
+            <FaHome />
+            Trang chủ
           </button>
         </div>
 
         <div className={styles.countdown}>
-          Tự động chuyển về trang chủ sau{' '}
-          <span className={styles.timer}>{countdown}s</span>
+          Tự động quay về trang chủ sau <strong>{countdown}s</strong>
         </div>
       </div>
     </div>

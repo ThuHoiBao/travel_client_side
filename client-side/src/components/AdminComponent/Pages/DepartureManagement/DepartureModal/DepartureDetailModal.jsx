@@ -118,16 +118,6 @@ const DepartureDetailModal = ({ departureId, onClose, onEdit }) => {
             </div>
             <div className={styles.actions}>
               <button
-                onClick={() => {
-                  onClose();
-                  onEdit(departure);
-                }}
-                className={styles.btnHeaderEdit}
-              >
-                <Edit2 size={18} />
-                <span>Chỉnh sửa</span>
-              </button>
-              <button
                 onClick={onClose}
                 className={styles.btnCloseIcon}
               >
