@@ -504,4 +504,17 @@ stompClient.subscribe('/topic/booking/<bookingCode>', callback);
 
 ---
 
-<p align="center">Made with ❤️ — Future Travel Team</p>
+## Contact
+
+For any inquiries, support, or feedback regarding the Future Travel system, please reach out to the development team:
+
+* **Tran Anh Thu** 
+    * Email: [trananhthu270904@gmail.com](mailto:trananhthu270904@gmail.com)
+    * GitHub: [https://github.com/ThuHoiBao](https://github.com/ThuHoiBao)
+* **Vuong Duc Thoai** 
+    * Email: [thoai12309@gmail.com](mailto:thoai12309@gmail.com)
+    * GitHub: [https://github.com/vuongducthoai](https://github.com/vuongducthoai)
+
+---
+
+<p align="center"> Future Travel </p>
